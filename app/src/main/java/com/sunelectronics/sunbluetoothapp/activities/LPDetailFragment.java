@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -54,6 +55,12 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public void onClick(View v) {
 
         switch (v.getId()){
@@ -81,6 +88,12 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
                 getFragmentManager().beginTransaction().replace(R.id.localProgramContainer, lpcreateEditFragment).commit();
                 break;
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(false);
+        menu.findItem(R.id.action_loadSampleLP).setVisible(false);
     }
 
     @Override

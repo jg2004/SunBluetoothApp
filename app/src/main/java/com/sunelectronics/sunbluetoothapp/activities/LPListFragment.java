@@ -2,6 +2,7 @@ package com.sunelectronics.sunbluetoothapp.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,6 +31,12 @@ public class LPListFragment extends Fragment {
     private LPDataBaseHandler mLPDataBaseHandler;
 
     public LPListFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -65,6 +73,23 @@ public class LPListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+
+        if (lpList.size()>0){
+
+            menu.findItem(R.id.action_loadSampleLP).setVisible(false);
+            menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(true);
+
+
+        }
+        else
+        {
+            menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(false);
+
+        }
+    }
 
     public LPRecyclerViewAdapter getLPRecyclerViewAdapter() {
         return mLPRecyclerViewAdapter;

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
+import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
 public class LocalProgramActivity extends AppCompatActivity implements MyAlertDialogFragment.OnPositiveDialogClick {
     public static final String DELETE_LP = "DELETE LP";
@@ -47,6 +48,7 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -59,6 +61,13 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
                 args.putString(ALERT_TYPE, DELETE_ALL_LP);
                 showDialog(args);
                 break;
+
+            case R.id.action_loadSampleLP:
+
+                LocalProgram lp = new LocalProgram("sample local program", null);
+                lp.setContent(Constants.SAMPLE_LP);
+                mLPDataBaseHandler.addLocalProgramToDB(lp);
+                getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
         }
 
         return true;
@@ -72,10 +81,13 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
+
+        Log.d(TAG, "onBackPressed: called");
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.d(TAG, "onBackPressed: entry count >0");
 
-            getFragmentManager().popBackStack();
+            getSupportFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
         }
@@ -103,7 +115,7 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
             case DELETE_ALL_LP:
 
                 mLPDataBaseHandler.deleteAllLocalPrograms();
-               // getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
+                // getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
 
                 break;
         }

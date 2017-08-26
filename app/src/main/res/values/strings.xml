@@ -16,4 +16,5 @@
     <string name="edit_lp">Edit LP</string>
     <string name="local_program">Local Program</string>
     <string name="action_deleteLocalPrograms">Delete All LP\'s</string>
+    <string name="load_sample_lp">Load Sample LP</string>
 </resources>

@@ -35,11 +35,11 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //to hide menu items from fragment set HasOptions menu to true and in onPrepareOptionsMenu hide item
         setHasOptionsMenu(true);
     }
 
-
-    @Override
+        @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -168,7 +168,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(false);
-    }
+        menu.findItem(R.id.action_loadSampleLP).setVisible(false);    }
 
     @Override
     public void onAttach(Context context) {
@@ -178,6 +178,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
 
     }
+
 
     @Override
     public void onDestroy() {
