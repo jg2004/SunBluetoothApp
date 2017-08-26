@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="10dp"
+    >
+
+    <TextView
+        android:id="@+id/lpTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/lp_dialog_title"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+
+    <EditText
+        android:id="@+id/lpName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:hint="@string/lp_name_hint"
+        android:inputType="textPersonName"
+        />
+
+
+    <EditText
+        android:id="@+id/lpContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="1"
+        android:gravity="top"
+        android:hint="@string/lp_content_hint"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        >
+
+        <ImageButton
+            android:id="@+id/saveLPButton"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_save_black_48dp"/>
+
+        <ImageButton
+            android:id="@+id/cancelButton"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            app:srcCompat="@drawable/ic_cancel_black_48dp"/>
+
+        <ImageButton
+            android:id="@+id/clearLPButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_erasor"/>
+
+        <ImageButton
+            android:id="@+id/loadSampleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_help_black_48dp"/>
+    </LinearLayout>
+
+
+</LinearLayout>
