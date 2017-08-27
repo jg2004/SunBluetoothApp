@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
@@ -132,13 +133,15 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
             case DELETE_ALL_LP:
 
                 mLPDataBaseHandler.deleteAllLocalPrograms();
-                // getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
 
                 break;
             case ALERT_CONFIRM_EXIT:
 
                 showConfirmDialog = false;
                 onBackPressed();
+                break;
+            default:
+                Toast.makeText(this, "dialog type not found", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

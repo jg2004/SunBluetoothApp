@@ -152,7 +152,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
         contentValues.put(Constants.LP_CONTENT, localProgram.getContent());
         int rowsAffected = db.update(Constants.LP_TABLE, contentValues, Constants.LP_ID + "=?", new String[]{String.valueOf(localProgram.getId())});
         if (rowsAffected > 0) {
-            Toast.makeText(mContext, "Local Program Updated!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "Local Program Updated!", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(mContext, "Unable to update Local Program", Toast.LENGTH_LONG).show();
