@@ -47,7 +47,13 @@ public class MyAlertDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
 
                         ((OnPositiveDialogClick) getActivity()).onPositiveClick(getArguments());
-                        getFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
+
+                        if (getFragmentManager().getBackStackEntryCount() > 0) {
+                            getFragmentManager().popBackStack();
+                        } else {
+                            getFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
+
+                        }
                     }
                 })
                 .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {

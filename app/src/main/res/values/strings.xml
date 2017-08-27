@@ -8,8 +8,8 @@
     <string name="lp_name_hint">Enter name of Local Program</string>
     <string name="lp_name">LP NAME:</string>
     <string name="lp_content_hint">Enter Local Program</string>
-    <string name="save_button">SAVE</string>
-    <string name="cancelButton">CANCEL</string>
+    <string name="save_button">Save</string>
+    <string name="cancelButton">Cancel</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">CANCEL</string>
     <string name="create_lp">Create LP</string>
@@ -17,4 +17,8 @@
     <string name="local_program">Local Program</string>
     <string name="action_deleteLocalPrograms">Delete All LP\'s</string>
     <string name="load_sample_lp">Load Sample LP</string>
+    <string name="clear_fields">Clear Fields</string>
+    <string name="load_sample_LP">Load a sample Local Program</string>
+    <string name="save_to_phone">Save Local Program to phone</string>
+    <string name="cancel">cancel</string>
 </resources>

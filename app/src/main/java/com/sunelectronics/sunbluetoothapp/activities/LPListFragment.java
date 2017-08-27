@@ -37,6 +37,7 @@ public class LPListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        ((LocalProgramActivity)getActivity()).setShowConfirmDialog(false);
     }
 
     @Override

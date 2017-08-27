@@ -7,17 +7,6 @@
               android:padding="10dp"
     >
 
-    <TextView
-        android:id="@+id/lpTitleTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center_horizontal"
-        android:text="@string/lp_dialog_title"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
-
 
     <EditText
         android:id="@+id/lpName"
@@ -52,6 +41,8 @@
             style="@style/Widget.AppCompat.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
+            android:contentDescription="@string/save_to_phone"
             app:srcCompat="@drawable/ic_save_black_48dp"/>
 
         <ImageButton
@@ -60,18 +51,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:contentDescription="@string/cancel"
             app:srcCompat="@drawable/ic_cancel_black_48dp"/>
 
         <ImageButton
             android:id="@+id/clearLPButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/clear_fields"
             app:srcCompat="@drawable/ic_erasor"/>
 
         <ImageButton
             android:id="@+id/loadSampleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/load_sample_LP"
             app:srcCompat="@drawable/ic_help_black_48dp"/>
     </LinearLayout>
 

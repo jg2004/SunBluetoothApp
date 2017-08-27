@@ -97,6 +97,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
                 lpList.add(lp);
 
             } while (cursor.moveToNext());
+            cursor.close();
 
         } else {
 

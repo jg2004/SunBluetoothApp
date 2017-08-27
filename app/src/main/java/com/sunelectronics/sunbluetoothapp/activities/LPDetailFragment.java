@@ -14,14 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
 public class LPDetailFragment extends Fragment  implements View.OnClickListener{
 
     private static final String TAG = "LPDetailFragment";
     private TextView lpDetailName, lpDetailContent;
-    private LPDataBaseHandler mLPDataBaseHandler;
     private ImageButton deleteButton, editButton, uploadLPButton;
     private LocalProgram localProgram;
 
@@ -100,7 +98,7 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called");
-        mLPDataBaseHandler = new LPDataBaseHandler(context);
+
     }
 
     @Override

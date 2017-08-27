@@ -37,6 +37,8 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         //to hide menu items from fragment set HasOptions menu to true and in onPrepareOptionsMenu hide item
         setHasOptionsMenu(true);
+
+        ((LocalProgramActivity)getActivity()).setShowConfirmDialog(true);
     }
 
         @Override
@@ -77,7 +79,6 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         saveButton = (ImageButton) view.findViewById(R.id.saveLPButton);
         saveButton.setOnClickListener(this);
 
-
         return view;
     }
 
@@ -87,6 +88,8 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         switch (v.getId()) {
 
             case R.id.saveLPButton:
+
+                ((LocalProgramActivity)getActivity()).setShowConfirmDialog(false);
                 if (isEdit) {
 
                     editLP();

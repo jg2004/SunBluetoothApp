@@ -20,6 +20,8 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
     public static final String DELETE_ALL_LP = "DELETE ALL LP";
     public static final String ALERT_TYPE = "type";
     public static final String ALERT_TITLE = "title";
+    public static final String ALERT_CONFIRM_EXIT = "exit";
+    private boolean showConfirmDialog;
     FragmentManager mFragmentManager;
     LPDataBaseHandler mLPDataBaseHandler;
     private static final String TAG = "LocalProgramActivity";
@@ -38,6 +40,12 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.localProgramContainer, localProgramListFragment);
         fragmentTransaction.commit();
+    }
+
+    //setters
+
+    public void setShowConfirmDialog(boolean showConfirmDialog) {
+        this.showConfirmDialog = showConfirmDialog;
     }
 
 
@@ -68,6 +76,7 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
                 lp.setContent(Constants.SAMPLE_LP);
                 mLPDataBaseHandler.addLocalProgramToDB(lp);
                 getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
+
         }
 
         return true;
@@ -84,6 +93,17 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
 
         Log.d(TAG, "onBackPressed: called");
 
+
+        if (showConfirmDialog) {
+
+            Bundle args = new Bundle();
+            args.putString(ALERT_TITLE, "Data not saved, OK to exit?");
+            args.putString(ALERT_TYPE, ALERT_CONFIRM_EXIT);
+            showDialog(args);
+            return;
+        }
+
+
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.d(TAG, "onBackPressed: entry count >0");
 
@@ -93,12 +113,9 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
         }
     }
 
-    /**
-     * interface inside MyAlertDialogFragment class to handle which dialog button was clicked OK or CANCEL
-     *
-     * @param args
-     */
+
     @Override
+    /* this is method from DialogFragment interface */
     public void onPositiveClick(Bundle args) {
 
         String type = args.getString(ALERT_TYPE);
@@ -118,6 +135,11 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
                 // getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
 
                 break;
+            case ALERT_CONFIRM_EXIT:
+
+                showConfirmDialog = false;
+                onBackPressed();
+                break;
         }
     }
 
@@ -125,6 +147,7 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: called");
+        mLPDataBaseHandler.close();
     }
 
     @Override
