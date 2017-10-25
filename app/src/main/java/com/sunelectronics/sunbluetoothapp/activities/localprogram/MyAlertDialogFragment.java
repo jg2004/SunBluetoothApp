@@ -1,4 +1,4 @@
-package com.sunelectronics.sunbluetoothapp.activities;
+package com.sunelectronics.sunbluetoothapp.activities.localprogram;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,10 +10,6 @@ import android.util.Log;
 
 import com.sunelectronics.sunbluetoothapp.R;
 
-/**
- * Created by Jerry on 8/20/2017.
- */
-
 public class MyAlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyAlertDialogFragment";
 
@@ -22,26 +18,25 @@ public class MyAlertDialogFragment extends DialogFragment {
         void onPositiveClick(Bundle args);
     }
 
-    //create an instance of MyAlertDialogFragment with title passed in as argument
+    //create an instance of MyAlertDialogFragment with bundle containing title, icon, objects passed in as argument
 
 
     public static MyAlertDialogFragment newInstance(Bundle args) {
-
         Log.d(TAG, "newInstance: called");
         MyAlertDialogFragment dialogFragment = new MyAlertDialogFragment();
         dialogFragment.setArguments(args);
         return dialogFragment;
     }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.d(TAG, "onCreateDialog: called");
 
-        String title = getArguments().getString("title");
+        String title = getArguments().getString(LocalProgramActivity.ALERT_TITLE);
+        int iconId = getArguments().getInt(LocalProgramActivity.ALERT_ICON);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
-                .setIcon(R.drawable.ic_delete_black_48dp)
+                .setIcon(iconId)
                 .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -52,7 +47,6 @@ public class MyAlertDialogFragment extends DialogFragment {
                             getFragmentManager().popBackStack();
                         } else {
                             getFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();
-
                         }
                     }
                 })
@@ -62,8 +56,6 @@ public class MyAlertDialogFragment extends DialogFragment {
                         dismiss();
                     }
                 });
-
-
         return builder.create();
     }
 }

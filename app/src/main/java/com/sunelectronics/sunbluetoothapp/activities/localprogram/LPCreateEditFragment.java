@@ -1,4 +1,4 @@
-package com.sunelectronics.sunbluetoothapp.activities;
+package com.sunelectronics.sunbluetoothapp.activities.localprogram;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -38,10 +38,10 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         //to hide menu items from fragment set HasOptions menu to true and in onPrepareOptionsMenu hide item
         setHasOptionsMenu(true);
 
-        ((LocalProgramActivity)getActivity()).setShowConfirmDialog(true);
+        ((LocalProgramActivity) getActivity()).setShowConfirmDialog(true);
     }
 
-        @Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -89,7 +89,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
             case R.id.saveLPButton:
 
-                ((LocalProgramActivity)getActivity()).setShowConfirmDialog(false);
+                ((LocalProgramActivity) getActivity()).setShowConfirmDialog(false);
                 if (isEdit) {
 
                     editLP();
@@ -97,9 +97,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
                 } else {
 
                     addLPtoDB();
-
                 }
-
                 break;
 
             case R.id.loadSampleButton:
@@ -116,7 +114,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
     private void editLP() {
 
-        if (!validateInput()){
+        if (!validateInput()) {
             return;
         }
         //if valid input create lp and update record in db
@@ -128,7 +126,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         lp.setId(localProgram.getId());
         mLPDataBaseHandler.upDateExistingLP(lp);
         //return back to lp list
-        if (getFragmentManager().getBackStackEntryCount()>0){
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();// go back to LPListFragment
         }
     }
@@ -148,7 +146,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         LocalProgram lp = new LocalProgram(lpName, lpContent);
         mLPDataBaseHandler.addLocalProgramToDB(lp);
         //return back to lp list
-        if (getFragmentManager().getBackStackEntryCount()>0){
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();// go back to LPListFragment
         }
     }
@@ -171,15 +169,14 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(false);
-        menu.findItem(R.id.action_loadSampleLP).setVisible(false);    }
+        menu.findItem(R.id.action_loadSampleLP).setVisible(false);
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called");
         mLPDataBaseHandler = new LPDataBaseHandler(context);
-
-
     }
 
 
@@ -219,6 +216,4 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         super.onStop();
         Log.d(TAG, "onStop: called");
     }
-
-
 }

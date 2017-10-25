@@ -2,8 +2,6 @@ package com.sunelectronics.sunbluetoothapp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.activities.LPDetailFragment;
-import com.sunelectronics.sunbluetoothapp.activities.LocalProgramActivity;
+import com.sunelectronics.sunbluetoothapp.activities.localprogram.LPDetailFragment;
+import com.sunelectronics.sunbluetoothapp.activities.localprogram.LocalProgramActivity;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
 import java.util.List;
@@ -66,17 +64,13 @@ public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAd
                 public void onClick(View v) {
 
                     LocalProgram localProgram = mLocalProgramList.get(getAdapterPosition());
-
                     Bundle args = new Bundle();
                     args.putSerializable("lp", localProgram);
-                    LocalProgramActivity activity = (LocalProgramActivity) mContext;
-
+                    LocalProgramActivity localProgramActivity = (LocalProgramActivity) mContext;
                     LPDetailFragment lpDetailFragment = new LPDetailFragment();
                     lpDetailFragment.setArguments(args);
-                    FragmentManager fm  = activity.getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                    fragmentTransaction.replace(R.id.localProgramContainer, lpDetailFragment).addToBackStack(null);
-                    fragmentTransaction.commit();
+                    localProgramActivity.getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, lpDetailFragment)
+                            .addToBackStack(null).commit();
                 }
             });
         }

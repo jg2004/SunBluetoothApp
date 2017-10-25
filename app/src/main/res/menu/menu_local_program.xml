@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.sunelectronics.sunbluetoothapp.activities.LocalProgramActivity">
+      tools:context="com.sunelectronics.sunbluetoothapp.activities.localprogram.LocalProgramActivity">
     <item
         android:id="@+id/action_loadSampleLP"
         android:orderInCategory="2"

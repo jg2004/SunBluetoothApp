@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/actionDiscoverBluetooth"
+        android:icon="@drawable/ic_action_discover"
+        android:orderInCategory="1"
+        android:title="@string/discover"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/actionPairedBluetooth"
+        android:icon="@drawable/ic_action_discover"
+        android:orderInCategory="2"
+        android:title="@string/paired"
+        app:showAsAction="never"/>
+
+
+
+</menu>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <item
+        android:id="@+id/bottom_bar_monitor"
+        android:icon="@drawable/ic_monitor_temp"
+        android:title="Monitor"
+        app:showAsAction="ifRoom">
+
+    </item>
+
+
+    <item
+        android:id="@+id/bottom_bar_local_program"
+        android:icon="@drawable/ic_lp_edit"
+        android:title="Local Program"
+        app:showAsAction="ifRoom">
+
+    </item>
+    <item
+        android:id="@+id/bottom_bar_communicate"
+        android:icon="@drawable/ic_communicate"
+        android:title="Communicate"
+        app:showAsAction="ifRoom">
+
+    </item>
+
+</menu>

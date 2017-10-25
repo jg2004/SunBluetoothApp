@@ -1,4 +1,4 @@
-package com.sunelectronics.sunbluetoothapp.activities;
+package com.sunelectronics.sunbluetoothapp.activities.localprogram;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
 
 import java.util.List;
 
-
 public class LPListFragment extends Fragment {
     private static final String TAG = "LPListFragment";
     private RecyclerView mLpRecyclerView;
@@ -37,7 +36,7 @@ public class LPListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        ((LocalProgramActivity)getActivity()).setShowConfirmDialog(false);
+        ((LocalProgramActivity) getActivity()).setShowConfirmDialog(false);
     }
 
     @Override
@@ -45,27 +44,26 @@ public class LPListFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView: called");
+
         View view = inflater.inflate(R.layout.fragment_lp_list, container, false);
 
-        mLpRecyclerView = (RecyclerView) view.findViewById(R.id.lpRecyclerView);
-        mLpRecyclerView.setHasFixedSize(true);
-        mLpRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         lpList = mLPDataBaseHandler.getLocalPrograms();
+        mLPRecyclerViewAdapter = new LPRecyclerViewAdapter(getContext(), lpList);
+        setUpRecyclerView(view);
 
-        mLPRecyclerViewAdapter = new LPRecyclerViewAdapter(getContext(),lpList);
-
-
-        LocalProgramActivity localProgramActivity = (LocalProgramActivity)getActivity();
-        localProgramActivity.getSupportActionBar().setTitle("Local Programs (" + lpList.size() + ")");
-        mLpRecyclerView.setAdapter(mLPRecyclerViewAdapter);
+        ((LocalProgramActivity) getActivity()).getSupportActionBar().setTitle("Local Programs (" + lpList.size() + ")");
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment lpCreateFragment = new LPCreateEditFragment();
+
                 FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction ft = fragmentManager.beginTransaction().replace(R.id.localProgramContainer, lpCreateFragment);
+                //FragmentTransaction ft = fragmentManager.beginTransaction().replace(R.id.localProgramContainer, new LPCreateEditFragment());
+                FragmentTransaction ft = fragmentManager.beginTransaction();
+                //ft.setCustomAnimations(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+                ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                ft.replace(R.id.localProgramContainer, new LPCreateEditFragment());
                 ft.addToBackStack(null);
                 ft.commit();
             }
@@ -74,21 +72,24 @@ public class LPListFragment extends Fragment {
         return view;
     }
 
+    private void setUpRecyclerView(View view) {
+
+        mLpRecyclerView = (RecyclerView) view.findViewById(R.id.lpRecyclerView);
+        mLpRecyclerView.setHasFixedSize(true);
+        mLpRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mLpRecyclerView.setAdapter(mLPRecyclerViewAdapter);
+    }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
 
-
-        if (lpList.size()>0){
+        if (lpList.size() > 0) {
 
             menu.findItem(R.id.action_loadSampleLP).setVisible(false);
             menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(true);
 
-
-        }
-        else
-        {
+        } else {
             menu.findItem(R.id.action_deleteAllLocalPrograms).setVisible(false);
-
         }
     }
 
@@ -101,7 +102,6 @@ public class LPListFragment extends Fragment {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called, context: " + context.getClass().getName());
         mLPDataBaseHandler = new LPDataBaseHandler(context);
-
     }
 
     @Override
@@ -121,6 +121,7 @@ public class LPListFragment extends Fragment {
         super.onPause();
         Log.d(TAG, "onPause: called");
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -137,8 +138,5 @@ public class LPListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: called");
-
-
-
     }
 }

@@ -1,4 +1,4 @@
-package com.sunelectronics.sunbluetoothapp.activities;
+package com.sunelectronics.sunbluetoothapp.activities.localprogram;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -39,15 +39,13 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
         deleteButton.setOnClickListener(this);
         editButton.setOnClickListener(this);
         uploadLPButton.setOnClickListener(this);
-
         lpDetailName = (TextView)view.findViewById(R.id.detailLpName);
         lpDetailContent = (TextView) view.findViewById(R.id.detailLpContent);
         localProgram = (LocalProgram) getArguments().getSerializable("lp");
         lpDetailName.setText(localProgram.getName());
         lpDetailContent.setText(localProgram.getContent());
 
-        LocalProgramActivity localProgramActivity = (LocalProgramActivity) getActivity();
-        localProgramActivity.getSupportActionBar().setTitle(getString(R.string.local_program )+ " id: " +localProgram.getId());
+        ((LocalProgramActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.local_program )+ " id: " +localProgram.getId());
 
         return view;
     }
@@ -69,6 +67,7 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
                 lpArgs.putSerializable("lp", localProgram);
                 lpArgs.putString(LocalProgramActivity.ALERT_TITLE, "OK to Delete LP " + localProgram.getName() + " ?");
                 lpArgs.putString(LocalProgramActivity.ALERT_TYPE, LocalProgramActivity.DELETE_LP);
+                lpArgs.putInt(LocalProgramActivity.ALERT_ICON,R.drawable.ic_delete_black_48dp);
                 ((LocalProgramActivity)getActivity()).showDialog(lpArgs);
 
                 break;
@@ -82,7 +81,6 @@ public class LPDetailFragment extends Fragment  implements View.OnClickListener{
                 Bundle args = new Bundle();
                 args.putSerializable("lp", localProgram);
                 lpcreateEditFragment.setArguments(args);
-
                 getFragmentManager().beginTransaction().replace(R.id.localProgramContainer, lpcreateEditFragment).commit();
                 break;
         }

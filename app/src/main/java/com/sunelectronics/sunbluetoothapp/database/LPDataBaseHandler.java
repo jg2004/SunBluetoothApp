@@ -50,7 +50,6 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
         Log.d(TAG, "onUpgrade: called, database upgraded from ver " + oldVersion + " to ver " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS" + Constants.LP_TABLE);
         onCreate(db);
-
     }
 
     //CRUD operations; Create, Read, Update, Delete methods;
@@ -69,9 +68,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
         } else {
 
             Toast.makeText(mContext, "Could not add local program to database", Toast.LENGTH_LONG).show();
-
         }
-
     }
 
     /**
@@ -138,10 +135,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
             } else {
                 Toast.makeText(mContext, "No Local Programs deleted", Toast.LENGTH_LONG).show();
             }
-
-
         }
-
     }
 
     public void upDateExistingLP(LocalProgram localProgram) {

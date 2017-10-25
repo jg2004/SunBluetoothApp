@@ -21,4 +21,15 @@
     <string name="load_sample_LP">Load a sample Local Program</string>
     <string name="save_to_phone">Save Local Program to phone</string>
     <string name="cancel">cancel</string>
+    <string name="discover">Discover</string>
+    <string name="paired">Paired</string>
+    <string name="paired_bt_devices">Paired Bluetooth Devices</string>
+    <string name="searching_bluetooth">Searching for bluetooth devices...</string>
+    <string name="cham">CHAM:</string>
+    <string name="user">USER:</string>
+    <string name="wait">WAIT:</string>
+    <string name="set">SET:</string>
+    <string name="searching_for_bluetooth_devices">searching for bluetooth devices...</string>
+    <string name="disc_bt_devices">Discovered Bluetooth Devices</string>
+    <string name="bluetooth">Bluetooth</string>
 </resources>
