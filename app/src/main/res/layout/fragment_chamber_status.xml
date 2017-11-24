@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:background="@drawable/border_curved_padding">
+
+    <TextView
+        android:id="@+id/textViewStatusTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/border_bottom_gray"
+        android:gravity="center_horizontal"
+        android:paddingBottom="5dp"
+        android:text="@string/chamber_status"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/textViewLpRunningStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewStatusTitle"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+    <LinearLayout
+        android:id="@+id/lpCycleLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewStatusTitle"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/textViewLpRunningStatus"
+        android:visibility="invisible"
+        android:orientation="horizontal"
+        >
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:entries="@array/cycle_number_array"
+            android:saveEnabled="false"
+            android:spinnerMode="dropdown"
+            >
+        </Spinner>
+
+        <TextView
+            android:id="@+id/textViewCycleNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pound_sign"
+            />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewWaitingAtBreakPointStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewLpRunningStatus"
+        android:layout_marginTop="10dp"
+
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+    <ImageButton
+        android:id="@+id/imageButtonBreakPointContinue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewLpRunningStatus"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@id/textViewWaitingAtBreakPointStatus"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
+
+    <TextView
+        android:id="@+id/textViewTimeOutLEDStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewWaitingAtBreakPointStatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/textViewWaitingForTimeOutStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewTimeOutLEDStatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/textViewCurrentlyRampingStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewWaitingForTimeOutStatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/textViewValidSetPointtatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewCurrentlyRampingStatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+    <TextView
+        android:id="@+id/textViewChamberPoweredOnStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewValidSetPointtatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
+
+</RelativeLayout>
+
+

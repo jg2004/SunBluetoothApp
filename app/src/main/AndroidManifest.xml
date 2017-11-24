@@ -12,31 +12,29 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/CustomAppTheme">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activities.localprogram.LocalProgramActivity"
             android:label="@string/title_activity_local_program"
             android:theme="@style/AppTheme.NoActionBar">
-
         </activity>
 
         <activity
             android:name=".activities.BluetoothStartUp"
             android:label="Set up Bluetooth"
-            android:theme="@style/AppTheme">
-
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.HomeActivity"
             android:label="HomeActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
             >
-
 
         </activity>
     </application>

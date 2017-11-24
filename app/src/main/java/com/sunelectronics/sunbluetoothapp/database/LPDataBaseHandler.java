@@ -5,10 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
+import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
 import java.util.ArrayList;
@@ -18,12 +20,29 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
 
     private static final String TAG = "LPDataBaseHandler";
     private Context mContext;
+    private static LPDataBaseHandler mLPDataBaseHandler;
+    private List<LocalProgram> mLocalProgramList;
+    private RecyclerView mLpRecyclerView;
 
 
-    public LPDataBaseHandler(Context context) {
+    private LPDataBaseHandler(Context context) {
         super(context, Constants.LP_DB_NAME, null, Constants.LP_DB_VER);
         mContext = context;
+
     }
+
+    public static LPDataBaseHandler getInstance(Context context) {
+
+        if (mLPDataBaseHandler == null) {
+
+            Log.d(TAG, "getInstance: creating LPDataBaseHandler singleton");
+            mLPDataBaseHandler = new LPDataBaseHandler(context);
+        }
+
+        return mLPDataBaseHandler;
+
+    }
+
 
         /*The onCreate method is not called until the database is first created by a call to getWritable or getReadable database*/
 
@@ -66,7 +85,6 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
             Log.d(TAG, "addLocalProgramToDB: called, local program saved to db: " + "name: " + lp.getName() + " content: " + lp.getContent());
             Toast.makeText(mContext, "Local Program added to database", Toast.LENGTH_SHORT).show();
         } else {
-
             Toast.makeText(mContext, "Could not add local program to database", Toast.LENGTH_LONG).show();
         }
     }
@@ -78,7 +96,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
      */
     public List<LocalProgram> getLocalPrograms() {
 
-        ArrayList<LocalProgram> lpList = new ArrayList<>();
+        mLocalProgramList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(Constants.LP_TABLE, new String[]{Constants.LP_ID, Constants.LP_NAME, Constants.LP_CONTENT}, null, null, null, null,
                 Constants.LP_NAME + " COLLATE NOCASE;");
@@ -91,7 +109,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
                 lp.setId(cursor.getInt(cursor.getColumnIndex(Constants.LP_ID)));
                 lp.setName(cursor.getString(cursor.getColumnIndex(Constants.LP_NAME)));
                 lp.setContent(cursor.getString(cursor.getColumnIndex(Constants.LP_CONTENT)));
-                lpList.add(lp);
+                mLocalProgramList.add(lp);
 
             } while (cursor.moveToNext());
             cursor.close();
@@ -103,7 +121,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
             Toast.makeText(mContext, "No local programs in database!!!", Toast.LENGTH_SHORT).show();
         }
 
-        return lpList;
+        return mLocalProgramList;
     }
 
     public void deleteLPFromDB(int id) {
@@ -113,6 +131,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
         int rowsDeleted = db.delete(Constants.LP_TABLE, Constants.LP_ID + "=?", new String[]{String.valueOf(id)});
 
         if (rowsDeleted > 0) {
+
             Toast.makeText(mContext, "Local program deleted", Toast.LENGTH_SHORT).show();
 
         } else {
@@ -124,14 +143,20 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
     public void deleteAllLocalPrograms() {
 
 
-        if (getLocalPrograms().size() > 0) {
+        if (mLocalProgramList.size() > 0) {
 
             SQLiteDatabase db = getWritableDatabase();
             int rowsDeleted = db.delete(Constants.LP_TABLE, null, null);
             if (rowsDeleted > 0) {
 
                 String localProgramText = (rowsDeleted == 1) ? " Local Program deleted" : " Local Programs deleted";
+                mLocalProgramList = getLocalPrograms();//refresh list
+
+                ((LPRecyclerViewAdapter) mLpRecyclerView.getAdapter()).setLocalProgramList(mLocalProgramList);
+                mLpRecyclerView.getAdapter().notifyDataSetChanged();
+
                 Toast.makeText(mContext, rowsDeleted + localProgramText, Toast.LENGTH_LONG).show();
+
             } else {
                 Toast.makeText(mContext, "No Local Programs deleted", Toast.LENGTH_LONG).show();
             }
@@ -153,4 +178,7 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void setRecyclerView(RecyclerView lpRecyclerView) {
+        mLpRecyclerView = lpRecyclerView;
+    }
 }

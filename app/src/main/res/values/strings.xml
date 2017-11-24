@@ -32,4 +32,42 @@
     <string name="searching_for_bluetooth_devices">searching for bluetooth devices...</string>
     <string name="disc_bt_devices">Discovered Bluetooth Devices</string>
     <string name="bluetooth">Bluetooth</string>
+    <string name="lp_dropdown_prompt">Select LP</string>
+    <string name="delete_lp">Delete LP</string>
+    <string name="lp_download_hint"> Select a local program location (0-9) and press the download button to
+        download the local program from chamber \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
+    <string name="status">STATUS</string>
+    <string name="status_unavailable">Status unavailable</string>
+    <string name="chamber_status">CHAMBER STATUS</string>
+    <string name="pound_sign">###</string>
+
+
+    <string-array name="lp_dropdown_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+
+    </string-array>
+    <array name="cycle_number_array">
+
+        <item>I0</item>
+        <item>I1</item>
+        <item>I2</item>
+        <item>I3</item>
+        <item>I4</item>
+        <item>I5</item>
+        <item>I6</item>
+        <item>I7</item>
+        <item>I8</item>
+        <item>I9</item>
+
+
+    </array>
 </resources>

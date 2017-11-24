@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="25dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -14,21 +16,41 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-
         android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/detailLpName"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/detailLpName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="70"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="30"
+                android:background="@android:drawable/btn_dropdown"
+                android:entries="@array/lp_dropdown_array"
+                android:saveEnabled="false"
+                android:spinnerMode="dropdown">
+
+            </Spinner>
+
+        </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -42,31 +64,28 @@
                 android:text="TextView"/>
         </ScrollView>
 
-
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="0dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarLp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintRight_toRightOf="parent">
 
         <ImageButton
-            android:id="@+id/deleteLPButton"
+            android:id="@+id/downLoadButton"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_delete_black_48dp"/>
+            app:srcCompat="@drawable/ic_file_download_black_24dp"/>
+
 
         <ImageButton
             android:id="@+id/editButton"
@@ -74,7 +93,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_edit_black_48dp"/>
+            app:srcCompat="@drawable/ic_edit_black_24dp"
+            tools:layout_editor_absoluteX="95dp"
+            tools:layout_editor_absoluteY="-47dp"/>
+
 
         <ImageButton
             android:id="@+id/upLoadButton"
@@ -82,6 +104,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_file_upload_black_48dp"/>
+            app:srcCompat="@drawable/ic_file_upload_black_24dp"/>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarLp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
 </android.support.constraint.ConstraintLayout>

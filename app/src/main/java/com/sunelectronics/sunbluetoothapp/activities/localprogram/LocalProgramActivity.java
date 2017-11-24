@@ -10,17 +10,20 @@ import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
+import com.sunelectronics.sunbluetoothapp.fragments.MyAlertDialogFragment;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_CONFIRM_EXIT;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LP;
+
 public class LocalProgramActivity extends AppCompatActivity implements MyAlertDialogFragment.OnPositiveDialogClick {
 
-    public static final String DELETE_LP = "DELETE LP";
-    public static final String DELETE_ALL_LP = "DELETE ALL LP";
-    public static final String ALERT_TYPE = "type";
-    public static final String ALERT_TITLE = "title";
-    public static final String ALERT_CONFIRM_EXIT = "exit";
-    public static final String ALERT_ICON = "alert";
+
     private boolean showConfirmDialog;
     private LPDataBaseHandler mLPDataBaseHandler;
     private static final String TAG = "LocalProgramActivity";
@@ -31,7 +34,7 @@ public class LocalProgramActivity extends AppCompatActivity implements MyAlertDi
         Log.d(TAG, "onCreate: called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_program);
-        mLPDataBaseHandler = new LPDataBaseHandler(this);
+        mLPDataBaseHandler = LPDataBaseHandler.getInstance(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, new LPListFragment()).commit();

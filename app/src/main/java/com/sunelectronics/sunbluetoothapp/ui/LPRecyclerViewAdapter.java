@@ -9,21 +9,29 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.activities.localprogram.LPDetailFragment;
-import com.sunelectronics.sunbluetoothapp.activities.localprogram.LocalProgramActivity;
+import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
+import com.sunelectronics.sunbluetoothapp.fragments.LPDetailFragment;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
+import java.io.Serializable;
 import java.util.List;
+
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
 
 /**
  * Created by Jerry on 8/19/2017.
  */
 
-public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAdapter.ViewHolder> {
+public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAdapter.ViewHolder> implements Serializable {
 
     private Context mContext;
-    private List<LocalProgram> mLocalProgramList;
 
+    public void setLocalProgramList(List<LocalProgram> localProgramList) {
+        mLocalProgramList = localProgramList;
+    }
+
+    private List<LocalProgram> mLocalProgramList;
 
     public LPRecyclerViewAdapter(Context context, List<LocalProgram> lpList) {
 
@@ -50,7 +58,6 @@ public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAd
         return mLocalProgramList.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView lpNameTv, lpContentTv;
@@ -65,11 +72,11 @@ public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAd
 
                     LocalProgram localProgram = mLocalProgramList.get(getAdapterPosition());
                     Bundle args = new Bundle();
-                    args.putSerializable("lp", localProgram);
-                    LocalProgramActivity localProgramActivity = (LocalProgramActivity) mContext;
+                    args.putSerializable(LP, localProgram);
+                    HomeActivity homeActivity = (HomeActivity) mContext;
                     LPDetailFragment lpDetailFragment = new LPDetailFragment();
                     lpDetailFragment.setArguments(args);
-                    localProgramActivity.getSupportFragmentManager().beginTransaction().replace(R.id.localProgramContainer, lpDetailFragment)
+                    homeActivity.getSupportFragmentManager().beginTransaction().replace(R.id.homeContainer, lpDetailFragment,TAG_LP_DETAIL_FRAG)
                             .addToBackStack(null).commit();
                 }
             });

@@ -23,11 +23,13 @@ public class SingleSegDialogFragment extends DialogFragment {
 
 
     public SingleSegDialogFragment() {
+        Log.d(TAG, "SingleSegDialogFragment: empty constructor called");
         //required empty constructor
     }
 
     public static SingleSegDialogFragment newInstance(String title) {
 
+        Log.d(TAG, "newInstance: creating instance of SignleSegDialogFragment");
         SingleSegDialogFragment fragment = new SingleSegDialogFragment();
         Bundle args = new Bundle();
         args.putString("TITLE", title);
@@ -46,6 +48,7 @@ public class SingleSegDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
+        Log.d(TAG, "onViewCreated: called");
         super.onViewCreated(view, savedInstanceState);
         Bundle args = getArguments();
         String title = args.getString("TITLE", "DEFAULT TITLE");

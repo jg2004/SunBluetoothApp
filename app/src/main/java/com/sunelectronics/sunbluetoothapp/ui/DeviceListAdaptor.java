@@ -29,7 +29,6 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
         mContext = context;
         layoutResource = resource;
         discoveredDeviceList = btDeviceList;
-
     }
 
     @NonNull
@@ -50,15 +49,10 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
                 name = "Name not supplied by vendor";
             }
             btName.setText(name);
-
             btAddress.setText(address);
-
         }
-
-
         return view;
     }
-
 
     public void setDiscoveredDeviceList(List<BluetoothDevice> discoveredDeviceList) {
         this.discoveredDeviceList = discoveredDeviceList;
@@ -67,6 +61,4 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
     public void setLayoutResource(int layoutResource) {
         this.layoutResource = layoutResource;
     }
-
-
 }

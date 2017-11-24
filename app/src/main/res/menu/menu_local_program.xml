@@ -1,15 +1,36 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.sunelectronics.sunbluetoothapp.activities.localprogram.LocalProgramActivity">
-    <item
-        android:id="@+id/action_loadSampleLP"
-        android:orderInCategory="2"
-        android:title="@string/load_sample_lp"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_deleteAllLocalPrograms"
-        android:orderInCategory="1"
-        android:title="@string/action_deleteLocalPrograms"
-        app:showAsAction="never"/>
+    >
+    <group android:id="@+id/menu_group_lp">
+
+        <item
+            android:id="@+id/action_loadSampleLP"
+            android:orderInCategory="2"
+            android:title="@string/load_sample_lp"
+            app:showAsAction="ifRoom"/>
+        <item
+            android:id="@+id/action_deleteAllLocalPrograms"
+            android:orderInCategory="1"
+            android:title="@string/action_deleteLocalPrograms"
+            app:showAsAction="never"/>
+
+        <item
+            android:id="@+id/action_deleteLocalProgram"
+            android:orderInCategory="1"
+            android:title="@string/delete_lp"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_showSavedLPs"
+            android:title="Saved LP's"
+            app:showAsAction="ifRoom"
+            />
+        <item
+            android:id="@+id/action_share_LP"
+            android:title="Share"
+            app:showAsAction="always"
+            android:icon="@drawable/ic_share_white_24dp"
+            />
+
+    </group>
+
 </menu>

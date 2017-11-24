@@ -3,7 +3,7 @@ package com.sunelectronics.sunbluetoothapp.models;
 import java.io.Serializable;
 
 /**
- * Created by Jerry on 8/19/2017.
+ * Simple POJO to store local program name, content and id assigned by database
  */
 
 public class LocalProgram implements Serializable {
@@ -20,7 +20,6 @@ public class LocalProgram implements Serializable {
         this.name = lpName;
         this.content = lpContent;
     }
-
 
     public int getId() {
         return id;

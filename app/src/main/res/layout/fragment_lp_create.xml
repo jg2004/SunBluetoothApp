@@ -41,22 +41,16 @@
             style="@style/Widget.AppCompat.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:layout_weight="1"
             android:contentDescription="@string/save_to_phone"
             app:srcCompat="@drawable/ic_save_black_48dp"/>
 
-        <ImageButton
-            android:id="@+id/cancelButton"
-            style="@style/Widget.AppCompat.ImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:contentDescription="@string/cancel"
-            app:srcCompat="@drawable/ic_cancel_black_48dp"/>
+
 
         <ImageButton
             android:id="@+id/clearLPButton"
             android:layout_width="wrap_content"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:contentDescription="@string/clear_fields"
             app:srcCompat="@drawable/ic_erasor"/>
@@ -65,6 +59,7 @@
             android:id="@+id/loadSampleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:contentDescription="@string/load_sample_LP"
             app:srcCompat="@drawable/ic_help_black_48dp"/>
     </LinearLayout>

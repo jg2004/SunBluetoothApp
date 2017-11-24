@@ -1,7 +1,5 @@
 package com.sunelectronics.sunbluetoothapp.bluetooth;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -10,10 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.activities.BluetoothStartUp;
-import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,9 +21,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static android.R.id.edit;
-import static com.sunelectronics.sunbluetoothapp.activities.BluetoothStartUp.BLUETOOTHDEV;
 
 public class BluetoothConnectionService implements Serializable {
 
@@ -117,7 +110,6 @@ public class BluetoothConnectionService implements Serializable {
     /**
      * this is the method that is executed inside the ConnectThread class once a bluetooth connection is made
      *
-     * @param bluetoothDevice
      * @param bluetoothSocket
      */
     private void connected(BluetoothSocket bluetoothSocket) {
@@ -142,7 +134,7 @@ public class BluetoothConnectionService implements Serializable {
         private final OutputStream mmOutstream;
         private BufferedReader br;
 
-        public ConnectedThread(BluetoothSocket socket) {
+        ConnectedThread(BluetoothSocket socket) {
 
             Log.d(TAG, "ConnectedThread: created");
             mmBluetoothSocket = socket;
@@ -159,8 +151,6 @@ public class BluetoothConnectionService implements Serializable {
             mmInstream = tmpIn;
             mmOutstream = tmpOut;
             br = new BufferedReader(new InputStreamReader(mmInstream), 2048);
-
-
         }
 
         @Override
@@ -300,6 +290,8 @@ public class BluetoothConnectionService implements Serializable {
             try {
                 Log.d(TAG, "trying to create insecure RF comm socket...");
                 tmp = mDevice.createInsecureRfcommSocketToServiceRecord(deviceUUID);
+
+
             } catch (IOException e) {
                 Log.d(TAG, "run: ConnectThread could not create insecureRFCommSocket, error: " + e.getMessage());
                 e.printStackTrace();
