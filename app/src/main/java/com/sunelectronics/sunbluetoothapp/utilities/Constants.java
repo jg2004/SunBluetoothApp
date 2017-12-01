@@ -33,11 +33,15 @@ public class Constants {
     public static final String LP = "lp";
     public static final int POWER_ON_DELAY_MS = 2000;
     public static final String LOG_FILE_CONTENTS = "log_file_contents";
-    public static final String EMPTY_LOG_FILE_CONTENTS =  "Log file empty";
+    public static final String EMPTY_LOG_FILE_CONTENTS = "Log file empty";
     public static final String LOG_FILE_NAME = "log_file_name";
     public static final String LOG_FILES_DIRECTORY = "logFiles";
     public static final String DELETE_LOG_FILE = "delete_log_file";
     public static final String DELETE_ALL_LOG_FILES = "delete_all_log_files";
+    public static final String LOGGING_STATE = "logging_state";
+    public static final String TURN_OFF_CHAMBER = "TURN OFF CHAMBER";
+    public static final String TERMINATE_LOGGING_SESSION = "TERMINATE LOGGING SESSION";
+    public static final String EXIT_APP = "EXIT APPLICATION";
 
     //Fragment TAGS
     public static final String TAG_LP_DETAIL_FRAG = "lp_detail_frag";
@@ -58,5 +62,14 @@ public class Constants {
     public static final String WAIT_TIME = "WAIT?";
     public static final String RATE = "RATE?";
     public static final String BKPNT = "BKPNT?";
+    public static final String PIDA_COMMAND = "PIDA=";
+    public static final String PIDA_QUERY = "PIDA?";
+
+    //command descriptions
+    public static final String PIDA_MODE_0 = "Control to chamber probe";
+    public static final String PIDA_MODE_1 = "Control to average of chamber and user probe";
+    public static final String PIDA_MODE_2 = "Control to chamber, then slowly force user to set";
+    public static final String PIDA_MODE_3 = "Control to user probe";
+    public static final String PIDA_MODE_4 = "Control to average, then slowly force user to set";
 
 }

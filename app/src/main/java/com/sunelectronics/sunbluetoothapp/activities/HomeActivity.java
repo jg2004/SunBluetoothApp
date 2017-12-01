@@ -20,14 +20,22 @@ import com.sunelectronics.sunbluetoothapp.fragments.LPCreateEditFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPDetailFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPDownloadFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
+import com.sunelectronics.sunbluetoothapp.fragments.MyAlertDialogFragment;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
 
-public class HomeActivity extends AppCompatActivity implements LogFileListFragment.DeleteLogFileListener, LPDownloadFragment.BottomNavigationListenter, LPCreateEditFragment.RefreshFragment, LPDownloadFragment.DownloadPInterface {
+public class HomeActivity extends AppCompatActivity implements LogFileListFragment.DeleteLogFileListener,
+        LPDownloadFragment.BottomNavigationListenter, LPCreateEditFragment.RefreshFragment,
+        LPDownloadFragment.DownloadPInterface, DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks {
 
     private static final String TAG = "HomeActivity";
     private List<Fragment> mFragmentList = new ArrayList<>();
@@ -45,9 +53,9 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         setContentView(R.layout.activity_home);
         buildFragmentList();
         setUpViews();
-        // switchFragment(0, TAG_FRAGMENT_MONITOR);
+        switchFragment(0, TAG_FRAGMENT_MONITOR);
         //switchFragment(1, TAG_FRAGMENT_LOCAL_PROGRAM);
-        switchFragment(2, TAG_FRAGMENT_LOGGER);
+        //switchFragment(2, TAG_FRAGMENT_LOGGER);
 
     }
 
@@ -127,7 +135,45 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         lpDetailFragment.setLocalProgram(localProgram);
     }
 
+    private void showAlertDialog() {
+        Bundle args = new Bundle();
+        args.putString(ALERT_TITLE, EXIT_APP);
+        args.putString(ALERT_TYPE, EXIT_APP);
+        args.putString(ALERT_MESSAGE, "Logging session in progress, exit application?");
+        args.putInt(ALERT_ICON, R.drawable.ic_warning_black_48dp);
+        MyAlertDialogFragment myAlertDialogFragment = MyAlertDialogFragment.newInstance(args);
+        myAlertDialogFragment.show(getSupportFragmentManager(), null);
+    }
+
     /*------------interface implemented methods--------------------------------------------------*/
+
+    @Override
+    public void stopLoggingSession() {
+        //called by MyAlertDialogFragment if user presses Yes button on dialog
+        Log.d(TAG, "stopLoggingSession: called");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        DisplayTemperatureFragment displayTemperatureFragment = (DisplayTemperatureFragment) fragmentManager
+                .findFragmentByTag(TAG_FRAGMENT_MONITOR);
+        displayTemperatureFragment.stopLogger();
+    }
+
+    @Override
+    public void closeActivity() {
+        //called by MyAlertDialogFragment if user presses Yes button on dialog
+        Log.d(TAG, "closing HomeActivity");
+        finish();
+    }
+
+    @Override
+    public void turnOffChamber() {
+        //called by MyAlertDialogFragment if user presses Yes button on dialog
+        Log.d(TAG, "turnOffChamber: called");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        DisplayTemperatureFragment displayTemperatureFragment = (DisplayTemperatureFragment) fragmentManager
+                .findFragmentByTag(TAG_FRAGMENT_MONITOR);
+        displayTemperatureFragment.turnOffChamberSwitch();
+    }
+
     @Override
     public void deleteLogFile(String fileName) {
 
@@ -146,7 +192,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         LogFileListFragment fragment = (LogFileListFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_LOGGER);
         //LogFileListFragment has deleteLogFileMethod
         fragment.deleteAllLogFiles();
-
     }
 
 
@@ -195,7 +240,11 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: closing bluetooth connection");
+        //clean up: cancel bluetooth thread and close TemperatureLogWriter text file
         BluetoothConnectionService.getInstance(HomeActivity.this).cancel();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        DisplayTemperatureFragment frag = (DisplayTemperatureFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_MONITOR);
+        frag.closeLoggingFile();
         super.onDestroy();
     }
 
@@ -213,8 +262,14 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
             mBottomNavigationView.setSelectedItemId(R.id.bottom_bar_monitor);
 
         } else {
-            // TODO: 11/7/2017 show dialog confirming exit
-            super.onBackPressed();
+            if (tempMonitorFrag.isLoggingData()) {
+                // if logging data, show alert dialog to confirm closing of app
+                showAlertDialog();
+
+            } else {
+                //not logging data so close HomeActivity and exit the app
+                super.onBackPressed();//this closes HomeActivity (closes the app)
+            }
         }
     }
 

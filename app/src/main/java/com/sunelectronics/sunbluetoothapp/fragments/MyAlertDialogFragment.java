@@ -26,14 +26,19 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LOG_FILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SEND_STOP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TERMINATE_LOGGING_SESSION;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CHAMBER;
 
 public class MyAlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyAlertDialogFragment";
     private LPRecyclerViewAdapter mAdpaptor;
     private LogFileListFragment.DeleteLogFileListener mDeleteLogFileListener;
+    private DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks mDisplayTemperatureFragmentCallBacks;
+
 
     public interface OnPositiveDialogClick {
 
@@ -87,6 +92,9 @@ public class MyAlertDialogFragment extends DialogFragment {
         super.onAttach(context);
         //HomeActivity implements the DeleteLogFileListener
         mDeleteLogFileListener = (HomeActivity) context;
+        mDisplayTemperatureFragmentCallBacks = (HomeActivity) context;
+
+
     }
 
     private void performAction() {
@@ -97,6 +105,21 @@ public class MyAlertDialogFragment extends DialogFragment {
         }
 
         switch (type) {
+
+            case EXIT_APP:
+                //HomeActivity has closeActivity method
+                mDisplayTemperatureFragmentCallBacks.closeActivity();
+                break;
+
+            case TERMINATE_LOGGING_SESSION:
+                //HomeActivity has stopLoggingSession() method
+                mDisplayTemperatureFragmentCallBacks.stopLoggingSession();
+                break;
+
+            case TURN_OFF_CHAMBER:
+                //HomeActivity contains the turnOffChamber() method
+                mDisplayTemperatureFragmentCallBacks.turnOffChamber();
+                break;
 
             case DELETE_LOG_FILE:
 

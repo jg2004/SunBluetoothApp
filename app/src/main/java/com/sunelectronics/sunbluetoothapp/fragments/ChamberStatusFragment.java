@@ -25,6 +25,7 @@ import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNTC;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
 
 /**
@@ -35,13 +36,13 @@ public class ChamberStatusFragment extends Fragment {
 
     private TextView mLprunningTv, mWaitingAtBreakPointTv, mCycleNumberTv, mTimeOutLedTv;
     private TextView mChamberWaitingToTimeOutTv, mChamberNotRampingTv, mChamberValidSetPointTv;
-    private TextView mChamberPoweredOnTv;
+    private TextView mChamberPoweredOnTv, mPidAModeTv;
     private ImageButton mBreakPointContinueImageButton;
     private Spinner mSpinner;
     private LinearLayout mCycleLayout;
     private Handler mHandler;
     private Context mContext;
-    private Runnable mStatusRunnable, mGetCycleRunnable, mGetBreakPointRunnable;
+    private Runnable mStatusRunnable, mGetCycleRunnable, mGetBreakPointRunnable, mPidARunnable;
     private BroadcastReceiver mStatusBroadcastReceiver;
     private ChamberStatus mChamberStatus;
     private String mCycleVariable;
@@ -93,6 +94,7 @@ public class ChamberStatusFragment extends Fragment {
         mChamberPoweredOnTv = (TextView) view.findViewById(R.id.textViewChamberPoweredOnStatus);
         mCycleNumberTv = (TextView) view.findViewById(R.id.textViewCycleNumber);
         mCycleVariable = mSpinner.getSelectedItem().toString() + "?";
+        mPidAModeTv = (TextView) view.findViewById(R.id.textViewPidaMode);
     }
 
     @Override
@@ -108,6 +110,7 @@ public class ChamberStatusFragment extends Fragment {
                 Log.d(TAG, "inside mStatusrunnable, writing STATUS? to bluetooth");
                 BluetoothConnectionService.getInstance(mContext).write(STATUS);
                 mHandler.postDelayed(this, GET_STATUS_MESSAGE_DELAY);
+                mHandler.postDelayed(mPidARunnable, 1000);
             }
         };
         mGetCycleRunnable = new Runnable() {
@@ -122,6 +125,13 @@ public class ChamberStatusFragment extends Fragment {
             public void run() {
                 Log.d(TAG, "inside breakPointRunnable, writing  BKPNT? to bluetooth");
                 BluetoothConnectionService.getInstance(mContext).write(BKPNT);
+            }
+        };
+        mPidARunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "inside writing PIDA? to bluetooth");
+                BluetoothConnectionService.getInstance(mContext).write(PIDA_QUERY);
             }
         };
     }
@@ -194,6 +204,12 @@ public class ChamberStatusFragment extends Fragment {
                     mWaitingAtBreakPointTv.setText(mChamberStatus.getWaitingAtBreakPointStatusMessage() + " " + response);
                     mBreakPointContinueImageButton.setVisibility(View.VISIBLE);
                 }
+                 else if (commandSent.equals(PIDA_QUERY)){
+
+                    // TODO: 11/30/2017 display PIDA mode
+                    mChamberStatus.setPidMode(response);
+                    mPidAModeTv.setText(mChamberStatus.getPidMode());
+                }
             }
         };
         LocalBroadcastManager.getInstance(mContext).registerReceiver(mStatusBroadcastReceiver,
@@ -209,6 +225,7 @@ public class ChamberStatusFragment extends Fragment {
         mHandler.removeCallbacks(mStatusRunnable);
         mHandler.removeCallbacks(mGetCycleRunnable);
         mHandler.removeCallbacks(mGetBreakPointRunnable);
+        mHandler.removeCallbacks(mPidARunnable);
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mStatusBroadcastReceiver);
     }
 

@@ -180,6 +180,7 @@ public class BluetoothConnectionService implements Serializable {
 
                     // than 0 before performing the following
                     String unHandledCommand = "NO COMMAND SENT";
+
                     if (mCommandsWrittenList.size() > 0) {
                         unHandledCommand = mCommandsWrittenList.get(0);
                         Log.d(TAG, " removing command from list: " + mCommandsWrittenList.get(0));

@@ -2,6 +2,12 @@ package com.sunelectronics.sunbluetoothapp.models;
 
 import android.util.Log;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_0;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_1;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_2;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_3;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_4;
+
 /**
  * Class that stores the chamber status info contained in the response from the STATUS? command.
  * This command contains a string of Yes and No characters (i.e YNNNYYY...etc) that provide the user
@@ -19,9 +25,8 @@ public class ChamberStatus {
     private String mLpRunningStatusMessage;
     private String mWaitingAtBreakPointStatusMessage;
     private String mChamberIsOnMessage;
-    private boolean mIsLPRunning;
-    private boolean mWaitingAtBreakPoint;
-    private boolean mPowerIsOn;
+    private StringBuilder mStringBuilder = new StringBuilder();
+    private boolean mIsLPRunning, mHeatEnableOn, mCoolEnableOn, mWaitingAtBreakPoint, mPowerIsOn;
     private static final String TAG = "ChamberStatus";
 
     public ChamberStatus() {
@@ -54,6 +59,8 @@ public class ChamberStatus {
         char lpRunning = statusString.charAt(12);
         char waitingAtBreakPoint = statusString.charAt(11);
         char powerIsOn = statusString.charAt(0);
+        char coolEnableOn = statusString.charAt(5);
+        char heatEnableOn = statusString.charAt(4);
 
         if (powerIsOn == 'Y') {
             mChamberIsOnMessage = "POWER IS ON";
@@ -61,6 +68,16 @@ public class ChamberStatus {
         } else {
             mChamberIsOnMessage = "POWER IS OFF";
             mPowerIsOn = false;
+        }
+        if (coolEnableOn == 'Y') {
+            mCoolEnableOn = true;
+        } else {
+            mCoolEnableOn = false;
+        }
+        if (heatEnableOn == 'Y') {
+            mHeatEnableOn = true;
+        } else {
+            mHeatEnableOn = false;
         }
 
         if (timeOutLedOn == 'Y') {
@@ -102,9 +119,22 @@ public class ChamberStatus {
         }
     }
 
+    /*---------------------------------setters----------------------------------------------------*/
+    public void setPowerIsOn(boolean powerIsOn) {
+        mPowerIsOn = powerIsOn;
+    }
+
     /*----------------------------------getters---------------------------------------------------*/
     public boolean isLPRunning() {
         return mIsLPRunning;
+    }
+
+    public boolean isHeatEnableOn() {
+        return mHeatEnableOn;
+    }
+
+    public boolean isCoolEnableOn() {
+        return mCoolEnableOn;
     }
 
     public String getStatusString() {
@@ -115,7 +145,7 @@ public class ChamberStatus {
         return mWaitingAtBreakPointStatusMessage;
     }
 
-    public boolean isPowerIsOn() {
+    public boolean isPowerOn() {
         return mPowerIsOn;
     }
 
@@ -145,5 +175,31 @@ public class ChamberStatus {
 
     public String getChamberIsOnMessage() {
         return mChamberIsOnMessage;
+    }
+
+    public void setPidMode(String pidMode) {
+        mStringBuilder.delete(0, mStringBuilder.length());
+        switch (pidMode) {
+
+            case "0":
+                mStringBuilder.append(PIDA_MODE_0);
+                break;
+            case "1":
+                mStringBuilder.append(PIDA_MODE_1);
+                break;
+            case "2":
+                mStringBuilder.append(PIDA_MODE_2);
+                break;
+            case "3":
+                mStringBuilder.append(PIDA_MODE_3);
+                break;
+            case "4":
+                mStringBuilder.append(PIDA_MODE_4);
+                break;
+        }
+    }
+
+    public String getPidMode() {
+        return mStringBuilder.toString();
     }
 }

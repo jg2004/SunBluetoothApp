@@ -142,6 +142,16 @@
         android:text="@string/status_unavailable"
         android:textColor="@android:color/black"
         android:textSize="14sp"/>
+    <TextView
+        android:id="@+id/textViewPidaMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewChamberPoweredOnStatus"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/status_unavailable"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
 
 </RelativeLayout>
 

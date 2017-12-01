@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -226,7 +227,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
 
-                if (!mChamberStatus.isPowerIsOn()) {
+                if (!mChamberStatus.isPowerOn()) {
                     //turn on chamber
                     BluetoothConnectionService.getInstance(mContext).write(ON);
                 }
@@ -292,6 +293,9 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
             mProgressBar.setProgress(counter);
             mProgressBar.setMax(lpArray.length);
             mProgressBar.setVisibility(View.VISIBLE);
+            //disable window
+            getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
 
         @Override
@@ -320,6 +324,8 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                 endCommandSent = false;
                 mLpUploadHandler.removeCallbacks(this);
                 mProgressBar.setVisibility(View.INVISIBLE);
+                //re-enable window
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 Toast.makeText(mContext, "Upload complete", Toast.LENGTH_LONG).show();
             }
         }

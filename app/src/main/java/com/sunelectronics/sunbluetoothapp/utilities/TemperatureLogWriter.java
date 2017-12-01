@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
+
 public class TemperatureLogWriter {
 
     private static final String TAG = "TemperatureLogWriter";
@@ -26,6 +28,7 @@ public class TemperatureLogWriter {
 
     public TemperatureLogWriter(Context context, ChamberModel chamberModel) {
 
+        Log.d(TAG, "TemperatureLogWriter: creating a new TemperatureLogWriter");
         mContext = context;
         mChamberModel = chamberModel;
         mOutputStreamWriter = getOutputStreamWriter();
@@ -52,10 +55,11 @@ public class TemperatureLogWriter {
 
         StringBuilder stringBuilderForFileHeader = new StringBuilder();
         stringBuilderForFileHeader.append(month)
-                .append("/").append(dayOfMonth).append("/").append(year).append(",")
+                .append("/").append(dayOfMonth).append("/").append(year).append(SPACE)
                 .append(hour).append(":").append(minute).append(":").append(second).append(NEW_LINE)
-                .append(mChamberModel.getCh1Command()).append(",").append(mChamberModel.getCh2Command()).append(SPACE)
-                .append(mChamberModel.getSetCommand()).append(",").append("TIME").append(NEW_LINE);
+                .append("TIME").append(",").append(mChamberModel.getCh1Command()).append(",")
+                .append(mChamberModel.getCh2Command()).append(",")
+                .append(mChamberModel.getSetCommand()).append(NEW_LINE);
         String fileHeader = stringBuilderForFileHeader.toString();
 
         StringBuilder stringBuilderForFileName = new StringBuilder();
@@ -64,16 +68,14 @@ public class TemperatureLogWriter {
                 .append("_").append(hour).append(minute).append(second).append(".txt");
 
         String fileName = stringBuilderForFileName.toString();
-        // File file = new File(mContext.getFilesDir() + File.separator + "logFiles", fileName);
-        File directory = new File(mContext.getFilesDir() + File.separator + "logFiles");
-        directory.delete();
+        File directory = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY);
         if (!directory.exists()) {
             //create a logFiles directory if it hasn't been created to store the log files
             Log.d(TAG, "creating logFiles directory");
             directory.mkdir();
         }
 
-        File file = new File(mContext.getFilesDir() + File.separator + "logFiles", fileName);
+        File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, fileName);
         Log.d(TAG, "TemperatureLogWriter: creating file: " + file.getPath());
 
         try {
@@ -95,14 +97,14 @@ public class TemperatureLogWriter {
 
     public void log() {
 
-        Log.d(TAG, "log: writing to file");
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
 
-        sb.append(mChamberModel.getCh1Reading()).append(",").append(mChamberModel.getCh2Reading()).append(",")
-                .append(mChamberModel.getSetReading()).append(",").append(sdf.format(new Date(mChamberModel.getTimeStamp())))
-                .append(NEW_LINE);
+        sb.append(sdf.format(new Date(mChamberModel.getTimeStamp()))).append(",").append(mChamberModel.getCh1Reading())
+                .append(",").append(mChamberModel.getCh2Reading()).append(",")
+                .append(mChamberModel.getSetReading()).append(NEW_LINE);
         try {
+            Log.d(TAG, "log: writing " + sb.toString() + "to file");
             mOutputStreamWriter.write(sb.toString());
 
         } catch (IOException e) {
@@ -115,6 +117,7 @@ public class TemperatureLogWriter {
         Log.d(TAG, "closeFile: closing file");
         try {
             mOutputStreamWriter.close();
+
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(TAG, "closeFile: error closing file");
