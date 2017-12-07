@@ -61,6 +61,7 @@
         <ImageButton
             android:id="@+id/downLoadButton"
             style="@style/Widget.AppCompat.Button"
+            android:contentDescription="@string/download_lp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -68,6 +69,7 @@
 
         <ImageButton
             android:id="@+id/startLPButton"
+            android:contentDescription="@string/run_lp"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,6 +82,7 @@
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/save_lp"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_save_black_48dp"
             tools:layout_editor_absoluteX="95dp"
@@ -91,6 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/stop_lp"
             app:srcCompat="@drawable/ic_stop_black_24dp"/>
 
         <ImageButton
@@ -99,6 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/upload_lp"
             app:srcCompat="@drawable/ic_file_upload_black_24dp"/>
 
     </LinearLayout>

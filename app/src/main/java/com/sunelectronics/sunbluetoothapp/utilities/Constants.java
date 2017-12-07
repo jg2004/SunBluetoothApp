@@ -46,8 +46,21 @@ public class Constants {
     //Fragment TAGS
     public static final String TAG_LP_DETAIL_FRAG = "lp_detail_frag";
     public static final String TAG_FRAGMENT_CHAMBER_STATUS = "chambers_status_fragment";
+    public static final String TAG_FRAGMENT_OUTPUT = "output_fragment";
+    public static final String TAG_FRAGMENT_PARAMETER = "parameter_fragment";
+    public static final String TAG_FRAGMENT_PIDA_MODE = "pidA_mode_fragment";
 
     //chamber commands
+    public static final String PIDH_COMMAND = "PIDH=";
+    public static final String PIDC_COMMAND = "PIDC=";
+    public static final String PWMP_COMMAND = "PWMP=";
+    public static final String UTL_COMMAND = "UTL=";
+    public static final String LTL_COMMAND = "LTL=";
+    public static final String PIDH_QUERY = "PIDH?";
+    public static final String PIDC_QUERY = "PIDC?";
+    public static final String PWMP_QUERY = "PWMP?";
+    public static final String UTL_QUERY = "UTL?";
+    public static final String LTL_QUERY = "LTL?";
     public static final String BKPNTC = "BKPNTC";
     public static final String STATUS = "STATUS?";
     public static final String HON = "HON";
@@ -64,12 +77,20 @@ public class Constants {
     public static final String BKPNT = "BKPNT?";
     public static final String PIDA_COMMAND = "PIDA=";
     public static final String PIDA_QUERY = "PIDA?";
+    public static final String OUT0_COMMAND_PREFIX = "OUT0:";
+    public static final String OUT_COMMAND_ON = ",1";
+    public static final String OUT_COMMAND_OFF = ",0";
+    public static final String OUT3_COMMAND_PREFIX = "OUT3:";
 
     //command descriptions
-    public static final String PIDA_MODE_0 = "Control to chamber probe";
-    public static final String PIDA_MODE_1 = "Control to average of chamber and user probe";
-    public static final String PIDA_MODE_2 = "Control to chamber, then slowly force user to set";
-    public static final String PIDA_MODE_3 = "Control to user probe";
-    public static final String PIDA_MODE_4 = "Control to average, then slowly force user to set";
+    public static final String PIDA_MODE_0 = "CONTROL TO CHAMBER PROBE";
+    public static final String PIDA_MODE_1 = "CONTROL TO AVG OF CHAMBER, USER PROBE";
+    public static final String PIDA_MODE_2 = "CONTROL TO CHAM, THEN SLOWLY FORCE USER TO SET";
+    public static final String PIDA_MODE_3 = "CONTROL TO USER PROBE";
+    public static final String PIDA_MODE_4 = "CONTROL TO AVG, THEN SLOWLY FORCE USER TO SET";
+    public static final String ANALOG_0 = "0";
+    public static final String ANALOG_1 = "1";
+    public static final String ANALOG_2 = "2";
+    public static final String ANALOG_3 = "3";
 
 }

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -40,16 +38,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewStatusTitle"
         android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/textViewLpRunningStatus"
         android:layout_toRightOf="@+id/textViewLpRunningStatus"
-        android:visibility="invisible"
         android:orientation="horizontal"
+        android:visibility="invisible"
         >
 
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:entries="@array/cycle_number_array"
             android:saveEnabled="false"
@@ -73,7 +74,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewLpRunningStatus"
         android:layout_marginTop="10dp"
-
         android:padding="5dp"
         android:text="@string/status_unavailable"
         android:textColor="@android:color/black"
@@ -85,7 +85,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewLpRunningStatus"
         android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@id/textViewWaitingAtBreakPointStatus"
         android:layout_toRightOf="@id/textViewWaitingAtBreakPointStatus"
+        android:contentDescription="@string/lp_bkpnt"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
 
@@ -132,21 +135,12 @@
         android:text="@string/status_unavailable"
         android:textColor="@android:color/black"
         android:textSize="14sp"/>
+
     <TextView
         android:id="@+id/textViewChamberPoweredOnStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewValidSetPointtatus"
-        android:layout_marginTop="10dp"
-        android:padding="5dp"
-        android:text="@string/status_unavailable"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"/>
-    <TextView
-        android:id="@+id/textViewPidaMode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewChamberPoweredOnStatus"
         android:layout_marginTop="10dp"
         android:padding="5dp"
         android:text="@string/status_unavailable"

@@ -40,6 +40,19 @@
     <string name="status_unavailable">Status unavailable</string>
     <string name="chamber_status">CHAMBER STATUS</string>
     <string name="pound_sign">###</string>
+    <string name="p_default">.15</string>
+    <string name="i_default">.001</string>
+    <string name="d_default">.1</string>
+    <string name="pwmp_default">2</string>
+    <string name="utl_default">300</string>
+    <string name="ltl_default">-200</string>
+    <string name="download_lp">download local program</string>
+    <string name="run_lp">run local program</string>
+    <string name="save_lp">save local program</string>
+    <string name="stop_lp">stop local program</string>
+    <string name="upload_lp">upload local program</string>
+    <string name="edit_lp_long_desc">Edit Local Program</string>
+    <string name="lp_bkpnt">continue from local program breakpoint</string>
 
 
     <string-array name="lp_dropdown_array">

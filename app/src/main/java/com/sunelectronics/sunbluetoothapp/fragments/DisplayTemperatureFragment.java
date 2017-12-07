@@ -51,6 +51,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.RATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SET_TEMP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_CHAMBER_STATUS;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_OUTPUT;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PIDA_MODE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TERMINATE_LOGGING_SESSION;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CHAMBER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.USER_TEMP;
@@ -78,20 +81,14 @@ public class DisplayTemperatureFragment extends Fragment {
     private MenuItem mStartLoggingMenuItem;
     private boolean mIsLoggingData;
 
-    public interface TurnOffChamberCallBack {
-        void turnOffChamber();
-    }
+    public interface DisplayTemperatureFragmentCallBacks {
 
-    public interface StoppLoggingSessionCallBack {
-        void stopLoggingSession();
-    }
-    public interface DisplayTemperatureFragmentCallBacks{
-
+        //implemented by HomeActivity
         void closeActivity();
+
         void turnOffChamber();
+
         void stopLoggingSession();
-
-
     }
 
     @Override
@@ -341,9 +338,39 @@ public class DisplayTemperatureFragment extends Fragment {
                     // then stopLogger will be called by HomeActivity via MyAlertDialogFragment
                     showAlertDialog(TERMINATE_LOGGING_SESSION);
                 }
-                break;
+                return true;
+
+            case R.id.outputs:
+                showOutputFragment();
+                return true;
+
+            case R.id.parameters:
+                showParametersFragment();
+                return true;
+            case R.id.pidAMode:
+                showPidAModeFragment();
+                return true;
         }
-        return true;
+        return false;
+    }
+
+    private void showPidAModeFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.homeContainer, new PidAModeFragment(), TAG_FRAGMENT_PIDA_MODE).commit();
+    }
+
+
+    private void showParametersFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.homeContainer, new ParameterFragment(), TAG_FRAGMENT_PARAMETER).commit();
+    }
+
+    private void showOutputFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.homeContainer, new OutputFragment(), TAG_FRAGMENT_OUTPUT).commit();
     }
 
     public boolean isLoggingData() {

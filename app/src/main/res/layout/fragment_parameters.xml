@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/progressBarLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <TextView
+            android:id="@+id/textViewProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/pidAmodeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal"
+        android:paddingBottom="2dp"
+        android:text="CONTROLLER PARAMETERS"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/pidMainLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pidAmodeTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/pidCoefficientTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/border_bottom_gray"
+            android:gravity="center_horizontal"
+            android:paddingBottom="2dp"
+            android:text="Heat/Cool PID Coefficients"
+            />
+
+        <LinearLayout
+            android:id="@+id/pidHCoefficientLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="PIDH: "
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/pHeatEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/iHeatEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/dHeatEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/pidCCoefficientLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="PIDC: "
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/pCoolEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/iCoolEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/dCoolHeatEditText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxWidth="85dp"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pwmpLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pidMainLayout"
+        android:layout_alignStart="@+id/pidMainLayout"
+        android:layout_below="@+id/pidMainLayout"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/pwmpTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/border_bottom_gray"
+            android:text="Pulse Width Modulation Period"
+            />
+
+        <LinearLayout
+            android:id="@+id/pwmpUtlLtlSubLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="PWMP:"
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/pwmpEditText"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:inputType="number"
+                android:maxWidth="200dp"
+                />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/UtlLtlLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pwmpLayout"
+        android:layout_alignStart="@+id/pwmpLayout"
+        android:layout_below="@+id/pwmpLayout"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/utlLtlitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/border_bottom_gray"
+            android:text="Upper/Lower Temp Limits"
+            />
+
+        <LinearLayout
+            android:id="@+id/UtlLtlSubLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="UTL:"
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/utlEditText"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:inputType="number"
+                android:maxWidth="100dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="LTL:"
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/ltlEditText"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:inputType="numberSigned"
+                android:maxWidth="100dp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/UtlLtlLayout"
+        android:gravity="center_horizontal">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonGet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="GET"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="SET"/>
+    </LinearLayout>
+
+</RelativeLayout>

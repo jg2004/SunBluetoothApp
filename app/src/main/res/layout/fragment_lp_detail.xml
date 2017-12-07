@@ -83,6 +83,7 @@
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/download_lp"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_file_download_black_24dp"/>
 
@@ -92,6 +93,7 @@
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/edit_lp_long_desc"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_edit_black_24dp"
             tools:layout_editor_absoluteX="95dp"
@@ -100,6 +102,7 @@
 
         <ImageButton
             android:id="@+id/upLoadButton"
+            android:contentDescription="@string/upload_lp"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

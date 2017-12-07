@@ -4,128 +4,34 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:padding="15dp">
+              android:padding="10dp">
 
-    <android.support.design.widget.TextInputLayout
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/editTextRate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:errorEnabled="true">
+        android:hint="Rate"
+        android:inputType="numberDecimal"
+        />
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/editTextRate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Rate"
-            android:inputType="numberDecimal"
-            />
-
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayoutWait"
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/editTextWait"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
+        android:hint="Wait time (hh:mm:ss)"
+        android:inputType="text"/>
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/editTextWait"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Wait time (hh:mm:ss)"
-            android:inputType="text"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayoutSet"
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/editTextSetPoint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/editTextSetPoint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Set point"
-            android:inputType="number|numberSigned|numberDecimal"/>
-
-
-    </android.support.design.widget.TextInputLayout>
-
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        >
-
-
-        <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/chamberRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:checked="true"
-            android:tag="0"
-            android:text="Control to chamber probe"/>
-
-        <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/userRadioButton"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:text="Control to user probe"/>
-
-        <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/chamberUserAverageRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:text="Control to average of chamber and user probe"/>
-
-        <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/slowlyForceUserRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Slowly force user to set"/>
-
-        <android.support.v7.widget.AppCompatRadioButton
-
-            android:id="@+id/averageSlowlyForceUserRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:text="Control to average, then slowly force user to set"/>
-    </RadioGroup>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Damping Coefficient (options 3 and 4 only): "
-            android:textColor="@android:color/black"
-            />
-
-
-        <android.support.v7.widget.AppCompatEditText
-            android:id="@+id/editTextDampingCoefficient"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:text="400"/>
-    </LinearLayout>
+        android:hint="Set point"
+        android:inputType="number|numberSigned|numberDecimal"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -134,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            android:background="@drawable/white_rounded_button"
+            android:background="@drawable/white_rounded_button_accent"
             android:text="@string/alert_dialog_ok"
             />
 
@@ -142,11 +48,9 @@
             android:id="@+id/buttonCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/white_rounded_button"
+            android:background="@drawable/white_rounded_button_accent"
             android:text="@string/cancel"
             />
-
     </LinearLayout>
-
-
 </LinearLayout>
+

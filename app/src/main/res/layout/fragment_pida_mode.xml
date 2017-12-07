@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+android:background="@android:color/white"
+                android:layout_margin="10dp"
+    >
+
+    <TextView
+        android:id="@+id/pidAmodeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/border_bottom_gray"
+        android:gravity="center_horizontal"
+        android:text="PIDA MODE"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pidAmodeTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/border_curved_padding"
+        android:orientation="vertical">
+
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            >
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/chamberRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:tag="0"
+                android:text="Control to chamber probe"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/userRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="3"
+                android:text="Control to user probe"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/chamberUserAverageRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="1"
+                android:text="Control to average of chamber and user probes"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/slowlyForceUserRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="2"
+                android:text="Slowly force user to set"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/averageSlowlyForceUserRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="4"
+                android:text="Control to average of chamber and user, then slowly force user to set"/>
+        </RadioGroup>
+
+
+        <LinearLayout
+            android:id="@+id/dampingCoefficientLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:text="Damp. Coefficient (options 4,5):"
+                android:textColor="@android:color/black"
+                />
+
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/editTextDampingCoefficient"
+                android:layout_width="65dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxWidth="65dp"
+                android:text="400"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mainLayout"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:padding="5dp">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonGet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="GET"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="SET"/>
+    </LinearLayout>
+
+</RelativeLayout>

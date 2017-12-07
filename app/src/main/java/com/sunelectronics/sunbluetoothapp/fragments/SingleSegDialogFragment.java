@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
@@ -22,8 +19,6 @@ public class SingleSegDialogFragment extends DialogFragment {
     private static final String TAG = "SingleSegDialogFragment";
     public static final int DELAY = 1000;
     private Button mButtonOK, mButtonCancel;
-    private RadioButton mRadioButton;
-    private RadioGroup mRadioGroup;
     private TextInputEditText mTextInputEditTextRate, mTextInputEditTextWait, mTextInputEditTextSet;
     private Handler mHandler = new Handler();
 
@@ -47,8 +42,7 @@ public class SingleSegDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
-        View view = inflater.inflate(R.layout.dialog_frag_single_seg, container, false);
-        return view;
+        return inflater.inflate(R.layout.dialog_frag_single_seg, container, false);
     }
 
     @Override
@@ -60,16 +54,13 @@ public class SingleSegDialogFragment extends DialogFragment {
         String title = args.getString("TITLE", "DEFAULT TITLE");
         getDialog().setTitle(title);
         initializeViews(view);
-
     }
 
     private void initializeViews(final View view) {
-        final EditText dampingCoefficientEditText = (EditText) view.findViewById(R.id.editTextDampingCoefficient);
         mTextInputEditTextWait = (TextInputEditText) view.findViewById(R.id.editTextWait);
         mTextInputEditTextWait.requestFocus();
         mTextInputEditTextRate = (TextInputEditText) view.findViewById(R.id.editTextRate);
         mTextInputEditTextSet = (TextInputEditText) view.findViewById(R.id.editTextSetPoint);
-        mRadioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
         mButtonCancel = (Button) view.findViewById(R.id.buttonCancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,20 +74,6 @@ public class SingleSegDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: OK was pressed, sending single segment commands...");
 
-                String dampingCoefficient = dampingCoefficientEditText.getText().toString();
-                if (Integer.parseInt(dampingCoefficient) > 1000 || Integer.parseInt(dampingCoefficient)<0){
-                    
-                }
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRadioButton = (RadioButton) view.findViewById(mRadioGroup.getCheckedRadioButtonId());
-                        String pidACommand = "PIDA=" + mRadioButton.getTag();
-                        Log.d(TAG, "run: sending pida command: " + pidACommand);
-
-
-                    }
-                });
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -130,12 +107,8 @@ public class SingleSegDialogFragment extends DialogFragment {
 
                     }
                 }, 3 * DELAY);
-
                 dismiss();
-
             }
         });
     }
-
-
 }

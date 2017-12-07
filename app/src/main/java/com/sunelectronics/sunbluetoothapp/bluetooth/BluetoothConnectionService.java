@@ -214,6 +214,9 @@ public class BluetoothConnectionService implements Serializable {
             } catch (IOException e) {
                 Log.d(TAG, "write: Error writing data to output stream: " + text);
                 e.printStackTrace();
+                // TODO: 12/5/2017  when connection lost this exception occurs
+                // might be a good idea to broadcast this back to activity to let it know
+
             }
         }
 

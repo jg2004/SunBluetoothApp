@@ -4,7 +4,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="15dp">
-
     <TextView
         android:id="@+id/textViewLogFile"
         android:layout_width="match_parent"
@@ -12,6 +11,5 @@
         android:textColor="@android:color/black"
         android:textSize="16sp"
         tools:text="test message"/>
-
 
 </ScrollView>

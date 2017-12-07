@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_curved_padding"
+    >
+
+
+    <LinearLayout
+        android:id="@+id/buttonBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <ToggleButton
+            android:id="@+id/buttonOutput2"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/white_rounded_button"
+            android:checked="false"
+            android:tag="2"
+            android:textOff="OUTPUT 2 (AB) ON"
+            android:textOn="OUTPUT 2 (AB) OFF"/>
+
+        <ToggleButton
+            android:id="@+id/buttonOutput3"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/white_rounded_button"
+            android:checked="false"
+            android:tag="3"
+            android:textOff="OUTPUT 3 ON"
+            android:textOn="OUTPUT 3 OFF"/>
+
+        <ToggleButton
+            android:id="@+id/buttonOutput4"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/white_rounded_button"
+            android:checked="false"
+            android:tag="4"
+            android:textOff="OUTPUT 4 (N2 GP) ON"
+            android:textOn="OUTPUT 4 (N2 GP) OFF"/>
+
+        <ToggleButton
+            android:id="@+id/buttonOutput5"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/white_rounded_button"
+            android:checked="false"
+            android:tag="5"
+            android:textOff="OUTPUT 5 ON"
+            android:textOn="OUTPUT 5 OFF"/>
+
+        <ToggleButton
+            android:id="@+id/buttonOutput6"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/white_rounded_button"
+            android:checked="false"
+            android:tag="6"
+            android:textOff="OUTPUT 6 ON"
+            android:textOn="OUTPUT 6 OFF"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channel_0_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonBar"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <TextView
+
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="4"
+            android:gravity="end"
+            android:text="ANLG0:"/>
+
+        <SeekBar
+            android:id="@+id/seekbarChannel0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="14"
+            android:max="255"
+            android:tag="0"/>
+
+        <TextView
+            android:id="@+id/channel_0_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="start"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channel_1_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/channel_0_layout"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="4"
+            android:gravity="end"
+            android:text="ANLG1:"/>
+
+        <SeekBar
+            android:id="@+id/seekbarChannel1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="14"
+            android:max="255"
+            android:tag="1"/>
+
+        <TextView
+            android:id="@+id/channel_1_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="start"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channel_2_layout"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/channel_1_layout"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="4"
+            android:gravity="end"
+            android:text="ANLG2:"/>
+
+        <SeekBar
+            android:id="@+id/seekbarChannel2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="14"
+            android:max="255"
+            android:tag="2"/>
+
+        <TextView
+            android:id="@+id/channel_2_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channel_3_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/channel_2_layout"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="4"
+            android:gravity="end"
+            android:text="ANLG3:"/>
+
+        <SeekBar
+            android:id="@+id/seekbarChannel3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="14"
+            android:max="255"
+            android:tag="3"/>
+
+        <TextView
+            android:id="@+id/channel_3_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -178,6 +178,7 @@ public class ChamberStatus {
     }
 
     public void setPidMode(String pidMode) {
+        Log.d(TAG, "setPidMode: called");
         mStringBuilder.delete(0, mStringBuilder.length());
         switch (pidMode) {
 
@@ -200,6 +201,7 @@ public class ChamberStatus {
     }
 
     public String getPidMode() {
+        Log.d(TAG, "getPidMode: returning " + mStatusString.toString());
         return mStringBuilder.toString();
     }
 }
