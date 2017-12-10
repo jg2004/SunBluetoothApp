@@ -18,24 +18,30 @@
             android:label="@string/title_activity_local_program"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-
         <activity
             android:name=".activities.BluetoothStartUp"
             android:label="Set up Bluetooth"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
 
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+            <!--this is a comment-->
+
+        </activity>
         <activity
             android:name=".activities.HomeActivity"
             android:label="HomeActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            >
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+        <activity android:name=".activities.IntroActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 
