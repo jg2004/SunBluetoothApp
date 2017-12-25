@@ -21,14 +21,7 @@
         <activity
             android:name=".activities.BluetoothStartUp"
             android:label="Set up Bluetooth"
-            android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
-            <!--this is a comment-->
-
+            android:theme="@style/AppTheme">
         </activity>
         <activity
             android:name=".activities.HomeActivity"
@@ -36,7 +29,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan">
         </activity>
-        <activity android:name=".activities.IntroActivity">
+        <activity
+            android:name=".activities.IntroActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

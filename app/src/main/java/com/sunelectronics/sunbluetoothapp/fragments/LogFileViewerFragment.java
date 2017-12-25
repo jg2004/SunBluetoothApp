@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +27,6 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NA
 
 public class LogFileViewerFragment extends Fragment {
 
-    private TextView logFileTextView;
     private static final String TAG = "LogFileViewerFragment";
     private String mLogFileContents;
     private String mFileName;
@@ -37,8 +38,13 @@ public class LogFileViewerFragment extends Fragment {
 
         Log.d(TAG, "onCreateView: called");
         View view = inflater.inflate(R.layout.fragment_log_file_viewer, container, false);
-        setHasOptionsMenu(true);
-        logFileTextView = (TextView) view.findViewById(R.id.textViewLogFile);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.show();
+            setHasOptionsMenu(true);
+        }
+
+        TextView logFileTextView = (TextView) view.findViewById(R.id.textViewLogFile);
         if (mLogFileContents.isEmpty()) {
 
             logFileTextView.setText(EMPTY_LOG_FILE_CONTENTS);
@@ -59,6 +65,8 @@ public class LogFileViewerFragment extends Fragment {
         if (args != null) {
             mLogFileContents = args.getString(LOG_FILE_CONTENTS);
             mFileName = args.getString(LOG_FILE_NAME);
+        } else {
+            mLogFileContents = getString(R.string.log_file_null_message);
         }
     }
 

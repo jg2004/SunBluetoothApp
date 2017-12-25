@@ -1,8 +1,6 @@
 package com.sunelectronics.sunbluetoothapp.utilities;
 
-/**
- * Created by Jerry on 8/19/2017.
- */
+
 public class Constants {
 
     public static final String LP_DB_NAME = "localPrograms.db";
@@ -18,7 +16,6 @@ public class Constants {
     public static final String LP_ID = "_id";
     public static final String LP_NAME = "lp_name";
     public static final String LP_CONTENT = "lp_content";
-    public static final String LP_LOCATION = "lp_location";
 
     //constants used
     public static final String SEND_STOP = "SEND STOP COMMAND";
@@ -42,6 +39,7 @@ public class Constants {
     public static final String TURN_OFF_CHAMBER = "TURN OFF CHAMBER";
     public static final String TERMINATE_LOGGING_SESSION = "TERMINATE LOGGING SESSION";
     public static final String EXIT_APP = "EXIT APPLICATION";
+    public static final String START_DISCOVERY = "start_discovery";
 
     //Fragment TAGS
     public static final String TAG_LP_DETAIL_FRAG = "lp_detail_frag";

@@ -30,9 +30,12 @@ import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.ui.DeviceListAdaptor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_DISCOVERY;
 
 public class BluetoothStartUp extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private static final String TAG = "BluetoothStartUp";
@@ -45,8 +48,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
     private ListView mDeviceListView;
     private TextView mTvDeviceList, mProgressBarTextView;
     private LinearLayout mProgressBarContainer;
-    private boolean isDiscovering, isDisplayingDiscovered;
-    private MenuItem mDiscoveringMenutItem;
+    private boolean mIsDisplayingDiscovered, mStartDiscovery;
     private BluetoothConnectionService mBluetoothConnectionService;
 
     /*-----------------overriden methods of AppCompatActivity----------------------------------------*/
@@ -73,35 +75,36 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
             Log.d(TAG, "phone does not have bluetooth!");
             Toast.makeText(this, "phone " + Build.VERSION.CODENAME + " does not have bluetooth", Toast.LENGTH_LONG).show();
             // TODO: 10/1/2017 cannot use app without bluetooth
+            return;
+        }
+        //get the intent from IntroActivity to see if discovery button pressed
+        Intent intent = getIntent();
+        mStartDiscovery = intent.getBooleanExtra(START_DISCOVERY, false);
+        if (mStartDiscovery) {
+            Log.d(TAG, "Discovery button from Intro activity selected, discovering devices...");
+            startDiscovery();
         } else {
-
-            if (mBluetoothAdapter.isEnabled()) {
-                Log.d(TAG, "bluetooth is already on");
-                initialize();
-
-            } else {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivity(intent);
-            }
+            Log.d(TAG, "Connect button from Intro activity selected, attempting connection...");
+            attemptConnection();
         }
 
     }//end of OnCreate
-
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu: called");
         //check to see if discovering, if so then disable paired menu item
-        MenuItem paired = menu.findItem(R.id.actionPairedBluetooth);
-        MenuItem discovering = menu.findItem(R.id.actionDiscoverBluetooth);
-        //set as a field for global access
-        mDiscoveringMenutItem = discovering;
+        MenuItem pairedMenuItem = menu.findItem(R.id.actionPairedBluetooth);
+        MenuItem discoveringMenuItem = menu.findItem(R.id.actionDiscoverBluetooth);
 
-        if (isDiscovering) {
-            paired.setEnabled(false);
+        //set menu item's discover icon based on whether it's discovering or not
+        if (mBluetoothAdapter.isDiscovering()) {
+            pairedMenuItem.setEnabled(false);
+            discoveringMenuItem.setIcon(R.drawable.ic_action_cancel_discovery);
 
         } else {
-            paired.setEnabled(true);
+            pairedMenuItem.setEnabled(true);
+            discoveringMenuItem.setIcon(R.drawable.ic_action_discover);
         }
         return true;
     }
@@ -109,6 +112,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        Log.d(TAG, "onCreateOptionsMenu: called");
         getMenuInflater().inflate(R.menu.menu_bluetooth_startup, menu);
         return true;
     }
@@ -122,7 +126,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
 
                 Log.d(TAG, "onOptionsItemSelected: discovering bluetooth devices");
 
-                if (isDiscovering) {
+                if (mBluetoothAdapter.isDiscovering()) {
                     item.setIcon(R.drawable.ic_action_discover);
                     if (mBluetoothAdapter.isDiscovering()) {
                         mBluetoothAdapter.cancelDiscovery();
@@ -134,13 +138,11 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
                     mDeviceListView.setAdapter(mAdaptor);
                     discoverDevices();
                 }
-
                 break;
 
             case R.id.actionPairedBluetooth:
                 Log.d(TAG, "onOptionsItemSelected: displaying paired devices");
                 displayPairedDevices();
-
         }
 
         return true;
@@ -150,24 +152,33 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         // when displaying discovered devices, try to pair with device
-        Log.d(TAG, "onItemClick: you clicked on item " + position + " isDisplayingDiscovered: " + isDisplayingDiscovered);
+        Log.d(TAG, "onItemClick: you clicked on item " + position + " mIsDisplayingDiscovered: " + mIsDisplayingDiscovered);
 
         BluetoothDevice device = mBluetoothDeviceList.get(position);
 
-        if (device != null && isDisplayingDiscovered) {
+        if (device != null && mIsDisplayingDiscovered) {
             //if device is present and list is showing discovered devices
             // note: the createbond method is only available with API's >19
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                Log.d(TAG, "attempting to create Bond with " + device.getName());
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2 && device.getBondState() == BluetoothDevice.BOND_NONE) {
+                Log.d(TAG, " device not bonded and API >19, attempting to create Bond with " + device.getName());
                 device.createBond();
+            } else if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                Log.d(TAG, "device is already bonded, starting connection");
+                startBTConnection(device);
             }
-        } else if (device != null && !isDisplayingDiscovered) {
+        } else if (device != null && !mIsDisplayingDiscovered) {
 
             // if device is present and list is showing paired devices (Not Discovered)
-
-            startBTConnection(device);
+            // first verify bluetooth enabled
+            if (mBluetoothAdapter.isEnabled()) {
+                startBTConnection(device);
+            } else {
+                //bluetooth has been turned off, enable it!!
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivity(intent);
+            }
         }
-
     }
 
     @Override
@@ -197,18 +208,10 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         registerReceiver(mBluetoothReceiver, filter);
 
-//        registerReceiver(mBluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-//        IntentFilter discoveryIntentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//        discoveryIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-//        discoveryIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-//        registerReceiver(mBluetoothReceiver, discoveryIntentFilter);
-//        IntentFilter bondingFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-//        registerReceiver(mBluetoothReceiver, bondingFilter);
         IntentFilter couldNotconnectBtFilter = new IntentFilter(BluetoothConnectionService.COULD_NOT_CONNECT_BLUETOOTH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetoothReceiver, couldNotconnectBtFilter);
         IntentFilter successfullConnectionFilter = new IntentFilter(BluetoothConnectionService.BLUETOOTH_SUCCESSFULLY_CONNECTED);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetoothReceiver, successfullConnectionFilter);
-
     }
 
     /**
@@ -221,15 +224,14 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         mDeviceListView.setVisibility(View.VISIBLE);
         mBluetoothDeviceList.clear();
         mTvDeviceList.setText(R.string.paired_bt_devices);
-        Set bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
-
+        Set<BluetoothDevice> bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
         Iterator<BluetoothDevice> iterator = bluetoothDeviceSet.iterator();
         while (iterator.hasNext()) {
             BluetoothDevice device = iterator.next();
             mBluetoothDeviceList.add(device);
         }
         mAdaptor.notifyDataSetChanged();
-        isDisplayingDiscovered = false;
+        mIsDisplayingDiscovered = false;
         Log.d(TAG, "displayPairedDevices: " + mBluetoothDeviceList);
     }
 
@@ -237,6 +239,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
      * start the discovery of unpaired bluetooth devices
      */
     private void discoverDevices() {
+
         Log.d(TAG, "discoverDevices: looking for a list of bluetooth devices to pair with");
         mTvDeviceList.setText(R.string.disc_bt_devices);
 
@@ -256,15 +259,12 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
 
         } else {
             Toast.makeText(this, "Discovery could not be started. Verify bluetooth is enabled", Toast.LENGTH_SHORT).show();
-            mDiscoveringMenutItem.setIcon(R.drawable.ic_action_discover);
             Log.d(TAG, "discoverDevices: discovery could not be started");
         }
     }
 
     /**
-     * Method called to start the Bluetooth connection service
-     *
-     * @param bluetoothDevice
+     * @param bluetoothDevice bluetooth device to connect with
      */
     private void startBTConnection(BluetoothDevice bluetoothDevice) {
         //this method called from onClicklistener and Broadcase receiver after pairing with discovered
@@ -291,7 +291,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
             //find the paired device with name found in prefs file
             boolean deviceFound = false;
             Log.d(TAG, "looking for device saved in prefs file...");
-            Set bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
+            Set<BluetoothDevice> bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
 
             Iterator<BluetoothDevice> iterator = bluetoothDeviceSet.iterator();
             while (iterator.hasNext()) {
@@ -310,11 +310,42 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         }
     }
 
+    /**
+     * method called when Connect button pressed in IntroActivity.
+     */
+    private void attemptConnection() {
+
+        if (mBluetoothAdapter.isEnabled()) {
+            Log.d(TAG, "bluetooth is already on");
+            initialize();
+        } else {
+            //turn on bluetooth
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * method called when Disccover button pressed in IntroActivity.
+     */
+    private void startDiscovery() {
+        if (mBluetoothAdapter.isEnabled()) {
+            Log.d(TAG, "bluetooth is already on");
+            discoverDevices();
+        } else {
+            //turn on bluetooth
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(intent);
+        }
+    }
+
+
     /*--------------------------------------------------------------------------------------------------
     * THIS IS THE INNER CLASS THAT HANDLES BROADCASTS FROM ANDROID BLUETOOTH
     * */
     private class BluetoothReceiver extends BroadcastReceiver {
         private static final String TAG = "BluetoothReceiver";
+        private Set<BluetoothDevice> mBluetoothDeviceSet = new HashSet<>();
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -350,15 +381,22 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
 
                         case BluetoothAdapter.STATE_OFF:
                             Log.d(TAG, "onReceive: Bluetooth is OFF");
-
                             break;
 
                         case BluetoothAdapter.STATE_TURNING_OFF:
                             Log.d(TAG, "onReceive: Bluetooth is turning OFF");
                             break;
+
                         case BluetoothAdapter.STATE_ON:
                             Log.d(TAG, "onReceive: Bluetooth is ON");
-                            initialize();
+
+                            if (mStartDiscovery) {
+                                //this indicates discover button pressed in IntroActivity
+                                discoverDevices();
+                            } else {
+                                initialize();
+                            }
+
                             break;
                         case BluetoothAdapter.STATE_TURNING_ON:
                             Log.d(TAG, "onReceive: Bluetooth is turning ON");
@@ -374,36 +412,32 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
                     mTvDeviceList.setText(getString(R.string.disc_bt_devices));
                     Toast.makeText(BluetoothStartUp.this, "Discovery started", Toast.LENGTH_SHORT).show();
                     mBluetoothDeviceList.clear();
-                    isDiscovering = true;
-                    isDisplayingDiscovered = true;
-
+                    mIsDisplayingDiscovered = true;
+                    invalidateOptionsMenu();
                     break;
 
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED://when BT discovery finished
                     Toast.makeText(BluetoothStartUp.this, "Discovery complete", Toast.LENGTH_SHORT).show();
-                    isDiscovering = false;
 
                     if (mBluetoothDeviceList.size() == 0) {
-                        mTvDeviceList.setText("No bluetooth devices found");
+                        mTvDeviceList.setText(R.string.no_bluetooth_message);
                     }
 
-                    //set menu item's icon from cancel icon to search icon
-                    mDiscoveringMenutItem.setIcon(R.drawable.ic_action_discover);
+                    invalidateOptionsMenu();
                     mProgressBarContainer.setVisibility(ProgressBar.GONE);
-                    mAdaptor.notifyDataSetChanged();
                     Log.d(TAG, "onReceive: discovery finished");
                     break;
 
                 case BluetoothDevice.ACTION_FOUND://when BT discovery finds device
 
                     Log.d(TAG, "onReceive: device found");
+                    mBluetoothDeviceList.clear();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    mBluetoothDeviceList.add(device);
+                    mBluetoothDeviceSet.add(device);
+                    mBluetoothDeviceList.addAll(mBluetoothDeviceSet);
+                    // mBluetoothDeviceList.add(device);
                     mAdaptor.notifyDataSetChanged();
 
-                    //mBluetoothDeviceSet.add(device);
-
-                    // mBluetoothDevices.add(device);
                     Log.d(TAG, "device found: " + "name: " + device.getName() + ", device address: " + device.getAddress());
 
                     break;
@@ -433,6 +467,3 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         }
     }
 }
-
-
-

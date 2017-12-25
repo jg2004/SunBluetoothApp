@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/actionDiscoverBluetooth"
-        android:icon="@drawable/ic_action_discover"
+        android:icon="@drawable/ic_action_cancel_discovery"
         android:orderInCategory="1"
         android:title="@string/discover"
         app:showAsAction="ifRoom"/>

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
+import com.sunelectronics.sunbluetoothapp.activities.IntroActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
@@ -91,8 +92,17 @@ public class MyAlertDialogFragment extends DialogFragment {
         Log.d(TAG, "onAttach: called");
         super.onAttach(context);
         //HomeActivity implements the DeleteLogFileListener
-        mDeleteLogFileListener = (HomeActivity) context;
-        mDisplayTemperatureFragmentCallBacks = (HomeActivity) context;
+        
+        if (context instanceof HomeActivity) {
+            Log.d(TAG, "context is instance of HomeActivity");
+            mDeleteLogFileListener = (HomeActivity) context;
+            mDisplayTemperatureFragmentCallBacks = (HomeActivity) context; 
+        } else if (context instanceof IntroActivity){
+
+            Log.d(TAG, "context is instance of IntroActivity");
+            mDeleteLogFileListener = (IntroActivity) context;
+        }
+        
 
 
     }

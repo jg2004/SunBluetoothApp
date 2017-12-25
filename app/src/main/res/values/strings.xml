@@ -11,7 +11,7 @@
     <string name="save_button">Save</string>
     <string name="cancelButton">Cancel</string>
     <string name="alert_dialog_ok">OK</string>
-    <string name="alert_dialog_cancel">CANCEL</string>
+    <string name="alert_dialog_cancel">Cancel</string>
     <string name="create_lp">Create LP</string>
     <string name="edit_lp">Edit LP</string>
     <string name="local_program">Local Program</string>
@@ -20,16 +20,16 @@
     <string name="clear_fields">Clear Fields</string>
     <string name="load_sample_LP">Load a sample Local Program</string>
     <string name="save_to_phone">Save Local Program to phone</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="discover">Discover</string>
     <string name="paired">Paired</string>
     <string name="paired_bt_devices">Paired Bluetooth Devices</string>
-    <string name="searching_bluetooth">Searching for bluetooth devices...</string>
+    <string name="searching_bluetooth">Searching for bluetooth devices…</string>
     <string name="cham">CHAM:</string>
     <string name="user">USER:</string>
     <string name="wait">WAIT:</string>
     <string name="set">SET:</string>
-    <string name="searching_for_bluetooth_devices">searching for bluetooth devices...</string>
+    <string name="searching_for_bluetooth_devices">searching for bluetooth devices…</string>
     <string name="disc_bt_devices">Discovered Bluetooth Devices</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="lp_dropdown_prompt">Select LP</string>
@@ -53,6 +53,8 @@
     <string name="upload_lp">upload local program</string>
     <string name="edit_lp_long_desc">Edit Local Program</string>
     <string name="lp_bkpnt">continue from local program breakpoint</string>
+    <string name="log_file_null_message">NO LOG FILES TO VIEW</string>
+    <string name="no_bluetooth_message">No bluetooth devices found</string>
 
 
     <string-array name="lp_dropdown_array">

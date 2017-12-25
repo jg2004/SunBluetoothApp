@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +40,9 @@ public class LogFileListFragment extends ListFragment {
     private static final String EMPTY_LISTVIEW_MESSAGE = "No Temperature Logging Files";
     private List<String> mLogFileList = new ArrayList<>();
     private TemperatureLogReader mTemperatureLogReader;
-    private ArrayAdapter mAdapter;
+    private ArrayAdapter<String> mAdapter;
+    private ActionBar mSupportActionBar;
+    private View view;
 
     public interface DeleteLogFileListener {
         void deleteLogFile(String fileName);
@@ -46,11 +50,13 @@ public class LogFileListFragment extends ListFragment {
         void deleteAllLogFiles();
     }
 
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated: called");
         super.onActivityCreated(savedInstanceState);
 
+        view = getView();
         mTemperatureLogReader = new TemperatureLogReader(getContext());
         mLogFileList = mTemperatureLogReader.getLogFiles();
 
@@ -59,10 +65,15 @@ public class LogFileListFragment extends ListFragment {
             mLogFileList.add(EMPTY_LISTVIEW_MESSAGE);
         }
 
-        mAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, mLogFileList);
+        mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, mLogFileList);
         setListAdapter(mAdapter);
         setUpLongClickListener();
+        mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (mSupportActionBar != null) {
+            mSupportActionBar.show();
+        }
         setHasOptionsMenu(true);
+        view.setBackgroundColor(0xFFFFFFFF);
     }
 
     private void setUpLongClickListener() {
@@ -85,11 +96,11 @@ public class LogFileListFragment extends ListFragment {
     /**
      * called from HomeActivity, which is called by MyAlertDialogFragment
      *
-     * @param fileName
+     * @param fileName filename to be deleted
      */
     public void deleteLogFile(String fileName) {
         if (mTemperatureLogReader.deleteFile(fileName)) {
-            Snackbar.make(getView(), "File deleted!", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "File deleted!", Snackbar.LENGTH_SHORT).show();
             mAdapter.remove(fileName);
 
             if (mAdapter.getCount() == 0) {
@@ -97,7 +108,7 @@ public class LogFileListFragment extends ListFragment {
             }
         } else {
 
-            Snackbar.make(getView(), "Filel could not be deleted", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "Filel could not be deleted", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -108,8 +119,7 @@ public class LogFileListFragment extends ListFragment {
             mAdapter.add(EMPTY_LISTVIEW_MESSAGE);
         } else {
 
-            Snackbar.make(getView(), "Some files could not be deleted", Snackbar.LENGTH_SHORT).show();
-
+            Snackbar.make(view, "Some files could not be deleted", Snackbar.LENGTH_SHORT).show();
         }
 
     }
@@ -117,7 +127,7 @@ public class LogFileListFragment extends ListFragment {
     /**
      * alert dialog to delete one log file
      *
-     * @param fileName
+     * @param fileName filename to delete
      */
     private void showAlertDialog(String fileName) {
         Bundle args = new Bundle();
@@ -178,5 +188,12 @@ public class LogFileListFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_log_file_list_view, menu);
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop: called");
+        mSupportActionBar.hide();
+        super.onStop();
     }
 }

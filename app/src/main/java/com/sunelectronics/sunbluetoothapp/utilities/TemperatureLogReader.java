@@ -69,7 +69,7 @@ public class TemperatureLogReader {
 
     public String getFileContents(String fileName) {
 
-        String fileContents = null;
+        String fileContents;
         File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY + File.separator + fileName);
 
         try {
