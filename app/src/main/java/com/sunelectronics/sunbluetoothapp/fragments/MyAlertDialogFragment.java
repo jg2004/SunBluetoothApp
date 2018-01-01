@@ -16,11 +16,11 @@ import com.sunelectronics.sunbluetoothapp.activities.IntroActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
-import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_CONFIRM_EXIT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_NOTIFICATION;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LOG_FILES;
@@ -36,18 +36,10 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CH
 
 public class MyAlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyAlertDialogFragment";
-    private LPRecyclerViewAdapter mAdpaptor;
     private LogFileListFragment.DeleteLogFileListener mDeleteLogFileListener;
     private DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks mDisplayTemperatureFragmentCallBacks;
 
-
-    public interface OnPositiveDialogClick {
-
-        void onPositiveClick(Bundle args);
-    }
-
     //create an instance of MyAlertDialogFragment with bundle containing title, icon, objects passed in as argument
-
 
     public static MyAlertDialogFragment newInstance(Bundle args) {
         Log.d(TAG, "newInstance: called");
@@ -64,6 +56,7 @@ public class MyAlertDialogFragment extends DialogFragment {
         String title = getArguments().getString(ALERT_TITLE);
         int iconId = getArguments().getInt(ALERT_ICON);
         String message = getArguments().getString(ALERT_MESSAGE);
+        String type = getArguments().getString(ALERT_TYPE);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
                 .setMessage(message)
@@ -72,17 +65,22 @@ public class MyAlertDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        //((OnPositiveDialogClick) getActivity()).onPositiveClick(getArguments());
                         Log.d(TAG, "onClick: ok was pressed");
                         performAction();
                     }
-                })
-                .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dismiss();
-                    }
                 });
+        // only set a negative button if not a notification type of alert
+        if ( type != null && !type.equals(ALERT_NOTIFICATION)) {
+
+            builder.setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dismiss();
+                }
+            });
+
+        }
+
         return builder.create();
     }
 
@@ -92,17 +90,16 @@ public class MyAlertDialogFragment extends DialogFragment {
         Log.d(TAG, "onAttach: called");
         super.onAttach(context);
         //HomeActivity implements the DeleteLogFileListener
-        
+
         if (context instanceof HomeActivity) {
             Log.d(TAG, "context is instance of HomeActivity");
             mDeleteLogFileListener = (HomeActivity) context;
-            mDisplayTemperatureFragmentCallBacks = (HomeActivity) context; 
-        } else if (context instanceof IntroActivity){
+            mDisplayTemperatureFragmentCallBacks = (HomeActivity) context;
+        } else if (context instanceof IntroActivity) {
 
             Log.d(TAG, "context is instance of IntroActivity");
             mDeleteLogFileListener = (IntroActivity) context;
         }
-        
 
 
     }
@@ -116,6 +113,9 @@ public class MyAlertDialogFragment extends DialogFragment {
 
         switch (type) {
 
+            case ALERT_NOTIFICATION:
+                dismiss();
+                break;
             case EXIT_APP:
                 //HomeActivity has closeActivity method
                 mDisplayTemperatureFragmentCallBacks.closeActivity();
@@ -169,7 +169,7 @@ public class MyAlertDialogFragment extends DialogFragment {
 
             case SEND_STOP:
 
-                BluetoothConnectionService.getInstance(getContext()).write("STOP");
+                BluetoothConnectionService.getInstance().write("STOP");
                 break;
 
             case ALERT_CONFIRM_EXIT:

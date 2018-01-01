@@ -12,6 +12,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +41,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP_DETAIL_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.POWER_ON_DELAY_MS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
@@ -48,8 +51,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "LPDetailFragment";
     private static final int UPLOAD_DELAY_MS = 500;
     private static final int GET_STATUS_DELAY_MS = 3000;
-    private TextView mLpdetailname, mLpdetailcontent;
-    private ImageButton mEditButton, mUploadLPButton, mDownLoadLPButton;
+    private TextView mLpdetailcontent;
     private LocalProgram mLocalProgram;
     private Handler mLpUploadHandler, mLpInitializeLPHandler, mGetChamberStatusHandler;
     private Runnable mLpUploadRunnable, mGetChamberStatusRunnable;
@@ -59,6 +61,8 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     private BroadcastReceiver mLpBroadcastReceiver;
     private LPDownloadFragment.DownloadPInterface mDownloadPInterface;
     private ChamberStatus mChamberStatus;
+    private View view;
+    private boolean mIsBusyUploadingLp;
 
     public LPDetailFragment() {//empty constructor
     }
@@ -74,14 +78,18 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView: called");
-        View view = inflater.inflate(R.layout.fragment_lp_detail, container, false);
+        view = inflater.inflate(R.layout.fragment_lp_detail, container, false);
         initializeViews(view);
         initializeHandler();
 
         // TODO: 10/25/2017 fix this shit below!!
         //((LocalProgramActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.local_program )+ " id: " +mLocalProgram.getId());
 
-        ((HomeActivity) getActivity()).getSupportActionBar().setTitle(TAG);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(LP_DETAIL_FRAG_TITLE);
+            supportActionBar.show();
+        }
         return view;
     }
 
@@ -101,6 +109,10 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (mIsBusyUploadingLp){
+            Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+            return true;
+        }
         switch (item.getItemId()) {
 
             case R.id.action_deleteLocalProgram:
@@ -148,7 +160,12 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
         mGetChamberStatusRunnable = new Runnable() {
             @Override
             public void run() {
-                BluetoothConnectionService.getInstance(mContext).write(STATUS);
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    mGetChamberStatusHandler.removeCallbacks(this);
+                    Log.d(TAG, "bluetooth not connected, removing chamber status runnable");
+                    return;
+                }
+                BluetoothConnectionService.getInstance().write(STATUS);
                 mGetChamberStatusHandler.postDelayed(this, GET_STATUS_DELAY_MS);
             }
         };
@@ -158,23 +175,25 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     private void initializeViews(View view) {
 
 
-        mDownLoadLPButton = (ImageButton) view.findViewById(R.id.downLoadButton);
-        mDownLoadLPButton.setOnClickListener(this);
+        ImageButton downLoadLPButton = (ImageButton) view.findViewById(R.id.downLoadButton);
+        downLoadLPButton.setOnClickListener(this);
 
-        mEditButton = (ImageButton) view.findViewById(R.id.editButton);
-        mEditButton.setOnClickListener(this);
+        ImageButton editButton = (ImageButton) view.findViewById(R.id.editButton);
+        editButton.setOnClickListener(this);
 
-        mUploadLPButton = (ImageButton) view.findViewById(R.id.upLoadButton);
-        mUploadLPButton.setOnClickListener(this);
+        ImageButton uploadLPButton = (ImageButton) view.findViewById(R.id.upLoadButton);
+        uploadLPButton.setOnClickListener(this);
 
-        mLpdetailname = (TextView) view.findViewById(R.id.detailLpName);
+        TextView lpdetailname = (TextView) view.findViewById(R.id.detailLpName);
         mLpdetailcontent = (TextView) view.findViewById(R.id.detailLpContent);
 
         if (mLocalProgram == null) {
             mLocalProgram = (LocalProgram) getArguments().getSerializable(LP);
         }
-        mLpdetailname.setText(mLocalProgram.getName());
-        mLpdetailcontent.setText(mLocalProgram.getContent());
+        if (mLocalProgram != null) {
+            lpdetailname.setText(mLocalProgram.getName());
+            mLpdetailcontent.setText(mLocalProgram.getContent());
+        }
         mSpinner = (Spinner) view.findViewById(R.id.spinner);
         mSpinner.setSelection(0, true);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBarLp);
@@ -197,9 +216,17 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
 
             case R.id.downLoadButton:
                 Log.d(TAG, "onClick: download pressed");
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 if (mChamberStatus.isLPRunning()) {
                     Log.d(TAG, "Cannot Download while LP is running");
-                    Snackbar.make(getView(), "Cannot Download while LP is running", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, "Cannot Download while LP is running", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (mIsBusyUploadingLp){
+                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 Log.d(TAG, "onClick: removing chamber status callback");
@@ -215,21 +242,27 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                 mDownloadPInterface.downloadLP(lpNumber);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.homeContainer, fragment).commit();
-
-
                 break;
 
             case R.id.upLoadButton:
                 Log.d(TAG, "onClick: upload button pressed");
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 if (mChamberStatus.isLPRunning()) {
                     Log.d(TAG, "LP is running. Cannot upload while LP is running");
-                    Snackbar.make(getView(), "Cannot Upload while LP is running", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, "Cannot Upload while LP is running", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (mIsBusyUploadingLp){
+                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (!mChamberStatus.isPowerOn()) {
                     //turn on chamber
-                    BluetoothConnectionService.getInstance(mContext).write(ON);
+                    BluetoothConnectionService.getInstance().write(ON);
                 }
 
 
@@ -240,6 +273,10 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.editButton:
+                if (mIsBusyUploadingLp){
+                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 LPCreateEditFragment lpcreateEditFragment = new LPCreateEditFragment();
                 Bundle args = new Bundle();
                 args.putSerializable(LP, mLocalProgram);
@@ -255,7 +292,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
 
         String lp = mLpdetailcontent.getText().toString();
         if (lp.isEmpty()) {
-            Snackbar.make(getView(), "Enter an LP to upload", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(view, "Enter an LP to upload", Snackbar.LENGTH_LONG).show();
             return;
         }
         Log.d(TAG, "lp content is: " + lp);
@@ -266,14 +303,14 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void run() {
                 Log.d(TAG, "run: deleting LP " + lpNumber);
-                BluetoothConnectionService.getInstance(mContext).write("DELP" + lpNumber);
+                BluetoothConnectionService.getInstance().write("DELP" + lpNumber);
             }
         }, POWER_ON_DELAY_MS);
         mLpInitializeLPHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                BluetoothConnectionService.getInstance(mContext).write("STORE#" + lpNumber);
+                BluetoothConnectionService.getInstance().write("STORE#" + lpNumber);
 
             }
         }, POWER_ON_DELAY_MS + 1000);
@@ -288,14 +325,16 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
         int counter = 0;
         boolean endCommandSent;
 
-        public LpUploadRunnable(String[] lpArray) {
+        LpUploadRunnable(String[] lpArray) {
             this.lpArray = lpArray;
             mProgressBar.setProgress(counter);
             mProgressBar.setMax(lpArray.length);
             mProgressBar.setVisibility(View.VISIBLE);
-            //disable window
-            getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //disable window...not implementing this anymore.
+            //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    //WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            mIsBusyUploadingLp = true;
+
         }
 
         @Override
@@ -309,7 +348,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     Log.d(TAG, "the END command was sent");
                     endCommandSent = true;
                 }
-                BluetoothConnectionService.getInstance(mContext).write(lpArray[counter]);
+                BluetoothConnectionService.getInstance().write(lpArray[counter]);
                 counter++;
                 mProgressBar.setProgress(counter);
                 mLpUploadHandler.postDelayed(this, UPLOAD_DELAY_MS);
@@ -319,16 +358,21 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                 if (!endCommandSent) {
                     //send the END command to exit EDIT mode if not in LP
                     Log.d(TAG, "no END command in LP, sending END command to exit EDIT mode");
-                    BluetoothConnectionService.getInstance(mContext).write("END");
+                    BluetoothConnectionService.getInstance().write("END");
                 }
                 endCommandSent = false;
                 mLpUploadHandler.removeCallbacks(this);
                 mProgressBar.setVisibility(View.INVISIBLE);
                 //re-enable window
                 getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                mIsBusyUploadingLp = false;
                 Toast.makeText(mContext, "Upload complete", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public boolean isBusyUploadingLp() {
+        return mIsBusyUploadingLp;
     }
 
     @Override
@@ -367,7 +411,6 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
         mLpBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
                 String commandSent = intent.getStringExtra(BluetoothConnectionService.COMMAND_SENT);
                 String response = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
                 Log.d(TAG, "onReceive: called with action: " + intent.getAction());
@@ -375,9 +418,9 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                 //this code checks for invalid command in local program was sent
                 if (response.equals("?")) {
                     Log.d(TAG, "onReceive: received a command error when " + commandSent + " was sent");
-                    Snackbar.make(getView(), "INVALID COMMAND SENT: " + commandSent, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(view, "INVALID COMMAND SENT: " + commandSent, Snackbar.LENGTH_LONG).show();
                     //exit EDIT MODE by sending the  "STOP" commmand
-                    BluetoothConnectionService.getInstance(mContext).write("STOP");
+                    BluetoothConnectionService.getInstance().write("STOP");
                     mLpUploadHandler.removeCallbacks(mLpUploadRunnable);
                     mProgressBar.setVisibility(View.INVISIBLE);
                     Toast.makeText(mContext, "Upload cancelled", Toast.LENGTH_LONG).show();

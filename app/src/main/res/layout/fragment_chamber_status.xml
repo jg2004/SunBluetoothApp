@@ -8,24 +8,10 @@
     android:background="@drawable/border_curved_padding">
 
     <TextView
-        android:id="@+id/textViewStatusTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/border_bottom_gray"
-        android:gravity="center_horizontal"
-        android:paddingBottom="5dp"
-        android:text="@string/chamber_status"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
-
-    <TextView
         android:id="@+id/textViewLpRunningStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewStatusTitle"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:padding="5dp"
         android:text="@string/status_unavailable"
@@ -36,7 +22,6 @@
         android:id="@+id/lpCycleLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewStatusTitle"
         android:layout_marginLeft="30dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"

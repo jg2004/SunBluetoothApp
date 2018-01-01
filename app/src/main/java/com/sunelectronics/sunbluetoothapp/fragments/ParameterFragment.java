@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,6 +29,7 @@ import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PARAMETER_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
@@ -42,20 +44,29 @@ public class ParameterFragment extends Fragment {
     public static final int DELAY = 1000;
     private EditText mPwmp, mUtl, mLtl, mPH, mIH, mDH, mPC, mIC, mDC;
     private LinearLayout mPidLayout, mPwmpLayout, mTempLimitLayout, mButtonLayout, mProgressBarLayout;
-    private Button mSetButton, mGetButton;
     private TextView mProgressBarTextView;
     private Handler mHandler = new Handler();
     private BroadcastReceiver mBroadcastReceiver;
     private Context mContext;
+    private View view;
+    private boolean isBusyDownLoading;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
-        View view = inflater.inflate(R.layout.fragment_parameters, container, false);
+        view = inflater.inflate(R.layout.fragment_parameters, container, false);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(PARAMETER_FRAG_TITLE);
+            supportActionBar.show();
+        }
         initializeViews(view);
-        getControllerParameters();
         setHasOptionsMenu(true);
+        if (BluetoothConnectionService.getInstance().getCurrentState()== BluetoothConnectionService.STATE_CONNECTED){
+            //only download parameters if connected
+            getControllerParameters();
+        }
         return view;
     }
 
@@ -75,27 +86,39 @@ public class ParameterFragment extends Fragment {
         mPC = (EditText) view.findViewById(R.id.pCoolEditText);
         mIC = (EditText) view.findViewById(R.id.iCoolEditText);
         mDC = (EditText) view.findViewById(R.id.dCoolHeatEditText);
-        mGetButton = (Button) view.findViewById(R.id.buttonGet);
-        mGetButton.setOnClickListener(new View.OnClickListener() {
+        Button getButton = (Button) view.findViewById(R.id.buttonGet);
+        getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(v, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d(TAG, "GET clicked, getting parameters");
                 getControllerParameters();
             }
         });
-        mSetButton = (Button) view.findViewById(R.id.buttonSet);
-        mSetButton.setOnClickListener(new View.OnClickListener() {
+        Button setButton = (Button) view.findViewById(R.id.buttonSet);
+        setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d(TAG, "SET clicked, sending commands");
                 setParameters();
             }
         });
     }
+    public boolean isBusyDownLoading() {
+        return isBusyDownLoading;
+    }
 
     private void setParameters() {
         mProgressBarLayout.setVisibility(View.VISIBLE);
-        mProgressBarTextView.setText("Setting parameters, please wait...");
+        mProgressBarTextView.setText(R.string.set_param_message);
         makeLayoutsInvisible();
 
         if (!isInputValid()) {
@@ -122,10 +145,7 @@ public class ParameterFragment extends Fragment {
 
     private boolean isInputValid() {
 
-        if (!isValidPWMP(mPwmp.getText().toString())) {
-            return false;
-        }
-        return true;
+        return isValidPWMP(mPwmp.getText().toString());
     }
 
     private boolean isValidPWMP(String s) {
@@ -140,18 +160,19 @@ public class ParameterFragment extends Fragment {
         } else {
 
             Log.d(TAG, "isValidPWMP: pwmp is out of range: " + pwmp);
-            Snackbar.make(getView(), "PWMP must be >= 2 and <= 30", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "PWMP must be >= 2 and <= 30", Snackbar.LENGTH_SHORT).show();
             return false;
         }
     }
 
     private void getControllerParameters() {
         //disable window
-        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+//                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
+        isBusyDownLoading = true; //HomeActivity checks this on onBackPressed to prevent leaving fragment until complete
         mProgressBarLayout.setVisibility(View.VISIBLE);
-        mProgressBarTextView.setText("Getting parameters, please wait...");
+        mProgressBarTextView.setText(R.string.get_param_message);
         makeLayoutsInvisible();
         sendPwmpQuery();
         sendUtlQuery();
@@ -193,7 +214,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDC query");
-                BluetoothConnectionService.getInstance(getContext()).write(PIDC_QUERY);
+                BluetoothConnectionService.getInstance().write(PIDC_QUERY);
             }
         }, DELAY * 8);
     }
@@ -203,7 +224,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDH query");
-                BluetoothConnectionService.getInstance(getContext()).write(PIDH_QUERY);
+                BluetoothConnectionService.getInstance().write(PIDH_QUERY);
             }
         }, DELAY * 4);
     }
@@ -213,7 +234,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending LTL query");
-                BluetoothConnectionService.getInstance(getContext()).write(LTL_QUERY);
+                BluetoothConnectionService.getInstance().write(LTL_QUERY);
             }
         }, DELAY * 3);
     }
@@ -223,7 +244,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending UTL query");
-                BluetoothConnectionService.getInstance(getContext()).write(UTL_QUERY);
+                BluetoothConnectionService.getInstance().write(UTL_QUERY);
             }
         }, DELAY * 2);
     }
@@ -233,7 +254,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PWMP query");
-                BluetoothConnectionService.getInstance(getContext()).write(PWMP_QUERY);
+                BluetoothConnectionService.getInstance().write(PWMP_QUERY);
             }
         }, DELAY);
     }
@@ -244,7 +265,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDH command " + pidCCommand);
-                BluetoothConnectionService.getInstance(getContext()).write(pidCCommand);
+                BluetoothConnectionService.getInstance().write(pidCCommand);
             }
         }, DELAY * 5);
     }
@@ -255,7 +276,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDH command " + pidHCommand);
-                BluetoothConnectionService.getInstance(getContext()).write(pidHCommand);
+                BluetoothConnectionService.getInstance().write(pidHCommand);
             }
         }, DELAY * 4);
     }
@@ -265,7 +286,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending UTL command " + LTL_COMMAND + mLtl.getText().toString());
-                BluetoothConnectionService.getInstance(getContext()).write(LTL_COMMAND + mLtl.getText().toString());
+                BluetoothConnectionService.getInstance().write(LTL_COMMAND + mLtl.getText().toString());
             }
         }, DELAY * 3);
     }
@@ -275,7 +296,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending UTL command " + UTL_COMMAND + mUtl.getText().toString());
-                BluetoothConnectionService.getInstance(getContext()).write(UTL_COMMAND + mUtl.getText().toString());
+                BluetoothConnectionService.getInstance().write(UTL_COMMAND + mUtl.getText().toString());
             }
         }, DELAY * 2);
     }
@@ -286,35 +307,31 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending pwmp command " + pwmpCommand);
-                BluetoothConnectionService.getInstance(getContext()).write(pwmpCommand);
+                BluetoothConnectionService.getInstance().write(pwmpCommand);
             }
         }, DELAY);
     }
 
-
     private String getPidHCommand() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb;
+        sb = new StringBuilder();
         sb.append(PIDH_COMMAND).append(mPH.getText().toString()).append(",").append(mIH.getText().toString())
                 .append(",").append(mDH.getText().toString());
         return sb.toString();
     }
 
     private String getPidCCommand() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb;
+        sb = new StringBuilder();
         sb.append(PIDC_COMMAND).append(mPC.getText().toString()).append(",").append(mIC.getText().toString())
                 .append(",").append(mDC.getText().toString());
         return sb.toString();
     }
 
-
     private String getPwmpCommand() {
 
-
-        String pwmpCommand = PWMP_COMMAND + mPwmp.getText().toString();
-        return pwmpCommand;
-
+        return PWMP_COMMAND + mPwmp.getText().toString();
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -381,8 +398,9 @@ public class ParameterFragment extends Fragment {
                             pidCCount = 0;
                             mDC.setText(response);
                             mProgressBarLayout.setVisibility(View.INVISIBLE);
-                            //re-enable window
-                            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            //re-enable window and set isBusyDownloading to false
+//                            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            isBusyDownLoading=false;
                             makeLayoutsVisible();
                         }
                         Log.d(TAG, "inside the default case, response is: " + response);
@@ -406,6 +424,10 @@ public class ParameterFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (isBusyDownLoading){
+            Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+            return true;
+        }
         switch (item.getItemId()) {
 
             case R.id.loadDefaults:

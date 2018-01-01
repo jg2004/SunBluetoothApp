@@ -7,6 +7,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
@@ -32,16 +33,14 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
-
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOCAL_PROGRAM_LIST_FRAG_TITLE;
 
 public class LocalProgramListFragment extends Fragment {
-    private static final String TAG = "LocalProgramListFragmen";
+    private static final String TAG = "LPListFragment";
     public static final String TAG_FRAG_LP_LIST = "LP_LIST_FRAG";
-    private RecyclerView mLpRecyclerView;
     private LPRecyclerViewAdapter mLPRecyclerViewAdapter;
     private List<LocalProgram> lpList;
     private LPDataBaseHandler mLPDataBaseHandler;
-
 
     public LocalProgramListFragment() {
     }
@@ -50,9 +49,7 @@ public class LocalProgramListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: called");
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
-        //((LocalProgramActivity) getActivity()).setShowConfirmDialog(false);
     }
 
     @Override
@@ -67,8 +64,12 @@ public class LocalProgramListFragment extends Fragment {
         mLPRecyclerViewAdapter = new LPRecyclerViewAdapter(getContext(), lpList);
         setUpRecyclerView(view);
 
-        // ((HomeActivity) getActivity()).getSupportActionBar().setTitle("Local Programs (" + lpList.size() + ")");
-        ((HomeActivity) getActivity()).getSupportActionBar().setTitle("LPListFragment");
+        //to see # of lp's use: setTitle("Local Programs (" + lpList.size() + ")")
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(LOCAL_PROGRAM_LIST_FRAG_TITLE);
+            supportActionBar.show();
+        }
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -76,9 +77,7 @@ public class LocalProgramListFragment extends Fragment {
             public void onClick(View view) {
 
                 FragmentManager fragmentManager = getFragmentManager();
-                //FragmentTransaction ft = fragmentManager.beginTransaction().replace(R.id.localProgramContainer, new LPCreateEditFragment());
                 FragmentTransaction ft = fragmentManager.beginTransaction();
-                //ft.setCustomAnimations(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
                 ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 ft.replace(R.id.homeContainer, new LPCreateEditFragment());
                 ft.addToBackStack(null);
@@ -91,12 +90,11 @@ public class LocalProgramListFragment extends Fragment {
 
     private void setUpRecyclerView(View view) {
 
-        mLpRecyclerView = (RecyclerView) view.findViewById(R.id.lpRecyclerView);
-        mLPDataBaseHandler.setRecyclerView(mLpRecyclerView);
-        mLpRecyclerView.setHasFixedSize(true);
-        mLpRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mLpRecyclerView.setAdapter(mLPRecyclerViewAdapter);
-
+        RecyclerView lpRecyclerView = (RecyclerView) view.findViewById(R.id.lpRecyclerView);
+        mLPDataBaseHandler.setRecyclerView(lpRecyclerView);
+        lpRecyclerView.setHasFixedSize(true);
+        lpRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        lpRecyclerView.setAdapter(mLPRecyclerViewAdapter);
     }
 
     @Override
@@ -142,7 +140,11 @@ public class LocalProgramListFragment extends Fragment {
                 LocalProgram lp = new LocalProgram("sample local program", null);
                 lp.setContent(Constants.SAMPLE_LP);
                 mLPDataBaseHandler.addLocalProgramToDB(lp);
-                getFragmentManager().beginTransaction().replace(R.id.homeContainer, new LocalProgramListFragment()).commit();
+                lpList = mLPDataBaseHandler.getLocalPrograms();
+                mLPRecyclerViewAdapter.setLocalProgramList(lpList);
+                mLPRecyclerViewAdapter.notifyDataSetChanged();
+                getActivity().invalidateOptionsMenu();
+                //// TODO: 12/26/2017  refresh list
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -154,10 +156,6 @@ public class LocalProgramListFragment extends Fragment {
         myAlertdialogFragment.show(getFragmentManager(), null);
     }
 
-
-    public LPRecyclerViewAdapter getLPRecyclerViewAdapter() {
-        return mLPRecyclerViewAdapter;
-    }
 
     @Override
     public void onAttach(Context context) {

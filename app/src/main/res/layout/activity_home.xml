@@ -3,6 +3,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -57,13 +58,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimaryDark"
             app:itemBackground="@color/colorPrimaryDark"
             app:itemIconTint="@drawable/selector_bottom_bar_icon"
             app:itemTextColor="@drawable/selector_bottom_bar_text"
             app:menu="@menu/menu_home_bottom_nav">
 
         </android.support.design.widget.BottomNavigationView>
-
+        <!--background is needed to extend to edge of screen-->
 
     </RelativeLayout>
 

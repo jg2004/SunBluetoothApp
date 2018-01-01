@@ -31,8 +31,8 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LOG_FILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_LIST_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
-
 
 public class LogFileListFragment extends ListFragment {
 
@@ -44,12 +44,12 @@ public class LogFileListFragment extends ListFragment {
     private ActionBar mSupportActionBar;
     private View view;
 
+    //implemented by HomeActivity and IntroActivity
     public interface DeleteLogFileListener {
         void deleteLogFile(String fileName);
 
         void deleteAllLogFiles();
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -71,6 +71,7 @@ public class LogFileListFragment extends ListFragment {
         mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (mSupportActionBar != null) {
             mSupportActionBar.show();
+            mSupportActionBar.setTitle(LOG_FILE_LIST_FRAG_TITLE);
         }
         setHasOptionsMenu(true);
         view.setBackgroundColor(0xFFFFFFFF);
@@ -92,7 +93,6 @@ public class LogFileListFragment extends ListFragment {
         });
     }
 
-
     /**
      * called from HomeActivity, which is called by MyAlertDialogFragment
      *
@@ -110,6 +110,7 @@ public class LogFileListFragment extends ListFragment {
 
             Snackbar.make(view, "Filel could not be deleted", Snackbar.LENGTH_SHORT).show();
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     public void deleteAllLogFiles() {
@@ -121,6 +122,7 @@ public class LogFileListFragment extends ListFragment {
 
             Snackbar.make(view, "Some files could not be deleted", Snackbar.LENGTH_SHORT).show();
         }
+        getActivity().invalidateOptionsMenu();
 
     }
 
@@ -174,6 +176,13 @@ public class LogFileListFragment extends ListFragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem deleteAllLogFileMenuItem = menu.findItem(R.id.action_deleteAllLogFiles);
+        deleteAllLogFileMenuItem.setEnabled(!mLogFileList.get(0).contains(EMPTY_LISTVIEW_MESSAGE));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -195,5 +204,11 @@ public class LogFileListFragment extends ListFragment {
         Log.d(TAG, "onStop: called");
         mSupportActionBar.hide();
         super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mSupportActionBar.show();
     }
 }

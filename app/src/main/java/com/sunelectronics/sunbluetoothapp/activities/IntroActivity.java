@@ -57,7 +57,6 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
                 Intent intentDiscoverBluetooth = new Intent (IntroActivity.this, BluetoothStartUp.class);
                 intentDiscoverBluetooth.putExtra(START_DISCOVERY,true);
                 startActivity(intentDiscoverBluetooth);
-
                 break;
         }
     }
@@ -78,6 +77,5 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
         LogFileListFragment fragment = (LogFileListFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_LOGGER);
         //LogFileListFragment has deleteLogFilesMethod
         fragment.deleteAllLogFiles();
-
     }
 }

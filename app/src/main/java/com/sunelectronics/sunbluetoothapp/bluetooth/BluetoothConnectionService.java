@@ -22,56 +22,75 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BluetoothConnectionService implements Serializable {
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UPDATE_BT_STATE;
 
-    private static final String TAG = "BluetoothConnectionServ";
-    //The following UUID is a common UUID for serial bluetooth devices
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+public class BluetoothConnectionService implements Serializable {
+    // public constants
     public static final String COULD_NOT_CONNECT_BLUETOOTH = "couldNotConnectBluetooth";
     public static final String DEV_NAME = "DEVICE_NAME";
     public static final String BLUETOOTH_SUCCESSFULLY_CONNECTED = "BluetoothConnected";
-    private Context mContext;
-    private ConnectThread mConnectThread;
+    public static final String COMMAND_SENT = "commandSent";
+    public static final String MY_INTENT_FILTER = "incomingMessage";
+    public static final String BLUETOOTH_RESPONSE = "response";
+    public static final int STATE_NONE = 0;
+    public static final int STATE_CONNECTING = 1;
+    public static final int STATE_CONNECTED = 2;
+
+    //private variables
+    private static final String TAG = "BluetoothConnectionServ";
+    //The following UUID is a common UUID for serial bluetooth devices
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private ConnectedThread mConnectedThread;
+    private ConnectThread mConnectThread;
     private BluetoothDevice mDevice;
     private UUID deviceUUID;
     private BluetoothAdapter mBluetoothAdapter;
     private static BluetoothConnectionService mBluetoothConnectionService;
     private List<String> mCommandsWrittenList = new ArrayList<>();
+    private int mCurrentState;
 
-    // public constants
-    public static final String COMMAND_SENT = "commandSent";
-    public static final String MY_INTENT_FILTER = "incomingMessage";
-    public static final String BLUETOOTH_RESPONSE = "response";
 
-    private BluetoothConnectionService(Context context) {
-        mContext = context;
+    private BluetoothConnectionService() {
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         deviceUUID = MY_UUID;
+        mCurrentState = STATE_NONE;
     }
 
-    public static BluetoothConnectionService getInstance(Context context) {
-
+    public static BluetoothConnectionService getInstance() {
 
         if (mBluetoothConnectionService == null) {
             Log.d(TAG, "getInstance: mBluetoothConnectionServices is null, creating singleton");
-            mBluetoothConnectionService = new BluetoothConnectionService(context);
+            mBluetoothConnectionService = new BluetoothConnectionService();
         }
-
         return mBluetoothConnectionService;
     }
 
     /*---------------------------public methods--------------------------------------------------*/
 
+    public int getCurrentState() {
+        return mCurrentState;
+    }
+
+    public BluetoothDevice getDevice() {
+        return mDevice;
+    }
+
     /**
      * This method is called from activity to create a connection  with a bluetooth device.
      *
-     * @param bluetoothDevice
+     * @param bluetoothDevice bluetooth device on Sun controller to connect with
      */
-    public void startClient(BluetoothDevice bluetoothDevice) {
+    public void startClient(BluetoothDevice bluetoothDevice, Context context) {
 
-        Log.d(TAG, "startClient: started, mContext is: " + mContext.getClass().getName());
-        mConnectThread = new ConnectThread(bluetoothDevice);
+        Log.d(TAG, "startClient: started, mContext is: " + context.getClass().getName());
+        // Cancel any thread currently running a connection
+        if (mConnectedThread != null) {
+            mConnectedThread.cancel();
+            mConnectedThread = null;
+        }
+        mConnectThread = new ConnectThread(bluetoothDevice, context);
         mConnectThread.start();
     }
 
@@ -79,24 +98,45 @@ public class BluetoothConnectionService implements Serializable {
      * convenience method to write strings to bluetooth. Method appends carriage return then
      * converts to byte array before writing to bluetooth
      *
-     * @param stringToSend
+     * @param stringToSend this is the command to send to Sun controller
      */
     public void write(String stringToSend) {
+
+
+        if (mCurrentState != STATE_CONNECTED) {
+            //if not connected, then don't write
+            Log.d(TAG, "attempt to write, but bluetooth is not connected. Current state is: " + mCurrentState);
+            return;
+        }
 
         mCommandsWrittenList.add(stringToSend); // used to determine expected response
 
 
         // append carriage return and convert to byte array
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb;
+        sb = new StringBuilder();
         sb.append(stringToSend);
         sb.append("\r");
         byte[] out = sb.toString().getBytes();
         mConnectedThread.write(out);
     }
 
-    public void cancel() {
+    /**
+     * Stop all threads
+     */
 
-        mConnectedThread.cancel();
+    public synchronized void stop() {
+        if (mConnectThread != null) {
+            mConnectThread.cancel();
+            mConnectThread = null;
+        }
+
+        if (mConnectedThread != null) {
+            mConnectedThread.cancel();
+            mConnectedThread = null;
+        }
+        mCurrentState = STATE_NONE;
+
     }
 
     public void clearCommandsWrittenList() {
@@ -110,11 +150,11 @@ public class BluetoothConnectionService implements Serializable {
     /**
      * this is the method that is executed inside the ConnectThread class once a bluetooth connection is made
      *
-     * @param bluetoothSocket
+     * @param bluetoothSocket socket created from connection in ConnectThread
      */
-    private void connected(BluetoothSocket bluetoothSocket) {
+    private void connected(BluetoothSocket bluetoothSocket, Context context) {
         Log.d(TAG, "connected: called");
-        mConnectedThread = new ConnectedThread(bluetoothSocket);
+        mConnectedThread = new ConnectedThread(bluetoothSocket, context);
         mConnectedThread.start();
 
     }
@@ -133,9 +173,11 @@ public class BluetoothConnectionService implements Serializable {
         private final InputStream mmInstream;
         private final OutputStream mmOutstream;
         private BufferedReader br;
+        private Context context;
 
-        ConnectedThread(BluetoothSocket socket) {
+        ConnectedThread(BluetoothSocket socket, Context context) {
 
+            this.context = context;
             Log.d(TAG, "ConnectedThread: created");
             mmBluetoothSocket = socket;
             InputStream tmpIn = null;
@@ -147,9 +189,11 @@ public class BluetoothConnectionService implements Serializable {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.d(TAG, "ConnectedThread: could not get input/output stream");
             }
             mmInstream = tmpIn;
             mmOutstream = tmpOut;
+            mCurrentState = STATE_CONNECTED;
             br = new BufferedReader(new InputStreamReader(mmInstream), 2048);
         }
 
@@ -161,7 +205,7 @@ public class BluetoothConnectionService implements Serializable {
 
             //keep reading from input stream until exception occurs, the read method is a blocking
             //call!!!
-            while (true) {
+            while (mCurrentState == STATE_CONNECTED) {
 
                 try {
                     //below is code to read without using buffered reader:
@@ -171,11 +215,12 @@ public class BluetoothConnectionService implements Serializable {
                     bluetoothResponse = br.readLine();
                     Log.d(TAG, "bufferedReader read in:  " + bluetoothResponse);
 
-                    if (bluetoothResponse.equals(null)) {
-                        Log.d(TAG, "incoming message was null, ignore");
-                    }
-                    if (bluetoothResponse.equals("")) {
-                        Log.d(TAG, "incoming message was blank, ignore");
+                    if (bluetoothResponse == null) {
+                        Log.d(TAG, "response was null");
+                    } else {
+                        if (bluetoothResponse.isEmpty()) {
+                            Log.d(TAG, "response was empty");
+                        }
                     }
 
                     // than 0 before performing the following
@@ -192,19 +237,34 @@ public class BluetoothConnectionService implements Serializable {
                     incomingMessageIntent.putExtra(COMMAND_SENT, unHandledCommand);
                     incomingMessageIntent.putExtra(BLUETOOTH_RESPONSE, bluetoothResponse);
                     Log.d(TAG, "sending broadcast of message " + bluetoothResponse);
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(incomingMessageIntent);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(incomingMessageIntent);
 
                 } catch (IOException e) {
                     Log.d(TAG, "run: Error reading from input stream");
-                    Log.d(TAG, "error message is: "+ e.getMessage());
+                    Log.d(TAG, "error message is: " + e.getMessage());
                     e.printStackTrace();
+                    connectionLost();
                     break;
                 }
             }
+            Log.d(TAG, "exiting the Connected Thread while loop, current state is: " + mCurrentState + "(0=NC, 1=CONNECTING, 2=CONNECTED");
         }
+
+        /**
+         * Indicate that the connection was lost and notify the UI Activity.
+         */
+        private void connectionLost() {
+            // Send a failure message back to the Activity
+            mCurrentState = STATE_NONE;
+            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(CONNECTION_LOST));
+            // Update UI title
+            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(UPDATE_BT_STATE));
+        }
+
 
         public void write(byte[] bytes) {
 
+            //only write if the current state of BT is connected!
 
             String text = new String(bytes, Charset.defaultCharset());
             Log.d(TAG, "write: writing data to output stream: " + text);
@@ -216,14 +276,14 @@ public class BluetoothConnectionService implements Serializable {
                 e.printStackTrace();
                 // TODO: 12/5/2017  when connection lost this exception occurs
                 // might be a good idea to broadcast this back to activity to let it know
-
             }
         }
 
         /**
-         * call this from activity to shutdown the connection
+         * method of Connected thread that is called from stop method in BluetoothConnection Service
+         * class to shutdown the connection. Access is package private so no access modifier needed
          */
-        public void cancel() {
+        void cancel() {
 
             //close down streams and socket
 
@@ -277,13 +337,18 @@ public class BluetoothConnectionService implements Serializable {
 
     private class ConnectThread extends Thread {
         private BluetoothSocket mBluetoothSocket;
+        private Context context;
 
         //first step in connecting bluetooth is to get a socket
         //second step is to connect
 
-        public ConnectThread(BluetoothDevice device) {
+        ConnectThread(BluetoothDevice device, Context context) {
             Log.d(TAG, "ConnectThread: created");
             mDevice = device;
+            this.context = context;
+            mCurrentState = STATE_CONNECTING;
+            // Update UI title in HomeActivity
+            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(UPDATE_BT_STATE));
         }
 
         @Override
@@ -299,8 +364,9 @@ public class BluetoothConnectionService implements Serializable {
             } catch (IOException e) {
                 Log.d(TAG, "run: ConnectThread could not create insecureRFCommSocket, error: " + e.getMessage());
                 e.printStackTrace();
+                // TODO: 12/26/2017 shouldn't a return statement go here!!
             }
-            //if here, then socket was created!
+            //if here, then socket was created? no! this isn't true!!!
             mBluetoothSocket = tmp;
             mBluetoothAdapter.cancelDiscovery();//always cancel before connecting
 
@@ -316,7 +382,7 @@ public class BluetoothConnectionService implements Serializable {
                 Log.d(TAG, "Attempting to close connection...");
                 Intent couldNotConnectIntent = new Intent(COULD_NOT_CONNECT_BLUETOOTH);
                 couldNotConnectIntent.putExtra(DEV_NAME, mDevice.getName());
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(couldNotConnectIntent);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(couldNotConnectIntent);
                 try {
                     mBluetoothSocket.close();
                 } catch (IOException e1) {
@@ -332,9 +398,21 @@ public class BluetoothConnectionService implements Serializable {
                 Intent intent = new Intent(BLUETOOTH_SUCCESSFULLY_CONNECTED);
                 intent.putExtra(DEV_NAME, mDevice.getName());
                 Log.d(TAG, "run: sending broadcast successfully connected");
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-                storeDevice();
-                connected(mBluetoothSocket);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                storeDevice(context);
+                connected(mBluetoothSocket, context);
+            }
+
+        }
+        /**
+         * method of Connect thread that is called from stop method (above) in BluetoothConnection Service
+         * class to shutdown the connection. Access is package private so no access modifier needed
+         */
+        void cancel() {
+            try {
+                mBluetoothSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close() of connect socket failed", e);
             }
         }
 
@@ -344,13 +422,13 @@ public class BluetoothConnectionService implements Serializable {
          * be read in and displayed in a list of previously paired and successfully connected
          * devices
          */
-        private void storeDevice() {
+        private void storeDevice(Context context) {
             // TODO: 10/18/2017 save device to file as well as shared prefs
-            SharedPreferences blueToothDevicePreferences = mContext.getSharedPreferences(BluetoothStartUp.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences blueToothDevicePreferences = context.getSharedPreferences(BluetoothStartUp.MY_PREF, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = blueToothDevicePreferences.edit();
             editor.putString(BluetoothStartUp.BLUETOOTHDEV, mDevice.getName());
             Log.d(TAG, "saving device " + mDevice.getName() + " to sharedPrefs");
-            editor.commit();
+            editor.apply();
         }
 
 

@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +27,8 @@ import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNTC;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAMBER_STATUS_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
-
-/**
- * Created by Jerry on 11/11/2017.
- */
 
 public class ChamberStatusFragment extends Fragment {
 
@@ -56,6 +55,11 @@ public class ChamberStatusFragment extends Fragment {
         Log.d(TAG, "onCreateView: called");
 
         View view = inflater.inflate(R.layout.fragment_chamber_status, container, false);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(CHAMBER_STATUS_FRAG_TITLE);
+            supportActionBar.show();
+        }
         initializeViews(view);
         return view;
     }
@@ -67,7 +71,7 @@ public class ChamberStatusFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: breakPoint image button was clicked");
-                BluetoothConnectionService.getInstance(mContext).write(BKPNTC);
+                BluetoothConnectionService.getInstance().write(BKPNTC);
             }
         });
         mSpinner = (Spinner) view.findViewById(R.id.spinner);
@@ -103,8 +107,12 @@ public class ChamberStatusFragment extends Fragment {
         mStatusRunnable = new Runnable() {
             @Override
             public void run() {
+                if (BluetoothConnectionService.getInstance().getCurrentState()!= BluetoothConnectionService.STATE_CONNECTED){
+                    mHandler.removeCallbacks(this);
+                    return;
+                }
                 Log.d(TAG, "inside mStatusrunnable, writing STATUS? to bluetooth");
-                BluetoothConnectionService.getInstance(mContext).write(STATUS);
+                BluetoothConnectionService.getInstance().write(STATUS);
                 mHandler.postDelayed(this, GET_STATUS_MESSAGE_DELAY);
 
             }
@@ -113,14 +121,14 @@ public class ChamberStatusFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "inside mGetCycleRunnable, writing " + mCycleVariable + " to bluetooth");
-                BluetoothConnectionService.getInstance(mContext).write(mCycleVariable);
+                BluetoothConnectionService.getInstance().write(mCycleVariable);
             }
         };
         mGetBreakPointRunnable = new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "inside breakPointRunnable, writing  BKPNT? to bluetooth");
-                BluetoothConnectionService.getInstance(mContext).write(BKPNT);
+                BluetoothConnectionService.getInstance().write(BKPNT);
             }
         };
 

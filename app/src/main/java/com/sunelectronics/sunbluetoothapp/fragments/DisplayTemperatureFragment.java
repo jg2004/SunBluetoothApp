@@ -7,10 +7,13 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +30,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.models.ChamberModel;
 import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
@@ -42,6 +44,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAM_TEMP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CON;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DISPLAY_TEMP_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HOFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
@@ -66,7 +69,6 @@ public class DisplayTemperatureFragment extends Fragment {
     private static final int LOGGER_DELAY_MS = 15000;
     private Handler mHandler;
     private Runnable mDisplayUpdateRunnable, mLoggerRunnable;
-    private Button mButtonSingleSegment, mButtonStatus;
     private TextView mTextViewChamberTemp, mTextViewUserTemp, mTextViewWaitTime, mTextViewSetTemp;
     private TextView mTextViewRate;
     private ToggleButton mHeatEnableToggleButton, mCoolEnableToggleButton;
@@ -78,8 +80,8 @@ public class DisplayTemperatureFragment extends Fragment {
     private ChamberModel mChamberModel;
     private ChamberStatus mChamberStatus;
     private TemperatureLogWriter mTemperatureLogWriter;
-    private MenuItem mStartLoggingMenuItem;
     private boolean mIsLoggingData;
+    private View view;
 
     public interface DisplayTemperatureFragmentCallBacks {
 
@@ -108,19 +110,22 @@ public class DisplayTemperatureFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView: called");
-        View view = inflater.inflate(R.layout.fragment_display_temps, container, false);
-        ((HomeActivity) getActivity()).getSupportActionBar().setTitle("DispTempFrag");
+        view = inflater.inflate(R.layout.fragment_display_temps, container, false);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(DISPLAY_TEMP_FRAG_TITLE);
+            supportActionBar.show();
+        }
         initializeCommandArrayList();
         initializeRunnables();
         initializeViews(view);
         setHasOptionsMenu(true);
         checkStatus();
-
         return view;
     }
 
     private void checkStatus() {
-        BluetoothConnectionService.getInstance(getContext()).write(STATUS);
+        BluetoothConnectionService.getInstance().write(STATUS);
     }
 
     private void initializeRunnables() {
@@ -130,8 +135,17 @@ public class DisplayTemperatureFragment extends Fragment {
         mDisplayUpdateRunnable = new Runnable() {
             @Override
             public void run() {
+
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+
+                    Log.d(TAG, "removing displayUpdate runnable from nHandler and stopping temperature LOGGER as well");
+                    mHandler.removeCallbacks(this);
+                    stopLogger();
+                    return;
+                }
                 String command = mCommands.get(mCommandCounter);
-                BluetoothConnectionService.getInstance(mContext).write(command);
+
+                BluetoothConnectionService.getInstance().write(command);
                 mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
                 // reset mCommandCounter to 0 when it reaches the end of list, otherwise increment
                 if (mCommandCounter >= mCommands.size() - 1) {
@@ -163,46 +177,82 @@ public class DisplayTemperatureFragment extends Fragment {
         mCommands.add(STATUS);
     }
 
-    private void initializeViews(View view) {
+    private void initializeViews(final View view) {
         mTextViewChamberTemp = (TextView) view.findViewById(R.id.textViewChamTemp);
         mTextViewUserTemp = (TextView) view.findViewById(R.id.textViewUserTemp);
         mTextViewRate = (TextView) view.findViewById(R.id.textViewRate);
         mTextViewWaitTime = (TextView) view.findViewById(R.id.textViewWait);
         mTextViewSetTemp = (TextView) view.findViewById(R.id.textViewSet);
-        mButtonStatus = (Button) view.findViewById(R.id.buttonStatus);
-        mButtonStatus.setOnClickListener(new View.OnClickListener() {
+        Button buttonStatus = (Button) view.findViewById(R.id.buttonStatus);
+        buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showStatusFragment();
             }
         });
-        mButtonSingleSegment = (Button) view.findViewById(R.id.buttonSingleSegment);
-        mButtonSingleSegment.setOnClickListener(new View.OnClickListener() {
+        Button buttonSingleSegment = (Button) view.findViewById(R.id.buttonSingleSegment);
+        buttonSingleSegment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 showSingleSegmentDialog();
             }
         });
         mHeatEnableToggleButton = (ToggleButton) view.findViewById(R.id.toggleButtonHeatEnable);
+        mHeatEnableToggleButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                        Snackbar.make(v, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                        return true;
+                    }
+
+                }
+
+                return false;
+            }
+        });
         mHeatEnableToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mHeatEnableToggleButton.isChecked()) {
-                    BluetoothConnectionService.getInstance(mContext).write(HON);
+                    BluetoothConnectionService.getInstance().write(HON);
 
                 } else {
-                    BluetoothConnectionService.getInstance(mContext).write(HOFF);
+                    BluetoothConnectionService.getInstance().write(HOFF);
                 }
             }
         });
         mCoolEnableToggleButton = (ToggleButton) view.findViewById(R.id.toggleButtonCoolEnable);
+        mCoolEnableToggleButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                        Snackbar.make(v, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         mCoolEnableToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(v, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 if (mCoolEnableToggleButton.isChecked()) {
-                    BluetoothConnectionService.getInstance(mContext).write(CON);
+                    BluetoothConnectionService.getInstance().write(CON);
                 } else {
-                    BluetoothConnectionService.getInstance(mContext).write(COFF);
+                    BluetoothConnectionService.getInstance().write(COFF);
                 }
             }
         });
@@ -215,11 +265,19 @@ public class DisplayTemperatureFragment extends Fragment {
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d(TAG, "onTouch: event occured");
 
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                    //check if bluetooth connected. if not, show snackbar and do nothing
+                    if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                        Snackbar.make(v, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                        return true;//this consumes event and prevents switch from changing state
+                    }
+
                     if (mIsLoggingData) {
                         //show alert dialog to confirm
                         showAlertDialog(TURN_OFF_CHAMBER);
-                        return true; //this consumes event and prevents switch from changing
+                        return true; //this consumes event and prevents switch from changing state
                     }
                 }
                 //return true if to consume event and not have onClick and stateChangeEvent occur
@@ -233,16 +291,18 @@ public class DisplayTemperatureFragment extends Fragment {
                 Log.d(TAG, "onCheckedChanged: switch was changed to: " + isChecked);
                 if (isChecked) {
 
-                    BluetoothConnectionService.getInstance(mContext).clearCommandsWrittenList();
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
                     if (!mChamberStatus.isPowerOn()) {
                         Log.d(TAG, "onCheckedChanged: chamber power not on, sending ON command");
-                        BluetoothConnectionService.getInstance(mContext).write(ON);
+                        BluetoothConnectionService.getInstance().write(ON);
                     } else {
                         // TODO: 11/25/2017 debugging code, ok to remove
                         Log.d(TAG, "onCheckedChanged: chamber is powered on, NOT sending ON command");
                     }
                     mHandler.postDelayed(mDisplayUpdateRunnable, COMMAND_SEND_DELAY_LONG_MS);
-                    mStartLoggingMenuItem.setEnabled(true);
+                    //mStartLoggingMenuItem.setEnabled(true);
+                    Log.d(TAG, "onCheckedChanged: invalidating options menu");
+                    getActivity().invalidateOptionsMenu();
                     if (mIsLoggingData) {
                         Log.d(TAG, "onCheckedChanged: starting logger, mIsLoggingData was true");
                         startLogger();
@@ -250,12 +310,13 @@ public class DisplayTemperatureFragment extends Fragment {
 
                 } else {
                     mHandler.removeCallbacks(mDisplayUpdateRunnable);
-                    BluetoothConnectionService.getInstance(mContext).write(OFF);
+                    BluetoothConnectionService.getInstance().write(OFF);
                     //manually setting power on to false since status not updated fast enough
                     mChamberStatus.setPowerIsOn(false);
                     mHeatEnableToggleButton.setChecked(false);
                     mCoolEnableToggleButton.setChecked(false);
-                    mStartLoggingMenuItem.setEnabled(false);
+                    Log.d(TAG, "onCheckedChanged: invalidating options menu");
+                    getActivity().invalidateOptionsMenu();
                     if (mIsLoggingData) {
                         stopLogger();
                     }
@@ -296,21 +357,18 @@ public class DisplayTemperatureFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu: called");
-
+        menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
+        MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
         if (mIsLoggingData) {
-            mStartLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            mStartLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
-            mStartLoggingMenuItem.setEnabled(true);
+            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            startLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
+            startLoggingMenuItem.setEnabled(true);
 
         } else {
 
             //not logging
-            mStartLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-            mStartLoggingMenuItem.setIcon(null);
-
-            if (!mSwitchOnOff.isChecked()) {
-                mStartLoggingMenuItem.setEnabled(false);
-            }
+            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            startLoggingMenuItem.setIcon(null);
         }
     }
 
@@ -318,8 +376,6 @@ public class DisplayTemperatureFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG, "onCreateOptionsMenu: called");
         inflater.inflate(R.menu.menu_disp_temp_frag, menu);
-        mStartLoggingMenuItem = menu.findItem(R.id.startLogging);
-
     }
 
     @Override
@@ -328,6 +384,10 @@ public class DisplayTemperatureFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.startLogging:
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
 
                 if (item.getIcon() == null) {
 
@@ -383,9 +443,10 @@ public class DisplayTemperatureFragment extends Fragment {
     public void stopLogger() {
 
         Log.d(TAG, "stopLogger: called");
-        mStartLoggingMenuItem.setIcon(null);
-        mStartLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
         mIsLoggingData = false;
+        Log.d(TAG, "stopLogger: invalidate options menu called");
+        getActivity().invalidateOptionsMenu();
         mHandler.removeCallbacks(mLoggerRunnable);
         closeLoggingFile();
     }
@@ -401,9 +462,9 @@ public class DisplayTemperatureFragment extends Fragment {
     private void startLogger() {
 
         Log.d(TAG, "startLogger: called, starting loggerRunnable");
-        mStartLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        mStartLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
         mIsLoggingData = true;
+        Log.d(TAG, "startLogger: invalidate options menu called");
+        getActivity().invalidateOptionsMenu();
         mHandler.postDelayed(mLoggerRunnable, LOGGER_DELAY_MS);
     }
 
@@ -454,8 +515,8 @@ public class DisplayTemperatureFragment extends Fragment {
     /**
      * method used to update the ChamberModel object and textViews according to response from bluetooth
      *
-     * @param commandSent
-     * @param responseToCommandSent
+     * @param commandSent           command that was sent to bluetooth
+     * @param responseToCommandSent the response to the command sent
      */
     private void updateView(String commandSent, String responseToCommandSent) {
 
@@ -487,7 +548,7 @@ public class DisplayTemperatureFragment extends Fragment {
             case WAIT_TIME:
 
                 if (responseToCommandSent.contains("FOREVER")) {
-                    mTextViewWaitTime.setText("FOREVER");
+                    mTextViewWaitTime.setText(R.string.forever);
                 } else {
                     mTextViewWaitTime.setText(responseToCommandSent);
                 }
@@ -503,7 +564,7 @@ public class DisplayTemperatureFragment extends Fragment {
                 // TODO: 11/25/2017 take following Toast command out?
                 if (responseToCommandSent.length() < 12) {
                     Log.d(TAG, "response " + responseToCommandSent + " from status was less than 12");
-                    Toast.makeText(getContext(), "Status length less than 12", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Status length less than 12", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mChamberStatus.setStatusMessages(responseToCommandSent);

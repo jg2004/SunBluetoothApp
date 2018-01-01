@@ -1,5 +1,6 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -18,7 +19,6 @@ import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 public class SingleSegDialogFragment extends DialogFragment {
     private static final String TAG = "SingleSegDialogFragment";
     public static final int DELAY = 1000;
-    private Button mButtonOK, mButtonCancel;
     private TextInputEditText mTextInputEditTextRate, mTextInputEditTextWait, mTextInputEditTextSet;
     private Handler mHandler = new Handler();
 
@@ -26,6 +26,14 @@ public class SingleSegDialogFragment extends DialogFragment {
     public SingleSegDialogFragment() {
         Log.d(TAG, "SingleSegDialogFragment: empty constructor called");
         //required empty constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog);
+        }
     }
 
     public static SingleSegDialogFragment newInstance(String title) {
@@ -61,15 +69,15 @@ public class SingleSegDialogFragment extends DialogFragment {
         mTextInputEditTextWait.requestFocus();
         mTextInputEditTextRate = (TextInputEditText) view.findViewById(R.id.editTextRate);
         mTextInputEditTextSet = (TextInputEditText) view.findViewById(R.id.editTextSetPoint);
-        mButtonCancel = (Button) view.findViewById(R.id.buttonCancel);
-        mButtonCancel.setOnClickListener(new View.OnClickListener() {
+        Button buttonCancel = (Button) view.findViewById(R.id.buttonCancel);
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
             }
         });
-        mButtonOK = (Button) view.findViewById(R.id.buttonOk);
-        mButtonOK.setOnClickListener(new View.OnClickListener() {
+        Button buttonOK = (Button) view.findViewById(R.id.buttonOk);
+        buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: OK was pressed, sending single segment commands...");
@@ -80,7 +88,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                         if (!mTextInputEditTextRate.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the rate...");
                             String rateCommand = "RATE=" + mTextInputEditTextRate.getText().toString();
-                            BluetoothConnectionService.getInstance(getContext()).write(rateCommand);
+                            BluetoothConnectionService.getInstance().write(rateCommand);
                         }
                     }
                 }, DELAY);
@@ -91,7 +99,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                         if (!mTextInputEditTextWait.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the wait...");
                             String waitCommand = "WAIT=" + mTextInputEditTextWait.getText().toString();
-                            BluetoothConnectionService.getInstance(getContext()).write(waitCommand);
+                            BluetoothConnectionService.getInstance().write(waitCommand);
                         }
 
                     }
@@ -102,7 +110,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                         if (!mTextInputEditTextSet.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the set...");
                             String setCommand = "SET=" + mTextInputEditTextSet.getText().toString();
-                            BluetoothConnectionService.getInstance(getContext()).write(setCommand);
+                            BluetoothConnectionService.getInstance().write(setCommand);
                         }
 
                     }

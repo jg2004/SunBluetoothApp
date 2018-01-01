@@ -55,7 +55,19 @@
     <string name="lp_bkpnt">continue from local program breakpoint</string>
     <string name="log_file_null_message">NO LOG FILES TO VIEW</string>
     <string name="no_bluetooth_message">No bluetooth devices found</string>
-
+    <string name="forever">FOREVER</string>
+    <string name="set_param_message">Setting parameters, please wait…</string>
+    <string name="get_param_message">Getting parameters, please wait…</string>
+    <string name="chamber_outputs">CHAMBER OUTPUTS</string>
+    <string name="bluetooth_not_connected">Bluetooth not connected</string>
+    <string name="lp_busy_uploading">Uploading LP, please wait</string>
+    <string name="download_parameters_message">Downloading parameters, please wait</string>
+    <string name="disc_mode">Discovery mode</string>
+    <string name="connecting">Connecting…</string>
+    <string name="bluetooth_enabled_message">App requires bluetooth to be enabled</string>
+    <string name="app_title">Sun Bluetooth</string>
+    <string name="no_paired_dev">No Paired Devices</string>
+    <string name="manually_pair_message"><![CDATA[This device is version 4.3 or below and must be manually paired. To pair, go to settings -> Bluetooth -> Scan (if necessary) and select Laird device. Pairing code is 1234]]></string>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
@@ -25,11 +26,11 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
     private static final String TAG = "LPCreateEditFragment";
     private LPDataBaseHandler mLPDataBaseHandler;
-    private ImageButton saveButton, cancelButton, lpClearButton, loadSampleButton;
     private EditText mLpName, mLpContent;
     private boolean isEdit;
     private LocalProgram localProgram;
     private RefreshFragment mRefreshFragment;
+    private View view;
 
     public interface RefreshFragment {
 
@@ -57,38 +58,39 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         Log.d(TAG, "onCreateView: called");
 
-        View view = inflater.inflate(R.layout.fragment_lp_create, container, false);
+        view = inflater.inflate(R.layout.fragment_lp_create, container, false);
 
         mLpName = (EditText) view.findViewById(R.id.lpName);
         mLpContent = (EditText) view.findViewById(R.id.lpContent);
 
-        String actionBarTitle = getString(R.string.create_lp);
-
-
+        //set title of action bar to create lp or edit lp depending on getarguments null or not
+        String actionBarTitle = getResources().getString(R.string.create_lp);
         if (getArguments() != null) {
 
             //then this is an edit lp called from LPDetailFragment otherwise create a new LP
             actionBarTitle = getString(R.string.edit_lp);
             Bundle args = getArguments();
             localProgram = (LocalProgram) args.getSerializable(LP);
-            mLpName.setText(localProgram.getName());
-            mLpContent.setText(localProgram.getContent());
+            if (localProgram != null) {
+                mLpName.setText(localProgram.getName());
+                mLpContent.setText(localProgram.getContent());
+            }
             isEdit = true; //lp is being edited not creating a new one
         }
 
-        //set title of action bar to create lp or edit lp depending on getarguments null or not
-        //LocalProgramActivity localProgramActivity = (LocalProgramActivity) getActivity();
-        //localProgramActivity.getSupportActionBar().setTitle(actionBarTitle);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(actionBarTitle);
+            supportActionBar.show();
+        }
 
-        ((HomeActivity) getActivity()).getSupportActionBar().setTitle("LPCreateEditFrag");
-
-        lpClearButton = (ImageButton) view.findViewById(R.id.clearLPButton);
+        ImageButton lpClearButton = (ImageButton) view.findViewById(R.id.clearLPButton);
         lpClearButton.setOnClickListener(this);
 
-        loadSampleButton = (ImageButton) view.findViewById(R.id.loadSampleButton);
+        ImageButton loadSampleButton = (ImageButton) view.findViewById(R.id.loadSampleButton);
         loadSampleButton.setOnClickListener(this);
 
-        saveButton = (ImageButton) view.findViewById(R.id.saveLPButton);
+        ImageButton saveButton = (ImageButton) view.findViewById(R.id.saveLPButton);
         saveButton.setOnClickListener(this);
 
         return view;
@@ -138,10 +140,9 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         LocalProgram lp = new LocalProgram(lpName, lpContent);
         lp.setId(localProgram.getId());
         mLPDataBaseHandler.upDateExistingLP(lp);
+
         //update the LPDetail fragment with the edited LP
-
         mRefreshFragment.refreshLPDetailFragment(lp);
-
 
         //go to previous fragment
         if (getFragmentManager().getBackStackEntryCount() > 0) {
@@ -173,19 +174,18 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
     private boolean validateInput() {
         if (TextUtils.isEmpty(mLpName.getText().toString())) {
-            Snackbar.make(getView(),"Enter a local program name", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "Enter a local program name", Snackbar.LENGTH_SHORT).show();
             mLpName.requestFocus();
             return false;
         }
 
         if (TextUtils.isEmpty(mLpContent.getText().toString())) {
-            Snackbar.make(getView(),"Enter a local program", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "Enter a local program", Snackbar.LENGTH_SHORT).show();
             mLpContent.requestFocus();
             return false;
         }
         return true;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -196,7 +196,6 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         //bundle local program to LPDetailFragment after local program is edited
         mRefreshFragment = (RefreshFragment) getActivity();
     }
-
 
     @Override
     public void onDestroy() {

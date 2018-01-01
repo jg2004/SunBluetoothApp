@@ -17,6 +17,17 @@ public class Constants {
     public static final String LP_NAME = "lp_name";
     public static final String LP_CONTENT = "lp_content";
 
+    //Titles for fragments/activities
+    public static final String DISPLAY_TEMP_FRAG_TITLE = "CHAMBER MONITOR";
+    public static final String LOCAL_PROGRAM_LIST_FRAG_TITLE = "STORED LP's";
+    public static final String LOG_FILE_LIST_FRAG_TITLE = "LOG FILES";
+    public static final String CHAMBER_STATUS_FRAG_TITLE = "CHAMBER STATUS";
+    public static final String LP_DETAIL_FRAG_TITLE = "LP DETAIL";
+    public static final String OUTPUT_FRAG_TITLE = "CHAMBER OUTPUTS";
+    public static final String PIDA_FRAG_TITLE = "ADVANCED PID MODE";
+    public static final String PARAMETER_FRAG_TITLE = "CONTROLLER PARAMETERS";
+    public static final String LP_DOWNLOAD_FRAG_TITLE = "LP MODE";
+    public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
     //constants used
     public static final String SEND_STOP = "SEND STOP COMMAND";
     public static final String DELETE_MESSAGE = "DELETE";
@@ -27,6 +38,7 @@ public class Constants {
     public static final String ALERT_MESSAGE = "message";
     public static final String ALERT_CONFIRM_EXIT = "exit";
     public static final String ALERT_ICON = "alert";
+    public static final String ALERT_NOTIFICATION = "alert_notification";
     public static final String LP = "lp";
     public static final int POWER_ON_DELAY_MS = 2000;
     public static final String LOG_FILE_CONTENTS = "log_file_contents";
@@ -40,6 +52,9 @@ public class Constants {
     public static final String TERMINATE_LOGGING_SESSION = "TERMINATE LOGGING SESSION";
     public static final String EXIT_APP = "EXIT APPLICATION";
     public static final String START_DISCOVERY = "start_discovery";
+    public static final String CONNECTION_LOST = "connection_lost";
+    public static final String UPDATE_BT_STATE = "update_bt_state";
+    public static final String VER_LESS_KITKAT_MESSAGE = "VER 4.3 OR BELOW";
 
     //Fragment TAGS
     public static final String TAG_LP_DETAIL_FRAG = "lp_detail_frag";

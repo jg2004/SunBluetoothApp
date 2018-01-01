@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_0;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_1;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_2;
@@ -36,16 +39,21 @@ public class PidAModeFragment extends Fragment {
     private RadioButton mRadioButton_mode3, mRadioButton_mode4;
     private RadioGroup mRadioGroup;
     private EditText mDampingCoefficient;
-    private Button mSetButton, mGetButton;
     private Handler mHandler = new Handler();
     private BroadcastReceiver mBroadcastReceiver;
     private Context mContext;
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
-        View view = inflater.inflate(R.layout.fragment_pida_mode, container, false);
+        view = inflater.inflate(R.layout.fragment_pida_mode, container, false);
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(PIDA_FRAG_TITLE);
+            supportActionBar.show();
+        }
         initializeViews(view);
         return view;
     }
@@ -59,18 +67,26 @@ public class PidAModeFragment extends Fragment {
         mRadioButton_mode3 = (RadioButton) view.findViewById(R.id.userRadioButton);
         mRadioButton_mode4 = (RadioButton) view.findViewById(R.id.averageSlowlyForceUserRadioButton);
         mRadioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
-        mGetButton = (Button) view.findViewById(R.id.buttonGet);
-        mGetButton.setOnClickListener(new View.OnClickListener() {
+        Button getButton = (Button) view.findViewById(R.id.buttonGet);
+        getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d(TAG, "GET clicked, getting parameters");
                 sendPidAQuery();
             }
         });
-        mSetButton = (Button) view.findViewById(R.id.buttonSet);
-        mSetButton.setOnClickListener(new View.OnClickListener() {
+        Button setButton = (Button) view.findViewById(R.id.buttonSet);
+        setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d(TAG, "SET clicked, sending commands");
                 mRadioButtonChecked = (RadioButton) view.findViewById(mRadioGroup.getCheckedRadioButtonId());
                 if (isDampingCoefficientValid()) {
@@ -90,7 +106,7 @@ public class PidAModeFragment extends Fragment {
 
             if (dampingCoefficient > 1000 || dampingCoefficient < 0) {
 
-                Snackbar.make(getView(), "Damping Coefficient must be between 0 and 1000", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, "Damping Coefficient must be between 0 and 1000", Snackbar.LENGTH_SHORT).show();
                 return false;
             }
         } catch (NumberFormatException e) {
@@ -108,7 +124,7 @@ public class PidAModeFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PidAQuery");
-                BluetoothConnectionService.getInstance(getContext()).write(PIDA_QUERY);
+                BluetoothConnectionService.getInstance().write(PIDA_QUERY);
             }
         });
     }
@@ -121,7 +137,7 @@ public class PidAModeFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending pida command: " + pidAcommand);
-                BluetoothConnectionService.getInstance(getContext()).write(pidAcommand);
+                BluetoothConnectionService.getInstance().write(pidAcommand);
             }
         });
     }
@@ -190,7 +206,7 @@ public class PidAModeFragment extends Fragment {
                             sb1.append("INVALID PIDA COMMAND!");
                         }
 
-                        Snackbar.make(getView(), sb1.toString(), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, sb1.toString(), Snackbar.LENGTH_SHORT).show();
                     }
                 }
 
@@ -198,28 +214,34 @@ public class PidAModeFragment extends Fragment {
 
                     case PIDA_QUERY:
 
-                        if (response.equals("0")) {
-                            mRadioButton_mode0.setChecked(true);
-                            sb.delete(0, sb.length());
-                            sb.append("Chamber set to: " + PIDA_MODE_0);
-                        } else if (response.equals("1")) {
-                            mRadioButton_mode1.setChecked(true);
-                            sb.delete(0, sb.length());
-                            sb.append("Chamber set to: " + PIDA_MODE_1);
-                        } else if (response.equals("2")) {
-                            mRadioButton_mode2.setChecked(true);
-                            sb.delete(0, sb.length());
-                            sb.append("Chamber set to: " + PIDA_MODE_2);
-                        } else if (response.equals("3")) {
-                            mRadioButton_mode3.setChecked(true);
-                            sb.delete(0, sb.length());
-                            sb.append("Chamber set to: " + PIDA_MODE_3);
-                        } else if (response.equals("4")) {
-                            mRadioButton_mode4.setChecked(true);
-                            sb.delete(0, sb.length());
-                            sb.append("Chamber set to: " + PIDA_MODE_4);
+                        switch (response) {
+                            case "0":
+                                mRadioButton_mode0.setChecked(true);
+                                sb.delete(0, sb.length());
+                                sb.append("Chamber set to: " + PIDA_MODE_0);
+                                break;
+                            case "1":
+                                mRadioButton_mode1.setChecked(true);
+                                sb.delete(0, sb.length());
+                                sb.append("Chamber set to: " + PIDA_MODE_1);
+                                break;
+                            case "2":
+                                mRadioButton_mode2.setChecked(true);
+                                sb.delete(0, sb.length());
+                                sb.append("Chamber set to: " + PIDA_MODE_2);
+                                break;
+                            case "3":
+                                mRadioButton_mode3.setChecked(true);
+                                sb.delete(0, sb.length());
+                                sb.append("Chamber set to: " + PIDA_MODE_3);
+                                break;
+                            case "4":
+                                mRadioButton_mode4.setChecked(true);
+                                sb.delete(0, sb.length());
+                                sb.append("Chamber set to: " + PIDA_MODE_4);
+                                break;
                         }
-                        Snackbar.make(getView(), sb.toString(), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(view, sb.toString(), Snackbar.LENGTH_LONG).show();
                         break;
 
                     default:

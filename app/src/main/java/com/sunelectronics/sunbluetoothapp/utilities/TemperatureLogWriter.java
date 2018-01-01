@@ -2,6 +2,7 @@ package com.sunelectronics.sunbluetoothapp.utilities;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.models.ChamberModel;
 
@@ -13,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
 
@@ -20,8 +22,8 @@ public class TemperatureLogWriter {
 
     private static final String TAG = "TemperatureLogWriter";
     private static final String FORMATTER = "%02d";
-    public static final String NEW_LINE = "\r\n";
-    public static final String SPACE = " ";
+    private static final String NEW_LINE = "\r\n";
+    private static final String SPACE = " ";
     private OutputStreamWriter mOutputStreamWriter;
     private Context mContext;
     private ChamberModel mChamberModel;
@@ -46,14 +48,15 @@ public class TemperatureLogWriter {
     private OutputStreamWriter getOutputStreamWriter() {
 
         Calendar calendar = Calendar.getInstance();
-        String month = String.format(FORMATTER, calendar.get(Calendar.MONTH) + 1);
-        String dayOfMonth = String.format(FORMATTER, calendar.get(Calendar.DAY_OF_MONTH));
-        String year = String.format(FORMATTER, calendar.get(Calendar.YEAR));
-        String hour = String.format(FORMATTER, calendar.get(Calendar.HOUR_OF_DAY));
-        String minute = String.format(FORMATTER, calendar.get(Calendar.MINUTE));
-        String second = String.format(FORMATTER, calendar.get(Calendar.SECOND));
+        String month = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.MONTH) + 1);
+        String dayOfMonth = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.DAY_OF_MONTH));
+        String year = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.YEAR));
+        String hour = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.HOUR_OF_DAY));
+        String minute = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.MINUTE));
+        String second = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.SECOND));
 
-        StringBuilder stringBuilderForFileHeader = new StringBuilder();
+        StringBuilder stringBuilderForFileHeader;
+        stringBuilderForFileHeader = new StringBuilder();
         stringBuilderForFileHeader.append(month)
                 .append("/").append(dayOfMonth).append("/").append(year).append(SPACE)
                 .append(hour).append(":").append(minute).append(":").append(second).append(NEW_LINE)
@@ -62,7 +65,8 @@ public class TemperatureLogWriter {
                 .append(mChamberModel.getSetCommand()).append(NEW_LINE);
         String fileHeader = stringBuilderForFileHeader.toString();
 
-        StringBuilder stringBuilderForFileName = new StringBuilder();
+        StringBuilder stringBuilderForFileName;
+        stringBuilderForFileName = new StringBuilder();
         stringBuilderForFileName.append(month)
                 .append("_").append(dayOfMonth).append("_").append(year)
                 .append("_").append(hour).append(minute).append(second).append(".txt");
@@ -72,7 +76,11 @@ public class TemperatureLogWriter {
         if (!directory.exists()) {
             //create a logFiles directory if it hasn't been created to store the log files
             Log.d(TAG, "creating logFiles directory");
-            directory.mkdir();
+            if (!directory.mkdir()) {
+                //if directory cannot be created with mkdir() then log error and display with toast
+                Log.d(TAG, "getOutputStreamWriter: could not make directory: " + directory.getName());
+                Toast.makeText(mContext, "Could not make directory: " + directory.getName(), Toast.LENGTH_LONG).show();
+            }
         }
 
         File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, fileName);
@@ -98,7 +106,7 @@ public class TemperatureLogWriter {
     public void log() {
 
         StringBuilder sb = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);//HH is military time (no AM/PM)
 
         sb.append(sdf.format(new Date(mChamberModel.getTimeStamp()))).append(",").append(mChamberModel.getCh1Reading())
                 .append(",").append(mChamberModel.getCh2Reading()).append(",")

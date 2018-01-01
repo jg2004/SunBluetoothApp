@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="invisible">
 
         <ProgressBar
             android:layout_width="100dp"
@@ -27,29 +27,14 @@
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/pidAmodeTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal"
-        android:paddingBottom="2dp"
-        android:text="CONTROLLER PARAMETERS"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        />
-
-
     <LinearLayout
         android:id="@+id/pidMainLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pidAmodeTitle"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
         <TextView

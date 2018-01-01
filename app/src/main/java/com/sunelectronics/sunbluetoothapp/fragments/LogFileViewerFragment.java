@@ -23,6 +23,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EMPTY_LOG_F
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_VIEWER_TITLE;
 
 
 public class LogFileViewerFragment extends Fragment {
@@ -41,9 +42,10 @@ public class LogFileViewerFragment extends Fragment {
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.show();
-            setHasOptionsMenu(true);
+            supportActionBar.setTitle(LOG_FILE_VIEWER_TITLE);
         }
 
+        setHasOptionsMenu(true);
         TextView logFileTextView = (TextView) view.findViewById(R.id.textViewLogFile);
         if (mLogFileContents.isEmpty()) {
 

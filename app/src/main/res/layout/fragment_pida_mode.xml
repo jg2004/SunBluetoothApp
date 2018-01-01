@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-android:background="@android:color/white"
                 android:layout_margin="10dp"
+                android:background="@android:color/white"
     >
 
     <TextView
@@ -11,18 +11,27 @@ android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/border_bottom_gray"
+        android:layout_marginBottom="5dp"
         android:gravity="center_horizontal"
         android:text="PIDA MODE"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textColor="@color/black"
+        android:textSize="16sp"/>
+    <View
+        android:id="@+id/horizontalLine"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/darkGray"
+        android:layout_below="@+id/pidAmodeTitle">
+
+    </View>
 
     <LinearLayout
         android:id="@+id/mainLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pidAmodeTitle"
+        android:layout_below="@+id/horizontalLine"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:background="@drawable/border_curved_padding"
@@ -112,7 +121,7 @@ android:background="@android:color/white"
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/buttonGet"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
@@ -121,7 +130,7 @@ android:background="@android:color/white"
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/buttonSet"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:background="@drawable/white_rounded_button_accent"
             android:text="SET"/>
