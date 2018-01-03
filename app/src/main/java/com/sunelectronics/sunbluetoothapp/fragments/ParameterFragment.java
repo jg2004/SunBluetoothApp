@@ -425,7 +425,7 @@ public class ParameterFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (isBusyDownLoading){
-            Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, R.string.download_parameters_message, Snackbar.LENGTH_SHORT).show();
             return true;
         }
         switch (item.getItemId()) {

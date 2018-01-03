@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -60,6 +61,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     private BottomNavigationView mBottomNavigationView;
     private BroadcastReceiver mReceiver;
     private Toolbar mToolbar;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 //if busy uploading lp or downloading params, ignore bottom navigation click
-                if (checkIfBusy()){
+                if (checkIfBusy()) {
                     return false; // so menu item is NOT selected
                 }
 
@@ -291,7 +293,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         Log.d(TAG, "onBackPressed: called");
 
         //make sure no lp's are being uploaded or parameters being downloades
-        if (checkIfBusy()){
+        if (checkIfBusy()) {
             return;
         }
 
@@ -318,11 +320,12 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     }
 
     /**
-     *  This method checks 3 fragments to see if busy uploading LP, or downloading parameters before
-     *  allowing onBackPressed or bottom navigation view to perform fragment transactions
+     * This method checks 3 fragments to see if busy uploading LP, or downloading parameters before
+     * allowing onBackPressed or bottom navigation view to perform fragment transactions
+     *
      * @return true if busy, false if not
      */
-    private boolean checkIfBusy(){
+    private boolean checkIfBusy() {
 
         ParameterFragment parameterFragment = (ParameterFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_PARAMETER);
         if (parameterFragment != null) {
@@ -354,6 +357,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     protected void onStart() {
         Log.d(TAG, "onStart: called");
         super.onStart();
+        mHandler = new Handler();
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -364,8 +368,27 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                 switch (action) {
 
                     case CONNECTION_LOST:
-                        mToolbar.setSubtitle("Connection Lost");
-                        Snackbar.make(view,"Bluetooth Connection Lost", Snackbar.LENGTH_INDEFINITE).show();
+                        //close out activity and start BluetoothStartup activity
+                        mToolbar.setSubtitle(R.string.connection_lost);
+                        Snackbar snackbar = Snackbar.make(view, "Bluetooth Connection Lost", Snackbar.LENGTH_INDEFINITE);
+                        snackbar.setAction("RECONNECT", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final Intent intent = new Intent(HomeActivity.this, BluetoothStartUp.class);
+                                Log.d(TAG, "onClick: finishing HomeActivity");
+
+                                finish();
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        startActivity(intent);
+                                        Log.d(TAG, "run: starting Bluetoothstartup activity with .25 sec delay");
+                                    }
+                                }, 500);
+
+
+                            }
+                        }).show();
                         break;
 
                     case UPDATE_BT_STATE:

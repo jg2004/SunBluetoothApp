@@ -67,7 +67,7 @@
     <string name="bluetooth_enabled_message">App requires bluetooth to be enabled</string>
     <string name="app_title">Sun Bluetooth</string>
     <string name="no_paired_dev">No Paired Devices</string>
-    <string name="manually_pair_message"><![CDATA[This device is version 4.3 or below and must be manually paired. To pair, go to settings -> Bluetooth -> Scan (if necessary) and select Laird device. Pairing code is 1234]]></string>
+    <string name="connection_lost">Connection Lost</string>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>
