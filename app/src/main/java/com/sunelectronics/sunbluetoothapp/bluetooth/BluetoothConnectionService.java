@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.UUID;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UPDATE_BT_STATE;
 
-public class BluetoothConnectionService implements Serializable {
+public class BluetoothConnectionService {
     // public constants
     public static final String COULD_NOT_CONNECT_BLUETOOTH = "couldNotConnectBluetooth";
     public static final String DEV_NAME = "DEVICE_NAME";
@@ -156,7 +155,6 @@ public class BluetoothConnectionService implements Serializable {
         Log.d(TAG, "connected: called");
         mConnectedThread = new ConnectedThread(bluetoothSocket, context);
         mConnectedThread.start();
-
     }
 
  /*--------------------------------end of public/private methods----------------------------------*/
@@ -340,7 +338,7 @@ public class BluetoothConnectionService implements Serializable {
         private Context context;
 
         //first step in connecting bluetooth is to get a socket
-        //second step is to connect
+        //second step is to connect. If successfull, pass the socket to the Connected Thread
 
         ConnectThread(BluetoothDevice device, Context context) {
             Log.d(TAG, "ConnectThread: created");
@@ -351,6 +349,7 @@ public class BluetoothConnectionService implements Serializable {
             LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(UPDATE_BT_STATE));
         }
 
+        //runs straight through and either connects or throws exception
         @Override
         public void run() {
             Log.d(TAG, "ConnectThread is now running");
@@ -400,10 +399,14 @@ public class BluetoothConnectionService implements Serializable {
                 Log.d(TAG, "run: sending broadcast successfully connected");
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                 storeDevice(context);
+                // Reset the ConnectThread because we're done
+                synchronized (BluetoothConnectionService.this) {
+                    mConnectedThread = null;
+                }
                 connected(mBluetoothSocket, context);
             }
-
         }
+
         /**
          * method of Connect thread that is called from stop method (above) in BluetoothConnection Service
          * class to shutdown the connection. Access is package private so no access modifier needed

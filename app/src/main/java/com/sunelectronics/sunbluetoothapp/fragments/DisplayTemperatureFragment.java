@@ -524,6 +524,15 @@ public class DisplayTemperatureFragment extends Fragment {
 
             case CHAM_TEMP:
 
+                //verify that response is numeric
+                if (!isNumeric(responseToCommandSent)) {
+                    //if it's not, then display is out of sync with controller responses
+                    //re-sync by clearing out array of commands written list
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    // TODO: 1/2/2018 temporary code!!
+                    Toast.makeText(mContext, "chamber temp was not numeric, clear command list to re-sync", Toast.LENGTH_LONG).show();
+                    break;
+                }
                 mChamberModel.setTimeStamp(System.currentTimeMillis());
                 mChamberModel.setCh1Reading(responseToCommandSent);
                 mTextViewChamberTemp.setText(mChamberModel.getCh1Reading());
@@ -531,11 +540,23 @@ public class DisplayTemperatureFragment extends Fragment {
 
             case USER_TEMP:
 
+                if (!isNumeric(responseToCommandSent)) {
+                    //if it's not, then display is out of sync with controller responses
+                    //re-sync by clearing out array of commands written list
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    break;
+                }
                 mChamberModel.setCh2Reading(responseToCommandSent);
                 mTextViewUserTemp.setText(mChamberModel.getCh2Reading());
                 break;
 
             case SET_TEMP:
+                if (!isNumeric(responseToCommandSent) && !responseToCommandSent.contains("NONE")) {
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    // TODO: 1/2/2018 temporary code!!
+                    Toast.makeText(mContext, "set temp was not numeric and not NONE", Toast.LENGTH_LONG).show();
+                    break;
+                }
                 if (responseToCommandSent.contains("NONE")) {
                     mChamberModel.setSetReading("NONE");
                     mTextViewSetTemp.setText(mChamberModel.getSetReading());
@@ -547,6 +568,12 @@ public class DisplayTemperatureFragment extends Fragment {
 
             case WAIT_TIME:
 
+                if (!responseToCommandSent.contains(":") && !responseToCommandSent.contains("FOREVER")) {
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    // TODO: 1/2/2018 temporary code!!
+                    Toast.makeText(mContext, "Wait time did not contain colon symbol", Toast.LENGTH_LONG).show();
+                    break;
+                }
                 if (responseToCommandSent.contains("FOREVER")) {
                     mTextViewWaitTime.setText(R.string.forever);
                 } else {
@@ -556,6 +583,14 @@ public class DisplayTemperatureFragment extends Fragment {
 
             case RATE:
 
+                if (!isNumeric(responseToCommandSent)) {
+                    //if it's not, then display is out of sync with controller responses
+                    //re-sync by clearing out array of commands written list
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    // TODO: 1/2/2018 temporary code!!
+                    Toast.makeText(mContext, "rate was not numeric, clear command list to re-sync", Toast.LENGTH_LONG).show();
+                    break;
+                }
                 mTextViewRate.setText(responseToCommandSent);
                 break;
 
@@ -563,8 +598,8 @@ public class DisplayTemperatureFragment extends Fragment {
 
                 // TODO: 11/25/2017 take following Toast command out?
                 if (responseToCommandSent.length() < 12) {
-                    Log.d(TAG, "response " + responseToCommandSent + " from status was less than 12");
-                    Toast.makeText(getContext(), "Status length less than 12", Toast.LENGTH_SHORT).show();
+                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                    Toast.makeText(getContext(), "Status length less than 12, re-syning", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mChamberStatus.setStatusMessages(responseToCommandSent);
@@ -586,6 +621,25 @@ public class DisplayTemperatureFragment extends Fragment {
                 Log.d(TAG, "Unknown command sent: " + commandSent + " response: " + responseToCommandSent);
                 break;
         }//end of switch statement
+    }
+
+
+    /**
+     * This verifies that commands sent such as cham?, rate?, user? have a valid numeric response
+     * if not, then controller sent back an invalid response that will cause display to be out of
+     * sync with controller responses i.e CHAM:YYYYNNNNNYY
+     *
+     * @param responseToCommandSent this is the response to the command sent to controller
+     * @return true if valid double, return false otherwise
+     */
+    private boolean isNumeric(String responseToCommandSent) {
+
+        try {
+            Double test = Double.parseDouble(responseToCommandSent);
+            return !test.isNaN();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

@@ -431,7 +431,6 @@ public class ParameterFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.loadDefaults:
-
                 loadControllerParameterDefaults();
                 return true;
         }
