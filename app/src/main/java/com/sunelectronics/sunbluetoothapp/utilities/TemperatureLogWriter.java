@@ -6,11 +6,11 @@ import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.models.ChamberModel;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,7 +24,7 @@ public class TemperatureLogWriter {
     private static final String FORMATTER = "%02d";
     private static final String NEW_LINE = "\r\n";
     private static final String SPACE = " ";
-    private OutputStreamWriter mOutputStreamWriter;
+    private BufferedWriter mBufferedWriter;
     private Context mContext;
     private ChamberModel mChamberModel;
 
@@ -33,7 +33,7 @@ public class TemperatureLogWriter {
         Log.d(TAG, "TemperatureLogWriter: creating a new TemperatureLogWriter");
         mContext = context;
         mChamberModel = chamberModel;
-        mOutputStreamWriter = getOutputStreamWriter();
+        mBufferedWriter = getBufferedWriter();
 
     }
 
@@ -43,9 +43,9 @@ public class TemperatureLogWriter {
      * and writes a file header (this is just date and time file created). logger will write temperature
      * data to this text file.
      *
-     * @return OutputStreamWriter
+     * @return BufferedWriter
      */
-    private OutputStreamWriter getOutputStreamWriter() {
+    private BufferedWriter getBufferedWriter() {
 
         Calendar calendar = Calendar.getInstance();
         String month = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.MONTH) + 1);
@@ -78,7 +78,7 @@ public class TemperatureLogWriter {
             Log.d(TAG, "creating logFiles directory");
             if (!directory.mkdir()) {
                 //if directory cannot be created with mkdir() then log error and display with toast
-                Log.d(TAG, "getOutputStreamWriter: could not make directory: " + directory.getName());
+                Log.d(TAG, "getBufferedWriter: could not make directory: " + directory.getName());
                 Toast.makeText(mContext, "Could not make directory: " + directory.getName(), Toast.LENGTH_LONG).show();
             }
         }
@@ -87,10 +87,14 @@ public class TemperatureLogWriter {
         Log.d(TAG, "TemperatureLogWriter: creating file: " + file.getPath());
 
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file, true);//true to append data!
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-            outputStreamWriter.write(fileHeader);
-            return outputStreamWriter;
+
+            FileWriter fileWriter = new FileWriter(file,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//            FileOutputStream fileOutputStream = new FileOutputStream(file, true);//true to append data!
+//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+//            outputStreamWriter.write(fileHeader);
+            bufferedWriter.write(fileHeader);
+            return bufferedWriter;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -113,7 +117,7 @@ public class TemperatureLogWriter {
                 .append(mChamberModel.getSetReading()).append(NEW_LINE);
         try {
             Log.d(TAG, "log: writing " + sb.toString() + "to file");
-            mOutputStreamWriter.write(sb.toString());
+            mBufferedWriter.write(sb.toString());
 
         } catch (IOException e) {
             Log.d(TAG, "log: error writing to file");
@@ -124,7 +128,7 @@ public class TemperatureLogWriter {
     public void closeFile() {
         Log.d(TAG, "closeFile: closing file");
         try {
-            mOutputStreamWriter.close();
+            mBufferedWriter.close();
 
         } catch (IOException e) {
             e.printStackTrace();

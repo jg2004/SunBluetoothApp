@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sun Bluetooth App</string>
+    <string name="app_name">Sun Bluetooth</string>
     <string name="action_settings">Settings</string>
     <string name="lp_title">Local Programs</string>
     <string name="title_activity_local_program">LocalProgramActivity</string>
@@ -68,6 +68,8 @@
     <string name="app_title">Sun Bluetooth</string>
     <string name="no_paired_dev">No Paired Devices</string>
     <string name="connection_lost">Connection Lost</string>
+    <string name="share_logging_file">Share temperature logging file…</string>
+    <string name="exit_help">Exit help section</string>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>

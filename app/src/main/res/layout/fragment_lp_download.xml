@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,9 +19,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="70"
-            android:saveEnabled="false"
             android:hint="Local Program"
-            android:inputType="textPersonName"/>
+            android:inputType="textPersonName"
+            android:saveEnabled="false"/>
 
         <Spinner
             android:id="@+id/spinner"
@@ -61,20 +58,26 @@
         <ImageButton
             android:id="@+id/downLoadButton"
             style="@style/Widget.AppCompat.Button"
-            android:contentDescription="@string/download_lp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_file_download_black_24dp"/>
+            android:background="@drawable/blue_rounded_button"
+            android:contentDescription="@string/download_lp"
+            app:srcCompat="@drawable/ic_action_down_arrow"/>
 
         <ImageButton
             android:id="@+id/startLPButton"
-            android:contentDescription="@string/run_lp"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_play_arrow_black_48dp"/>
+            android:background="@drawable/blue_rounded_button"
+            android:contentDescription="@string/run_lp"
+            app:srcCompat="@drawable/ic_action_play_arrow"/>
 
 
         <ImageButton
@@ -82,20 +85,25 @@
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/save_lp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_save_black_48dp"
-            tools:layout_editor_absoluteX="95dp"
-            tools:layout_editor_absoluteY="-47dp"/>
+            android:background="@drawable/blue_rounded_button"
+            android:contentDescription="@string/save_lp"
+            app:srcCompat="@drawable/ic_action_save"
+            />
 
         <ImageButton
             android:id="@+id/stopLPButton"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
+            android:background="@drawable/blue_rounded_button"
             android:contentDescription="@string/stop_lp"
-            app:srcCompat="@drawable/ic_stop_black_24dp"/>
+            app:srcCompat="@drawable/ic_action_stop"/>
 
         <ImageButton
             android:id="@+id/upLoadButton"
@@ -103,8 +111,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/blue_rounded_button"
             android:contentDescription="@string/upload_lp"
-            app:srcCompat="@drawable/ic_file_upload_black_24dp"/>
+            app:srcCompat="@drawable/ic_action_up_arrow"/>
 
     </LinearLayout>
 

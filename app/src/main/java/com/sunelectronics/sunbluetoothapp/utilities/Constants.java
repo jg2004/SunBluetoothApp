@@ -42,6 +42,7 @@ public class Constants {
     public static final String LP = "lp";
     public static final int POWER_ON_DELAY_MS = 2000;
     public static final String LOG_FILE_CONTENTS = "log_file_contents";
+    public static final String FILE_CONTENTS = "file_contents";
     public static final String EMPTY_LOG_FILE_CONTENTS = "Log file empty";
     public static final String LOG_FILE_NAME = "log_file_name";
     public static final String LOG_FILES_DIRECTORY = "logFiles";
@@ -62,6 +63,7 @@ public class Constants {
     public static final String TAG_FRAGMENT_OUTPUT = "output_fragment";
     public static final String TAG_FRAGMENT_PARAMETER = "parameter_fragment";
     public static final String TAG_FRAGMENT_PIDA_MODE = "pidA_mode_fragment";
+    public static final String TAG_FRAGMENT_HELP_DIALOG = "help_dialog_fragment";
 
     //chamber commands
     public static final String PIDH_COMMAND = "PIDH=";

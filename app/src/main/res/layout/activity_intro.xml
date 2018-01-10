@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:background="@drawable/gradient_darkgray_lightgray_center">
 
 
@@ -37,54 +37,94 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/appBarLayout">
 
-        <LinearLayout
-            android:id="@+id/buttonLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <TextView
 
-            <TextView
-                android:id="@+id/textViewTitle"
-                android:layout_marginTop="25dp"
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="EC1x Bluetooth"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/buttonLayoutColumn1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="50dp"
-                android:text="EC1x Bluetooth"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                />
+                android:layout_marginRight="25dp"
+                android:layout_marginEnd="25dp"
+                android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/buttonConnect"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/blue_rounded_button"
-                android:text="CONNECT"
-                android:textColor="@color/white"/>
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/buttonConnect"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/blue_rounded_button"
+                    android:drawableTop="@drawable/ic_action_connect"
+                    android:paddingTop="10dp"
+                    android:text="CONNECT"
+                    android:textColor="@color/white"/>
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/buttonDiscover"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/blue_rounded_button"
-                android:text="DISCOVER"
-                android:textColor="@color/white"/>
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/buttonDiscover"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/blue_rounded_button"
+                    android:drawableTop="@drawable/ic_action_discover"
+                    android:paddingTop="10dp"
+                    android:text="DISCOVER"
+                    android:textColor="@color/white"/>
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/buttonViewLog"
-                android:layout_width="300dp"
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonLayoutColumn2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/blue_rounded_button"
-                android:text="VIEW LOGS"
-                android:textColor="@color/white"/>
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/buttonViewLog"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/blue_rounded_button"
+                    android:drawableTop="@drawable/ic_action_chart"
+                    android:paddingTop="10dp"
+                    android:text="View Logs"
+                    android:textColor="@color/white"/>
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/buttonHelp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/blue_rounded_button"
+                    android:drawableTop="@drawable/ic_action_help"
+                    android:paddingTop="10dp"
+                    android:text="Help"
+                    android:textColor="@color/white"/>
+
+
+            </LinearLayout>
+
         </LinearLayout>
+
 
     </FrameLayout>
 

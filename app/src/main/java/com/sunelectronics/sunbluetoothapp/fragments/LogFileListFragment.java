@@ -66,6 +66,7 @@ public class LogFileListFragment extends ListFragment {
         }
 
         mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, mLogFileList);
+
         setListAdapter(mAdapter);
         setUpLongClickListener();
         mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();

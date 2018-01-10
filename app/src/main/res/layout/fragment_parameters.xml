@@ -261,15 +261,23 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
-            android:background="@drawable/white_rounded_button_accent"
-            android:text="GET"/>
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_down_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="GET"
+            android:textColor="@color/white"/>
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/buttonSet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/white_rounded_button_accent"
-            android:text="SET"/>
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_up_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="SET"
+            android:textColor="@color/white"/>
     </LinearLayout>
 
 </RelativeLayout>

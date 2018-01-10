@@ -1,0 +1,70 @@
+REQUIREMENTS
+
+- Sun EC1x chamber equipped with Bluetooth capability, either through external or onboard bluetooth module.
+
+- Android running version 4.1.x or higher with bluetooth capability.
+Note: Most smartphones are equipped with CLASS II Bluetooth which has a range of approximately 30ft.
+-----GETTING STARTED
+
+- When using this app for the first time you will need to "discover" the chamber's bluetooth module.
+
+- Click on the DISCOVER button, follow prompt to enable bluetooth if necessary.
+
+- The bluetooth device will be a Laird device followed by 6 digits (i.e Laird 0B6293).
+
+- Click on the device to pair (only necessary if not already paired). Pairing code is "1234".
+
+- After pairing, app should connect with chamber.
+
+-----PREVIOUSLY CONNECTED
+
+- If previously connected to chamber, click on the CONNECT button to establish connection with chamber. The app will attempt to connect with last successful connection.
+
+- To connect with a different device than the last successful connection, click on the DISCOVER button and follow steps from the GETTING STARTED section.
+
+-----MONITOR SECTION
+
+- The monitor section queries chamber every few seconds for chamber temperature, user temperature, rate, wait and set point.
+
+- SET button allows user to enter a SINGLE segment (rate, wait, set point).
+
+- STATUS button allows user to examine status of chamber - such as if running a local program, what cycle of for loop chamber is on etc.
+
+- Menu item "start logging" will create a text file and add chamber temperature, user temperature, set point and a time stamp. It will record these values into the file approximately 4 times per minute.
+- Logging is paused when leaving the MONITOR section and will resume upon re-entry.
+
+- Logging is stopped when backing out of application or pressing square "stop" icon.
+
+- Menu item "Chamber outputs" allows user to turn on digital outputs such as N2 gas purge and ambient blower as well as analog outputs.
+
+- Menu item "Controller Parameters" allow user to inspect and modify the following controller parameters: PIDC, PIDH, PWMP, UTL and LTL.
+
+- Menu item "PIDA MODE" allows user to inspect and modify PIDA mode. This mode determines which probe the chamber will control to (chamber, user, average etc.)
+
+-----LOCAL PROGRAM SECTION
+
+- Allows user to create a local program, upload this local program to chamber and save the local program onto phone.
+
+- In addition to local program creation, uploading and storage, users can download an existing local program from chamber, modify, store to phone and re-upload to chamber.
+
+- This is also the section where users RUN and STOP a currently running local program.
+
+- Local programs may also be "shared" when clicking the share icon in local program detail section
+
+-----VIEW LOG SECTION
+
+- Lists all logging files that have been created.
+
+- Files are .txt files and are titled using a time stamp. This gives each file a unique id in addition to allowing user to determine when file was created.
+
+- Clicking on a file in the list, will allow user to view the contents of file.
+
+- Each row of file has a time stamp, chamber reading, user reading and the set point.
+
+- Contents of file can be "shared" by clicking share icon. 
+
+-----TROUBLESHOOTING
+
+- Android phones running versions 4.1 to 4.4 require pairing outside the application. To do this, go into Settings..Bluetooth...Scan and find chamber's Laird device. Click on pair and enter pin code "1234" to begin pairing process.
+
+- Most smartphones are equipped with Class II Bluetooth, which has a range of 30ft. When connecting and during connection, keep phone within 30ft of chamber to prevent diconnection.

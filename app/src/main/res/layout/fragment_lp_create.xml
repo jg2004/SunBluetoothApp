@@ -22,7 +22,6 @@
         android:id="@+id/lpContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-
         android:layout_weight="1"
         android:gravity="top"
         android:hint="@string/lp_content_hint"
@@ -32,6 +31,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:orientation="horizontal"
 
         >
@@ -39,29 +39,35 @@
         <ImageButton
             android:id="@+id/saveLPButton"
             style="@style/Widget.AppCompat.ImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:contentDescription="@string/save_to_phone"
-            app:srcCompat="@drawable/ic_save_black_48dp"/>
-
+            android:background="@drawable/blue_rounded_button"
+            android:contentDescription="@string/save_lp"
+            app:srcCompat="@drawable/ic_action_save"/>
 
 
         <ImageButton
             android:id="@+id/clearLPButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:background="@drawable/blue_rounded_button"
             android:contentDescription="@string/clear_fields"
-            app:srcCompat="@drawable/ic_erasor"/>
+            app:srcCompat="@drawable/ic_action_clear"/>
 
         <ImageButton
             android:id="@+id/loadSampleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
             android:layout_weight="1"
+            android:background="@drawable/blue_rounded_button"
             android:contentDescription="@string/load_sample_LP"
-            app:srcCompat="@drawable/ic_help_black_48dp"/>
+            app:srcCompat="@drawable/ic_action_help_white"/>
     </LinearLayout>
 
 

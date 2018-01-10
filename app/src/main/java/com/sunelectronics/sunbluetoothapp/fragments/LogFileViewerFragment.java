@@ -106,14 +106,17 @@ public class LogFileViewerFragment extends Fragment {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-        // sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_logging_file)));
+
+
+
         //sendIntent.setType("message/rfc822");
 
-        if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(Intent.createChooser(sendIntent, "Share temperature logging file..."));
-        }
+       // if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            //startActivity(Intent.createChooser(sendIntent, "Share temperature logging file..."));
+        //}
 
     }
 }
