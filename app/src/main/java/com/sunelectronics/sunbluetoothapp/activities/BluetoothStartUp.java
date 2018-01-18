@@ -15,12 +15,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -54,7 +54,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
     private List<BluetoothDevice> mBluetoothDeviceList;
     private ListView mDeviceListView;
     private TextView mTvDeviceList, mProgressBarTextView;
-    private LinearLayout mProgressBarContainer;
+    private CardView mProgressBarContainer;
     private boolean mIsDisplayingDiscovered, mStartDiscovery;
     private BluetoothConnectionService mBluetoothConnectionService;
     private ActionBar actionbar;
@@ -72,7 +72,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         mDeviceListView = (ListView) findViewById(R.id.deviceListView);
         mTvDeviceList = (TextView) findViewById(R.id.textViewDeviceList);
         mProgressBarTextView = (TextView) findViewById(R.id.textViewProgressBar);
-        mProgressBarContainer = (LinearLayout) findViewById(R.id.progressBarWithText);
+        mProgressBarContainer = (CardView) findViewById(R.id.progressBarWithText);
         mProgressBarContainer.setVisibility(View.GONE);
         mBluetoothDeviceList = new ArrayList<>();
         mAdaptor = new DeviceListAdaptor(this, R.layout.disc_bt_devices, mBluetoothDeviceList);
@@ -280,7 +280,6 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
 
         Log.d(TAG, "discoverDevices: looking for a list of bluetooth devices to pair with");
 
-
         //cancel discovery if in discovery mode
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
@@ -291,14 +290,12 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
 
-
         if (mBluetoothAdapter.startDiscovery()) {
             Log.d(TAG, "discoverDevices: discovery started successfully");
             actionbar.setTitle(R.string.disc_mode);
 
         } else {
             Toast.makeText(this, "Discovery could not be started. Verify bluetooth is enabled", Toast.LENGTH_SHORT).show();
-
             invalidateOptionsMenu();
             Log.d(TAG, "discoverDevices: discovery could not be started");
         }
@@ -312,7 +309,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         //device
         mProgressBarContainer.setVisibility(View.VISIBLE);
         mDeviceListView.setVisibility(View.INVISIBLE);
-        mProgressBarTextView.setText(String.format("Attempting to connect with %s...", bluetoothDevice.getName()));
+        mProgressBarTextView.setText("Attempting to connect to " + bluetoothDevice.getName());
         actionbar.setTitle(R.string.connecting);
         mBluetoothConnectionService.startClient(bluetoothDevice, getApplicationContext());
     }

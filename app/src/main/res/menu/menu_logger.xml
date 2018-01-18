@@ -8,8 +8,15 @@
         android:icon="@drawable/ic_share_white_24dp"
         android:orderInCategory="1"
         android:title="Share"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         />
+
+    <item
+        android:id="@+id/action_chart"
+        android:icon="@drawable/ic_action_chart"
+        android:orderInCategory="2"
+        android:title="Chart"
+        app:showAsAction="ifRoom"/>
 
 
 </menu>

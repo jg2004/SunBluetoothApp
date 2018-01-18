@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,13 +19,14 @@ import java.util.Locale;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
 
-public class TemperatureLogWriter {
+public class TemperatureLogWriter implements Serializable {
 
     private static final String TAG = "TemperatureLogWriter";
     private static final String FORMATTER = "%02d";
     private static final String NEW_LINE = "\r\n";
     private static final String SPACE = " ";
     private BufferedWriter mBufferedWriter;
+    private String mFileName;
     private Context mContext;
     private ChamberModel mChamberModel;
 
@@ -37,6 +39,19 @@ public class TemperatureLogWriter {
 
     }
 
+    public String getFileName() {
+        return mFileName;
+    }
+
+    public TemperatureLogWriter(Context context, ChamberModel chamberModel, String fileName) {
+        Log.d(TAG, "TemperatureLogWriter: creating Logwriter from existing fileName");
+        mContext = context;
+        mChamberModel = chamberModel;
+        mFileName = fileName;
+        mBufferedWriter = getBufferedWriter(fileName);
+
+    }
+
     /**
      * Builds a file name based on the date and time such as 11_18_2017_143503.txt to ensure a unique
      * file name. Creates a logFiles folder in internal storage, creates an Output stream writer
@@ -46,7 +61,6 @@ public class TemperatureLogWriter {
      * @return BufferedWriter
      */
     private BufferedWriter getBufferedWriter() {
-
         Calendar calendar = Calendar.getInstance();
         String month = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.MONTH) + 1);
         String dayOfMonth = String.format(Locale.ENGLISH, FORMATTER, calendar.get(Calendar.DAY_OF_MONTH));
@@ -71,7 +85,7 @@ public class TemperatureLogWriter {
                 .append("_").append(dayOfMonth).append("_").append(year)
                 .append("_").append(hour).append(minute).append(second).append(".txt");
 
-        String fileName = stringBuilderForFileName.toString();
+        mFileName = stringBuilderForFileName.toString();
         File directory = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY);
         if (!directory.exists()) {
             //create a logFiles directory if it hasn't been created to store the log files
@@ -83,18 +97,43 @@ public class TemperatureLogWriter {
             }
         }
 
-        File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, fileName);
+        File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, mFileName);
         Log.d(TAG, "TemperatureLogWriter: creating file: " + file.getPath());
 
         try {
 
-            FileWriter fileWriter = new FileWriter(file,true);
+            FileWriter fileWriter = new FileWriter(file, true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-//            FileOutputStream fileOutputStream = new FileOutputStream(file, true);//true to append data!
-//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-//            outputStreamWriter.write(fileHeader);
             bufferedWriter.write(fileHeader);
             return bufferedWriter;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.d(TAG, "TemperatureLogWriter: file not found: " + file.getName());
+        } catch (IOException e) {
+            Log.d(TAG, "TemperatureLogWriter: I/O exception writing to file: " + file.getName());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * this gets a bufferedwriter for an existing file
+     *
+     * @param fileName name of file that should exist
+     * @return returns a buffered wirter
+     */
+
+    private BufferedWriter getBufferedWriter(String fileName) {
+
+        Log.d(TAG, "getBufferedWriter: fileName is: " + fileName);
+        File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, fileName);
+        Log.d(TAG, "TemperatureLogWriter: file that already existed was created: " + file.getPath());
+
+        try {
+
+            FileWriter fileWriter = new FileWriter(file, true);//true to append data to this file!!
+            return new BufferedWriter(fileWriter);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -133,6 +172,19 @@ public class TemperatureLogWriter {
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(TAG, "closeFile: error closing file");
+        }
+    }
+
+    /**
+     * used by DispTempFrag to write data to phone when pausing logger - called from onDetach
+     */
+    public void flush(){
+
+        try {
+            mBufferedWriter.flush();
+        } catch (IOException e) {
+            Log.d(TAG, "flush: error trying to flush writer");
+            e.printStackTrace();
         }
     }
 }

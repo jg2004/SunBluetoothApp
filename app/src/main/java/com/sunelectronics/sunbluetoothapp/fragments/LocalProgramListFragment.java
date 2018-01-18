@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
@@ -161,12 +162,13 @@ public class LocalProgramListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called, context: " + context.getClass().getName());
-        mLPDataBaseHandler = LPDataBaseHandler.getInstance(context);
+        mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mLPDataBaseHandler.close();
         Log.d(TAG, "onDetach: called");
     }
 

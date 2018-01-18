@@ -30,6 +30,11 @@ public class Constants {
     public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
     //constants used
     public static final String SEND_STOP = "SEND STOP COMMAND";
+    public static final String IS_LOGGING = "is_logging";
+    public static final String FILE_NAME = "file_name";
+    public static final String CHART_DATA = "chart_data";
+    public static final String TEMPERATURE_LOG_WRITER_OBJECT = "temp_log_writer";
+    public static final String CHAMBER_MODEL = "chamber_model";
     public static final String DELETE_MESSAGE = "DELETE";
     public static final String DELETE_LP = "DELETE LP";
     public static final String DELETE_ALL_LP = "DELETE ALL LP";
@@ -64,6 +69,10 @@ public class Constants {
     public static final String TAG_FRAGMENT_PARAMETER = "parameter_fragment";
     public static final String TAG_FRAGMENT_PIDA_MODE = "pidA_mode_fragment";
     public static final String TAG_FRAGMENT_HELP_DIALOG = "help_dialog_fragment";
+    public static final String TAG_FRAGMENT_TEMP_CHART = "temp_chart_fragment";
+    public static final String TAG_FRAGMENT_LOF_FILE_VIEWER = "log_file_viewer_fragment";
+    public static final String TAG_FRAGMENT_INTRO_FRAGMENT = "intro_fragment";
+
 
     //chamber commands
     public static final String PIDH_COMMAND = "PIDH=";

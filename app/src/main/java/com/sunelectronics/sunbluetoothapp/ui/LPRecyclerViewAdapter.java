@@ -19,19 +19,16 @@ import java.util.List;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
 
-/**
- * Created by Jerry on 8/19/2017.
- */
-
 public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAdapter.ViewHolder> implements Serializable {
 
     private Context mContext;
+    private List<LocalProgram> mLocalProgramList;
+
 
     public void setLocalProgramList(List<LocalProgram> localProgramList) {
         mLocalProgramList = localProgramList;
     }
 
-    private List<LocalProgram> mLocalProgramList;
 
     public LPRecyclerViewAdapter(Context context, List<LocalProgram> lpList) {
 
@@ -58,11 +55,11 @@ public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAd
         return mLocalProgramList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView lpNameTv, lpContentTv;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             lpNameTv = (TextView) view.findViewById(R.id.lpNameTextView);
             lpContentTv = (TextView) view.findViewById(R.id.lpContentTextView);
@@ -76,7 +73,7 @@ public class LPRecyclerViewAdapter extends RecyclerView.Adapter<LPRecyclerViewAd
                     HomeActivity homeActivity = (HomeActivity) mContext;
                     LPDetailFragment lpDetailFragment = new LPDetailFragment();
                     lpDetailFragment.setArguments(args);
-                    homeActivity.getSupportFragmentManager().beginTransaction().replace(R.id.homeContainer, lpDetailFragment,TAG_LP_DETAIL_FRAG)
+                    homeActivity.getSupportFragmentManager().beginTransaction().replace(R.id.homeContainer, lpDetailFragment, TAG_LP_DETAIL_FRAG)
                             .addToBackStack(null).commit();
                 }
             });

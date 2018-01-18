@@ -1,9 +1,11 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,11 +21,13 @@ import com.sunelectronics.sunbluetoothapp.R;
 
 import java.io.File;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_DATA;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EMPTY_LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_VIEWER_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_TEMP_CHART;
 
 
 public class LogFileViewerFragment extends Fragment {
@@ -97,8 +101,31 @@ public class LogFileViewerFragment extends Fragment {
                 //Log.d(TAG, "onOptionsItemSelected:  Uri: " + uri.toString());
                 shareLog(subject, mLogFileContents);
                 return true;
+            case R.id.action_chart:
+
+                goToChartFrag();
+                return true;
         }
         return false;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    private void goToChartFrag() {
+        Fragment chartFrag = new TemperatureChartFragment();
+        Bundle args = new Bundle();
+        args.putString(CHART_DATA, mLogFileContents);
+        chartFrag.setArguments(args);
+        performTransaction(chartFrag, TAG_FRAGMENT_TEMP_CHART);
+    }
+
+    public void performTransaction(Fragment fragment, String tag) {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.homeContainer, fragment, tag).commit();
     }
 
     private void shareLog(String subject, String message) {
@@ -109,14 +136,6 @@ public class LogFileViewerFragment extends Fragment {
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.share_logging_file)));
-
-
-
-        //sendIntent.setType("message/rfc822");
-
-       // if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            //startActivity(Intent.createChooser(sendIntent, "Share temperature logging file..."));
-        //}
 
     }
 }

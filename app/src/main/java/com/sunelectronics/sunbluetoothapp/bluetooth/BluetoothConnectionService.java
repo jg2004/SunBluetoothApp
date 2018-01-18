@@ -296,15 +296,6 @@ public class BluetoothConnectionService {
             }
 
             try {
-                if (mmInstream != null) {
-                    Log.d(TAG, "cancel: closing input stream");
-                    mmInstream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d(TAG, "cancel: could not close input stream");
-            }
-            try {
                 if (mmOutstream != null) {
                     Log.d(TAG, "cancel: closing output stream");
                     mmOutstream.close();
@@ -404,6 +395,9 @@ public class BluetoothConnectionService {
                     mConnectedThread = null;
                 }
                 connected(mBluetoothSocket, context);
+            } else {
+                //it's not connected
+                mCurrentState = STATE_NONE;
             }
         }
 

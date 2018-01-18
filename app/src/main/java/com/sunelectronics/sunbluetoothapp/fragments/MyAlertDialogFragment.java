@@ -38,6 +38,7 @@ public class MyAlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyAlertDialogFragment";
     private LogFileListFragment.DeleteLogFileListener mDeleteLogFileListener;
     private DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks mDisplayTemperatureFragmentCallBacks;
+    private LPDataBaseHandler mLPDataBaseHandler;
 
     //create an instance of MyAlertDialogFragment with bundle containing title, icon, objects passed in as argument
 
@@ -89,24 +90,26 @@ public class MyAlertDialogFragment extends DialogFragment {
 
         Log.d(TAG, "onAttach: called");
         super.onAttach(context);
+
         //HomeActivity implements the DeleteLogFileListener
 
         if (context instanceof HomeActivity) {
             Log.d(TAG, "context is instance of HomeActivity");
             mDeleteLogFileListener = (HomeActivity) context;
             mDisplayTemperatureFragmentCallBacks = (HomeActivity) context;
+            mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
         } else if (context instanceof IntroActivity) {
 
             Log.d(TAG, "context is instance of IntroActivity");
             mDeleteLogFileListener = (IntroActivity) context;
         }
-
-
     }
 
     private void performAction() {
 
         String type = getArguments().getString(ALERT_TYPE);
+        Log.d(TAG, "performAction: called, type is: " + type);
+
         if (type == null) {
             type = "Type Not Found"; //this just prevents switch (null) from causing app to crash
         }
@@ -148,7 +151,7 @@ public class MyAlertDialogFragment extends DialogFragment {
 
                 LocalProgram lp = (LocalProgram) getArguments().getSerializable(LP);
                 if (lp != null) {
-                    LPDataBaseHandler.getInstance(getContext()).deleteLPFromDB(lp.getId());
+                    mLPDataBaseHandler.deleteLPFromDB(lp.getId());
                     if (getFragmentManager().getBackStackEntryCount() > 0) {
                         getFragmentManager().popBackStack();
                     } else {
@@ -161,7 +164,7 @@ public class MyAlertDialogFragment extends DialogFragment {
 
             case DELETE_ALL_LP:
 
-                LPDataBaseHandler.getInstance(getContext()).deleteAllLocalPrograms();
+               mLPDataBaseHandler.deleteAllLocalPrograms();
 
                 // TODO: 11/2/2017 should the frag trans code above be added to this case as well?
 

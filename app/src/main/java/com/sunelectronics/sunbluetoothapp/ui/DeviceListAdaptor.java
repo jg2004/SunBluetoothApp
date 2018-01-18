@@ -15,16 +15,13 @@ import com.sunelectronics.sunbluetoothapp.R;
 
 import java.util.List;
 
-/**
- * Created by Jerry on 9/4/2017.
- */
 
 public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
     private List<BluetoothDevice> discoveredDeviceList;
     private int layoutResource;
     private Context mContext;
 
-    public DeviceListAdaptor(@NonNull Context context, @LayoutRes int resource, @NonNull List btDeviceList) {
+    public DeviceListAdaptor(@NonNull Context context, @LayoutRes int resource, @NonNull List<BluetoothDevice> btDeviceList) {
         super(context, resource, btDeviceList);
         mContext = context;
         layoutResource = resource;
@@ -58,7 +55,4 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
         this.discoveredDeviceList = discoveredDeviceList;
     }
 
-    public void setLayoutResource(int layoutResource) {
-        this.layoutResource = layoutResource;
-    }
 }

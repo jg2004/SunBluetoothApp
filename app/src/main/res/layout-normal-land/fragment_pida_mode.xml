@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:background="@android:color/white"
+    >
+    <RadioGroup
+        android:id="@+id/mainLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/border_curved_padding"
+        >
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/chamberRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:tag="0"
+            android:text="Control to chamber probe"
+            android:textSize="12sp"/>
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/userRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="3"
+            android:text="Control to user probe"
+            android:textSize="12sp"/>
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/chamberUserAverageRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="1"
+            android:text="Control to Avg."
+            android:textSize="12sp"/>
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/slowlyForceUserRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="2"
+            android:text="Slowly force user to set"
+            android:textSize="12sp"/>
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/averageSlowlyForceUserRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="4"
+            android:text="Ctl to Avg, force user to set"
+            android:textSize="12sp"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/dampingCoefficientLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/mainLayout"
+        android:layout_toRightOf="@id/mainLayout"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:text="Damp. Coefficient (options 4,5):"
+            android:textColor="@android:color/black"
+            />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/editTextDampingCoefficient"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxWidth="65dp"
+            android:text="400"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/mainLayout"
+        android:layout_toRightOf="@+id/mainLayout"
+        >
+
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonGet"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_down_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="GET"
+            android:textColor="@color/white"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonSet"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_up_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="SET"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+</RelativeLayout>

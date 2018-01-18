@@ -40,7 +40,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSA
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP_CONTENT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP_DOWNLOAD_FRAG_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.POWER_ON_DELAY_MS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SEND_STOP;
@@ -100,6 +102,12 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
             supportActionBar.setTitle(LP_DOWNLOAD_FRAG_TITLE);
             supportActionBar.show();
         }
+        if (savedInstanceState != null) {
+            String lpContent = savedInstanceState.getString(LP_CONTENT);
+            String lpName = savedInstanceState.getString(LP_NAME);
+            mLpContent.setText(lpContent);
+            mLpName.setText(lpName);
+        }
         return view;
     }
 
@@ -125,7 +133,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         switch (item.getItemId()) {
 
             case R.id.action_showSavedLPs:
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return true;
                 }
@@ -228,7 +236,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, "Cannot Download while LP is running", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -249,7 +257,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, "LP is already running", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -262,7 +270,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -285,7 +293,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, "Cannot Upload while LP is running", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -299,7 +307,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.editButton:
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -313,7 +321,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.saveLPButton:
-                if (mIsBusyUploadingLp){
+                if (mIsBusyUploadingLp) {
                     Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -414,7 +422,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
             mProgressBar.setVisibility(View.VISIBLE);
             //disable window...not implementing this anymore
             //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                    //WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            //WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             mIsBusyUploadingLp = true;
         }
 
@@ -447,7 +455,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         Log.d(TAG, "onAttach: called");
         super.onAttach(context);
         mContext = context;
-        mLPDataBaseHandler = LPDataBaseHandler.getInstance(getContext());
+        mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
         mBottomNavigationListener = (HomeActivity) context;
     }
 
@@ -532,5 +540,16 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause: called");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        String lpContent = mLpContent.getText().toString();
+        String lpName = mLpName.getText().toString();
+        if (!lpContent.isEmpty()) {
+            outState.putString(LP_CONTENT, lpContent);
+            outState.putString(LP_NAME, lpName);
+        }
+        super.onSaveInstanceState(outState);
     }
 }

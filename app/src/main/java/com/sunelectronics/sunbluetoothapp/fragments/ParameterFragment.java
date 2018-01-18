@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
@@ -50,6 +52,24 @@ public class ParameterFragment extends Fragment {
     private Context mContext;
     private View view;
     private boolean isBusyDownLoading;
+    private CountDownTimer mTimeOutTimer = new CountDownTimer(13000, 1000) {
+        //Timer used to determine if getting controller parameters has taken too long
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.d(TAG, "onTick: called, seconds left: " + millisUntilFinished / 1000);
+        }
+
+        @Override
+        public void onFinish() {
+            //after 13 seconds, getParameters should be completed
+            if (isBusyDownLoading) {
+                isBusyDownLoading = false;
+                Toast.makeText(mContext, "Operation Timed Out", Toast.LENGTH_LONG).show();
+                mProgressBarLayout.setVisibility(View.INVISIBLE);
+                makeLayoutsVisible();
+            }
+        }
+    };
 
     @Nullable
     @Override
@@ -63,7 +83,7 @@ public class ParameterFragment extends Fragment {
         }
         initializeViews(view);
         setHasOptionsMenu(true);
-        if (BluetoothConnectionService.getInstance().getCurrentState()== BluetoothConnectionService.STATE_CONNECTED){
+        if (BluetoothConnectionService.getInstance().getCurrentState() == BluetoothConnectionService.STATE_CONNECTED) {
             //only download parameters if connected
             getControllerParameters();
         }
@@ -112,6 +132,7 @@ public class ParameterFragment extends Fragment {
             }
         });
     }
+
     public boolean isBusyDownLoading() {
         return isBusyDownLoading;
     }
@@ -166,10 +187,9 @@ public class ParameterFragment extends Fragment {
     }
 
     private void getControllerParameters() {
-        //disable window
-//        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-//                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
+
+        mTimeOutTimer.start();
         isBusyDownLoading = true; //HomeActivity checks this on onBackPressed to prevent leaving fragment until complete
         mProgressBarLayout.setVisibility(View.VISIBLE);
         mProgressBarTextView.setText(R.string.get_param_message);
@@ -398,9 +418,7 @@ public class ParameterFragment extends Fragment {
                             pidCCount = 0;
                             mDC.setText(response);
                             mProgressBarLayout.setVisibility(View.INVISIBLE);
-                            //re-enable window and set isBusyDownloading to false
-//                            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                            isBusyDownLoading=false;
+                            isBusyDownLoading = false;
                             makeLayoutsVisible();
                         }
                         Log.d(TAG, "inside the default case, response is: " + response);
@@ -424,7 +442,7 @@ public class ParameterFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (isBusyDownLoading){
+        if (isBusyDownLoading) {
             Snackbar.make(view, R.string.download_parameters_message, Snackbar.LENGTH_SHORT).show();
             return true;
         }

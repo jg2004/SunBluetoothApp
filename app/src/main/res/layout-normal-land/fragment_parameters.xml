@@ -13,7 +13,6 @@
         android:visibility="invisible">
 
         <ProgressBar
-            android:id="@+id/progressBar"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
@@ -27,27 +26,18 @@
 
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/pidMainLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/pidCoefficientTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/border_bottom_gray"
-            android:gravity="center_horizontal"
-            android:paddingBottom="2dp"
-            android:text="Heat/Cool PID Coefficients"
-            />
 
         <LinearLayout
             android:id="@+id/pidHCoefficientLayout"
@@ -131,23 +121,16 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:id="@+id/pwmpLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/pidMainLayout"
-        android:layout_alignStart="@+id/pidMainLayout"
-        android:layout_below="@+id/pidMainLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/pwmpTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/border_bottom_gray"
-            android:text="Pulse Width Modulation Period"
-            />
 
         <LinearLayout
             android:id="@+id/pwmpUtlLtlSubLayout"
@@ -189,60 +172,66 @@
         android:layout_marginBottom="10dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/utlLtlitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/border_bottom_gray"
-            android:text="Upper/Lower Temp Limits"
-            />
 
         <LinearLayout
             android:id="@+id/UtlLtlSubLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:text="UTL:"
-                android:textColor="@android:color/black"
-                />
+                android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatEditText
-                android:id="@+id/utlEditText"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:inputType="number"
-                android:maxWidth="100dp"
-                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="UTL:"
+                    android:textColor="@android:color/black"
+                    />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:text="LTL:"
-                android:textColor="@android:color/black"
-                />
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/utlEditText"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:inputType="number"
+                    android:maxWidth="100dp"
+                    />
 
-            <android.support.v7.widget.AppCompatEditText
-                android:id="@+id/ltlEditText"
-                android:layout_width="100dp"
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:inputType="numberSigned"
-                android:maxWidth="100dp"
-                />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="LTL:"
+                    android:textColor="@android:color/black"
+                    />
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/ltlEditText"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:inputType="numberSigned"
+                    android:maxWidth="100dp"
+                    />
+            </LinearLayout>
+
+
         </LinearLayout>
 
     </LinearLayout>
@@ -253,7 +242,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="15dp"
-        android:gravity="center_horizontal">
+        android:gravity="start"
+        android:padding="10dp"
+        >
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/buttonGet"

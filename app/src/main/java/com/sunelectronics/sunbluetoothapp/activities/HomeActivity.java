@@ -23,6 +23,7 @@ import android.view.View;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.fragments.DisplayTemperatureFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPCreateEditFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPDetailFragment;
@@ -58,6 +59,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     public static final String TAG_FRAGMENT_LOCAL_PROGRAM = "tag_frag_lp";
     public static final String TAG_FRAGMENT_LOGGER = "tag_frag_logger";
     private View view;
+    private LPDataBaseHandler mLPDataBaseHandler;
     private BottomNavigationView mBottomNavigationView;
     private BroadcastReceiver mReceiver;
     private Toolbar mToolbar;
@@ -65,13 +67,21 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         Log.d(TAG, "onCreate: called");
+        mLPDataBaseHandler = new LPDataBaseHandler(HomeActivity.this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         view = findViewById(R.id.activityLayout);
         buildFragmentList();
         setUpViews();
-        switchFragment(0, TAG_FRAGMENT_MONITOR);
+        if (savedInstanceState == null) {
+            Log.d(TAG, "onCreate: savedInstanceState was NULL");
+            switchFragment(0, TAG_FRAGMENT_MONITOR);
+
+        } else {
+            Log.d(TAG, "onCreate: savedInstanceState was NOT NULL");
+        }
     }
 
     //-------------------------------private methods----------------------------------------------
@@ -117,6 +127,10 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                 return false;
             }
         });
+    }
+
+    public LPDataBaseHandler getLPDataBaseHandler() {
+        return mLPDataBaseHandler;
     }
 
     private void setToolbarSubTitle() {
@@ -201,6 +215,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     public void closeActivity() {
         //called by MyAlertDialogFragment if user presses Yes button on dialog
         Log.d(TAG, "closing HomeActivity");
+        stopLoggingSession();
         finish();
     }
 
@@ -273,18 +288,18 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        // getMenuInflater().inflate(R.menu.menu_local_program,menu);
         return true;
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: closing bluetooth connection");
-        //clean up: cancel bluetooth thread and close TemperatureLogWriter text file
-        BluetoothConnectionService.getInstance().stop();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        DisplayTemperatureFragment frag = (DisplayTemperatureFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        frag.closeLoggingFile();
+        Log.d(TAG, "onDestroy: called CLOSING DB");
+        mLPDataBaseHandler.close();
+        //set mIsLogging from DisplayTempFrag back to false
+
+        //FragmentManager fragmentManager = getSupportFragmentManager();
+        //DisplayTemperatureFragment frag = (DisplayTemperatureFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_MONITOR);
+        //frag.closeLoggingFile();
         super.onDestroy();
     }
 
@@ -353,6 +368,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         return false;
     }
 
+
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart: called");
@@ -409,4 +425,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         LocalBroadcastManager.getInstance(HomeActivity.this).unregisterReceiver(mReceiver);
         super.onStop();
     }
+
+
 }

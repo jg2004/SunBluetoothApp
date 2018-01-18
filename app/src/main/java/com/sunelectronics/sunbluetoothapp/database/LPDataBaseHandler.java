@@ -20,29 +20,13 @@ public class LPDataBaseHandler extends SQLiteOpenHelper {
 
     private static final String TAG = "LPDataBaseHandler";
     private Context mContext;
-    private static LPDataBaseHandler mLPDataBaseHandler;
     private List<LocalProgram> mLocalProgramList;
     private RecyclerView mLpRecyclerView;
 
-
-    private LPDataBaseHandler(Context context) {
+    public LPDataBaseHandler(Context context) {
         super(context, Constants.LP_DB_NAME, null, Constants.LP_DB_VER);
         mContext = context;
-
     }
-
-    public static LPDataBaseHandler getInstance(Context context) {
-
-        if (mLPDataBaseHandler == null) {
-
-            Log.d(TAG, "getInstance: creating LPDataBaseHandler singleton");
-            mLPDataBaseHandler = new LPDataBaseHandler(context);
-        }
-
-        return mLPDataBaseHandler;
-
-    }
-
 
         /*The onCreate method is not called until the database is first created by a call to getWritable or getReadable database*/
 

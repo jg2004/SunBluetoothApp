@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:layout_margin="10dp"
+                                             android:background="@drawable/border_curved_padding">
+
+
+    <TextView
+        android:id="@+id/textViewLabelCham"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/cham"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewChamTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/textViewLabelCham"
+        app:layout_constraintTop_toTopOf="@+id/textViewLabelCham"/>
+
+    <TextView
+        android:id="@+id/textViewUserLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/user"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewLabelCham"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLabelCham"
+        />
+
+    <TextView
+        android:id="@+id/textViewUserTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewChamTemp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewChamTemp"
+        />
+
+    <TextView
+        android:id="@+id/textViewWaitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/wait"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewRateLabel"
+        app:layout_constraintTop_toBottomOf="@+id/textViewRateLabel"/>
+
+    <TextView
+        android:id="@+id/textViewWait"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="##:##:##"
+        android:textColor="@android:color/black"
+
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewRate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewRate"/>
+
+    <TextView
+        android:id="@+id/textViewSetLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/set"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewWaitLabel"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaitLabel"/>
+
+    <TextView
+        android:id="@+id/textViewSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewWait"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWait"/>
+
+    <TextView
+        android:id="@+id/textViewRateLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="RATE:"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewUserLabel"
+        app:layout_constraintTop_toBottomOf="@+id/textViewUserLabel"/>
+
+    <TextView
+        android:id="@+id/textViewRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewUserTemp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewUserTemp"/>
+
+
+    <Switch
+        android:id="@+id/switchOnOff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:checked="false"
+        app:layout_constraintLeft_toRightOf="@+id/toggleButtonHeatEnable"
+        app:layout_constraintRight_toLeftOf="@+id/toggleButtonCoolEnable"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
+
+    <Button
+        android:id="@+id/buttonSingleSegment"
+
+        android:layout_width="275dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/white_rounded_button_accent"
+        android:text="SET"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewLabelCham"/>
+
+    <ToggleButton
+        android:id="@+id/toggleButtonHeatEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/button_on_off"
+        android:checked="false"
+        android:text="ToggleButton"
+        android:textOff="Heat"
+        android:textOn="Heat"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/buttonStatus"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
+
+    <ToggleButton
+        android:id="@+id/toggleButtonCoolEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/button_on_off"
+        android:checked="false"
+        android:textOff="Cool"
+        android:textOn="Cool"
+        android:textSize="12sp"
+        app:layout_constraintRight_toRightOf="@+id/buttonStatus"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="90dp"/>
+
+    <Button
+        android:id="@+id/buttonStatus"
+        android:layout_width="275dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/white_rounded_button_accent"
+        android:text="@string/status"
+        app:layout_constraintLeft_toLeftOf="@+id/buttonSingleSegment"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSingleSegment"/>
+
+
+</android.support.constraint.ConstraintLayout>

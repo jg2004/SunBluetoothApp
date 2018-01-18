@@ -1,10 +1,9 @@
 package com.sunelectronics.sunbluetoothapp.models;
 
-/**
- * Created by Jerry on 11/12/2017.
- */
 
-public class ChamberModel {
+import java.io.Serializable;
+
+public class ChamberModel implements Serializable {
 
     private String ch1Command;
     private String ch2Command;

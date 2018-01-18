@@ -1,9 +1,11 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
@@ -16,11 +18,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
@@ -30,9 +34,11 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LOG_FILES;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LOG_FILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_LIST_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOF_FILE_VIEWER;
 
 public class LogFileListFragment extends ListFragment {
 
@@ -43,6 +49,7 @@ public class LogFileListFragment extends ListFragment {
     private ArrayAdapter<String> mAdapter;
     private ActionBar mSupportActionBar;
     private View view;
+    private boolean mIsLogging;
 
     //implemented by HomeActivity and IntroActivity
     public interface DeleteLogFileListener {
@@ -55,10 +62,13 @@ public class LogFileListFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated: called");
         super.onActivityCreated(savedInstanceState);
+        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), Context.MODE_PRIVATE);
+        mIsLogging = prefs.getBoolean(LOGGING_STATE, false);
 
         view = getView();
         mTemperatureLogReader = new TemperatureLogReader(getContext());
         mLogFileList = mTemperatureLogReader.getLogFiles();
+        Collections.sort(mLogFileList);
 
         if (mLogFileList.isEmpty()) {
 
@@ -75,7 +85,6 @@ public class LogFileListFragment extends ListFragment {
             mSupportActionBar.setTitle(LOG_FILE_LIST_FRAG_TITLE);
         }
         setHasOptionsMenu(true);
-        view.setBackgroundColor(0xFFFFFFFF);
     }
 
     private void setUpLongClickListener() {
@@ -85,6 +94,10 @@ public class LogFileListFragment extends ListFragment {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 if (mLogFileList.get(position).contains(EMPTY_LISTVIEW_MESSAGE)) {
+                    return true;
+                }
+                if (position == mLogFileList.size() - 1 && mIsLogging) {
+                    Toast.makeText(getContext(), "Logging in progress, can't delete", Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
@@ -164,23 +177,42 @@ public class LogFileListFragment extends ListFragment {
         if (mLogFileList.get(position).equals(EMPTY_LISTVIEW_MESSAGE)) {
             return;
         }
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
+        goToLogFileViewer(position);
+
+    }
+
+    private void goToLogFileViewer(int position) {
         LogFileViewerFragment fragment = new LogFileViewerFragment();
         Bundle args = new Bundle();
         String fileContents = mTemperatureLogReader.getFileContents(mLogFileList.get(position));
         args.putString(LOG_FILE_CONTENTS, fileContents);
         args.putString(LOG_FILE_NAME, mLogFileList.get(position));
         fragment.setArguments(args);
-        ft.addToBackStack(null);
-        ft.replace(R.id.homeContainer, fragment).commit();
+        performTransaction(fragment, TAG_FRAGMENT_LOF_FILE_VIEWER);
+
+    }
+
+    public void performTransaction(Fragment fragment, String tag) {
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.homeContainer, fragment, tag).commit();
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
 
+        Log.d(TAG, "onPrepareOptionsMenu: called");
         MenuItem deleteAllLogFileMenuItem = menu.findItem(R.id.action_deleteAllLogFiles);
-        deleteAllLogFileMenuItem.setEnabled(!mLogFileList.get(0).contains(EMPTY_LISTVIEW_MESSAGE));
+
+
+        if (mLogFileList.get(0).contains(EMPTY_LISTVIEW_MESSAGE) || mIsLogging) {
+            deleteAllLogFileMenuItem.setEnabled(false);
+
+        } else {
+            deleteAllLogFileMenuItem.setEnabled(true);
+
+        }
     }
 
     @Override
@@ -198,6 +230,12 @@ public class LogFileListFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_log_file_list_view, menu);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
     }
 
     @Override

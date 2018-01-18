@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
@@ -191,7 +192,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called");
-        mLPDataBaseHandler = LPDataBaseHandler.getInstance(getContext());
+        mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
         //RefreshFragment is an interface implemented by HomeActivity that is used to send
         //bundle local program to LPDetailFragment after local program is edited
         mRefreshFragment = (RefreshFragment) getActivity();

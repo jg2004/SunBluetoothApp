@@ -1,32 +1,26 @@
 package com.sunelectronics.sunbluetoothapp.activities;
 
-import android.content.Intent;
-import android.content.res.AssetManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
-import com.sunelectronics.sunbluetoothapp.fragments.HelpDialogFragment;
+import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.fragments.IntroFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import static com.sunelectronics.sunbluetoothapp.activities.HomeActivity.TAG_FRAGMENT_LOGGER;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_DISCOVERY;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_HELP_DIALOG;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_INTRO_FRAGMENT;
 
-public class IntroActivity extends AppCompatActivity implements View.OnClickListener, LogFileListFragment.DeleteLogFileListener {
+public class IntroActivity extends AppCompatActivity implements LogFileListFragment.DeleteLogFileListener {
     private static final String TAG = "IntroActivity";
 
     @Override
@@ -37,88 +31,27 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setVisibility(View.GONE);
-        Button buttonConnect = (Button) findViewById(R.id.buttonConnect);
-        buttonConnect.setOnClickListener(this);
-        Button buttonLogViewer = (Button) findViewById(R.id.buttonViewLog);
-        buttonLogViewer.setOnClickListener(this);
-        Button buttonDiscover = (Button) findViewById(R.id.buttonDiscover);
-        buttonDiscover.setOnClickListener(this);
-        Button buttonHelp = (Button) findViewById(R.id.buttonHelp);
-        buttonHelp.setOnClickListener(this);
-    }
+        Log.d(TAG, "PIXEL WIDTH: " + getResources().getDisplayMetrics().widthPixels);
+        Log.d(TAG, "PIXEL HEIGHT: " + getResources().getDisplayMetrics().heightPixels);
+        Log.d(TAG, "PIXEL DENSITY: " + getResources().getDisplayMetrics().density);
+        Log.d(TAG, "SCREEN DENSITY (dpi): " + getResources().getDisplayMetrics().densityDpi);
+        Log.d(TAG, "resetting SharedPrefs " + getPackageName());
+        SharedPreferences prefs = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(LOGGING_STATE, false).apply();
 
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.buttonHelp:
-
-                String helpFileContents = getFileContents();
-                Log.d(TAG, "onClick: file contents: " + "\n" + helpFileContents);
-                showHelpDialog(helpFileContents);
-                break;
-
-            case R.id.buttonConnect:
-
-                Intent intentConnectBluetooth = new Intent(IntroActivity.this, BluetoothStartUp.class);
-                startActivity(intentConnectBluetooth);
-                break;
-
-            case R.id.buttonViewLog:
-
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                fragmentTransaction.replace(R.id.homeContainer, new LogFileListFragment(), TAG_FRAGMENT_LOGGER);
-                fragmentTransaction.addToBackStack(null).commit();
-                break;
-
-            case R.id.buttonDiscover:
-                Intent intentDiscoverBluetooth = new Intent(IntroActivity.this, BluetoothStartUp.class);
-                intentDiscoverBluetooth.putExtra(START_DISCOVERY, true);
-                startActivity(intentDiscoverBluetooth);
-                break;
+        if (savedInstanceState == null) {
+            performTransaction(new IntroFragment(), TAG_FRAGMENT_INTRO_FRAGMENT, false);
         }
-    }
-
-    private void showHelpDialog(String helpFileContents) {
-
-        HelpDialogFragment frag = HelpDialogFragment.newInstance(helpFileContents);
-        frag.show(getSupportFragmentManager(),TAG_FRAGMENT_HELP_DIALOG);
 
     }
 
-    private String getFileContents() {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        AssetManager assetManager = getAssets();
-        try {
-            InputStream inputStream = assetManager.open("help.txt");
-            br = new BufferedReader(new InputStreamReader(inputStream));
-            String temp;
-            while ((temp = br.readLine()) != null) {
-                sb.append(temp).append("\n");
-            }
+    public void performTransaction(Fragment fragment, String tag, boolean addTobackStack) {
 
-        } catch (FileNotFoundException f) {
-            Log.d(TAG, "getFileContents: error opening help.txt file");
-            Toast.makeText(IntroActivity.this, "File not found: " + "\n" + f.getMessage(), Toast.LENGTH_LONG).show();
-            f.printStackTrace();
-        } catch (IOException e) {
-            Log.d(TAG, "getFileContents: error opening help.txt file");
-            Toast.makeText(IntroActivity.this, "Error opening text file" + "\n" + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) br.close();
-
-            } catch (IOException ex) {
-                Log.d(TAG, "getFileContents: error closing help.txt file");
-                ex.printStackTrace();
-            }
-        }
-        return sb.toString();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        if (addTobackStack) fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.homeContainer, fragment, tag).commit();
     }
+
 
     @Override
     public void deleteLogFile(String fileName) {
@@ -137,4 +70,28 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
         //LogFileListFragment has deleteLogFilesMethod
         fragment.deleteAllLogFiles();
     }
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart: called");
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: called");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: called, closing bluetooth connection");
+        //clean up: cancel bluetooth thread
+        BluetoothConnectionService.getInstance().stop();
+
+        Log.d(TAG, "storing saved preference in: " + getPackageName());
+        super.onDestroy();
+    }
+
+
 }
