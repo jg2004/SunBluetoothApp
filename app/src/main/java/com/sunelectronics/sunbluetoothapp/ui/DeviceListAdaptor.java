@@ -15,7 +15,6 @@ import com.sunelectronics.sunbluetoothapp.R;
 
 import java.util.List;
 
-
 public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
     private List<BluetoothDevice> discoveredDeviceList;
     private int layoutResource;
@@ -32,14 +31,18 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(layoutResource, null);
-
         BluetoothDevice device = discoveredDeviceList.get(position);
+
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            convertView = inflater.inflate(layoutResource, null);
+
+        }
+
         if (device != null) {
 
-            TextView btName = (TextView) view.findViewById(R.id.tvDevName);
-            TextView btAddress = (TextView) view.findViewById(R.id.tvDevAddress);
+            TextView btName = (TextView) convertView.findViewById(R.id.tvDevName);
+            TextView btAddress = (TextView) convertView.findViewById(R.id.tvDevAddress);
             String name = device.getName();
             String address = device.getAddress();
             if (name == null) {
@@ -48,11 +51,10 @@ public class DeviceListAdaptor extends ArrayAdapter<BluetoothDevice> {
             btName.setText(name);
             btAddress.setText(address);
         }
-        return view;
+        return convertView;
     }
 
     public void setDiscoveredDeviceList(List<BluetoothDevice> discoveredDeviceList) {
         this.discoveredDeviceList = discoveredDeviceList;
     }
-
 }

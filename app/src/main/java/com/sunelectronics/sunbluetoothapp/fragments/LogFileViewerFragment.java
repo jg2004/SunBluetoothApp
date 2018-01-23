@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,26 +17,40 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.ui.LogFileContentRecyclerViewAdapter;
+import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogReader;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_DATA;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EMPTY_LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_VIEWER_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_TEMP_CHART;
 
-
 public class LogFileViewerFragment extends Fragment {
 
     private static final String TAG = "LogFileViewerFragment";
-    private String mLogFileContents;
-    private String mFileName;
+    private String mLogFileContents, mFileName;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: called");
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+
+        if (args != null) {
+            mFileName = args.getString(LOG_FILE_NAME);
+
+        } else {
+            mLogFileContents = getString(R.string.log_file_null_message);
+        }
+    }
 
     @Nullable
     @Override
@@ -50,30 +66,17 @@ public class LogFileViewerFragment extends Fragment {
         }
 
         setHasOptionsMenu(true);
-        TextView logFileTextView = (TextView) view.findViewById(R.id.textViewLogFile);
-        if (mLogFileContents.isEmpty()) {
+        TemperatureLogReader tempLogReader = new TemperatureLogReader(getContext());
+        mLogFileContents = tempLogReader.getFileContents(mFileName);
+        String[] logFileContentsArray = mLogFileContents.split("\n");
+        List<String> logFileList = Arrays.asList(logFileContentsArray);
 
-            logFileTextView.setText(EMPTY_LOG_FILE_CONTENTS);
-        } else {
-
-            logFileTextView.setText(mLogFileContents);
-        }
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LogFileContentRecyclerViewAdapter adapter = new LogFileContentRecyclerViewAdapter(getContext(), logFileList);
+        recyclerView.setAdapter(adapter);
         return view;
-    }
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: called");
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-
-        if (args != null) {
-            mLogFileContents = args.getString(LOG_FILE_CONTENTS);
-            mFileName = args.getString(LOG_FILE_NAME);
-        } else {
-            mLogFileContents = getString(R.string.log_file_null_message);
-        }
     }
 
     @Override
@@ -103,7 +106,12 @@ public class LogFileViewerFragment extends Fragment {
                 return true;
             case R.id.action_chart:
 
-                goToChartFrag();
+                //only chart if more than 2 lines as first 2 lines are title and header
+                if (mLogFileContents.split("\n").length > 2) {
+                    goToChartFrag();
+                } else {
+                    Toast.makeText(getContext(), "No data to chart!", Toast.LENGTH_SHORT).show();
+                }
                 return true;
         }
         return false;
@@ -136,6 +144,5 @@ public class LogFileViewerFragment extends Fragment {
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.share_logging_file)));
-
     }
 }

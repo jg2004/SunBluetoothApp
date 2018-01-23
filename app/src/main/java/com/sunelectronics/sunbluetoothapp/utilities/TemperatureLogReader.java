@@ -80,7 +80,7 @@ public class TemperatureLogReader {
 
             while ((tempString = br.readLine()) != null) {
 
-                stringBuilder.append(tempString + "\n");
+                stringBuilder.append(tempString).append("\n");
             }
             br.close();
             fileContents = stringBuilder.toString();

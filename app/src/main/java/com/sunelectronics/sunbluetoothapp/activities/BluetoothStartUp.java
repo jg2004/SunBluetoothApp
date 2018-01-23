@@ -309,7 +309,7 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         //device
         mProgressBarContainer.setVisibility(View.VISIBLE);
         mDeviceListView.setVisibility(View.INVISIBLE);
-        mProgressBarTextView.setText("Attempting to connect to " + bluetoothDevice.getName());
+        mProgressBarTextView.setText(String.format("Attempting to connect to %s", bluetoothDevice.getName()));
         actionbar.setTitle(R.string.connecting);
         mBluetoothConnectionService.startClient(bluetoothDevice, getApplicationContext());
     }

@@ -35,7 +35,6 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LOG_FILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_CONTENTS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_LIST_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOF_FILE_VIEWER;
@@ -68,7 +67,11 @@ public class LogFileListFragment extends ListFragment {
         view = getView();
         mTemperatureLogReader = new TemperatureLogReader(getContext());
         mLogFileList = mTemperatureLogReader.getLogFiles();
-        Collections.sort(mLogFileList);
+        List<String> newFileList = customSort(mLogFileList);
+        Collections.sort(newFileList);
+        mLogFileList.clear();
+        rebuildFileList(newFileList);
+        Log.d(TAG, "after sort: " + newFileList);
 
         if (mLogFileList.isEmpty()) {
 
@@ -85,6 +88,48 @@ public class LogFileListFragment extends ListFragment {
             mSupportActionBar.setTitle(LOG_FILE_LIST_FRAG_TITLE);
         }
         setHasOptionsMenu(true);
+    }
+
+    /**
+     * rebuilds array list with the original but now properly sorted file names
+     *
+     * @param newFileList list of file names to rename
+     */
+    private void rebuildFileList(List<String> newFileList) {
+        for (int i = 0; i < newFileList.size(); i++) {
+            String year = newFileList.get(i).substring(0, 4);
+            String month = newFileList.get(i).substring(4, 6);
+            String day = newFileList.get(i).substring(6, 8);
+            String time = newFileList.get(i).substring(8);
+            StringBuilder sb;
+            sb = new StringBuilder();
+            String originalName = sb.append(month).append("_").append(day).append("_")
+                    .append(year).append("_").append(time).append(".txt").toString();
+            mLogFileList.add(originalName);
+        }
+    }
+
+    /**
+     * This method renames the file so they can be sorted properly by renaming file with year
+     * first, month second, day third, time fourth
+     *
+     * @param logFileList list of file names
+     * @return returns list with new file names that will be sorted properly
+     */
+    private List<String> customSort(List<String> logFileList) {
+
+        List<String> namesToSort = new ArrayList<>();
+        for (int i = 0; i < logFileList.size(); i++) {
+            String year = logFileList.get(i).substring(6, 10);
+            String day = logFileList.get(i).substring(3, 5);
+            String month = logFileList.get(i).substring(0, 2);
+            String time = logFileList.get(i).substring(11, 17);
+            StringBuilder sb;
+            sb = new StringBuilder();
+            String name = sb.append(year).append(month).append(day).append(time).toString();
+            namesToSort.add(name);
+        }
+        return namesToSort;
     }
 
     private void setUpLongClickListener() {
@@ -184,8 +229,6 @@ public class LogFileListFragment extends ListFragment {
     private void goToLogFileViewer(int position) {
         LogFileViewerFragment fragment = new LogFileViewerFragment();
         Bundle args = new Bundle();
-        String fileContents = mTemperatureLogReader.getFileContents(mLogFileList.get(position));
-        args.putString(LOG_FILE_CONTENTS, fileContents);
         args.putString(LOG_FILE_NAME, mLogFileList.get(position));
         fragment.setArguments(args);
         performTransaction(fragment, TAG_FRAGMENT_LOF_FILE_VIEWER);

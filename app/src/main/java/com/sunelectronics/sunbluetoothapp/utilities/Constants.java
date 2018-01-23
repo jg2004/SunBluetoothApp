@@ -30,10 +30,9 @@ public class Constants {
     public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
     //constants used
     public static final String SEND_STOP = "SEND STOP COMMAND";
-    public static final String IS_LOGGING = "is_logging";
+    public static final String CHART_TITLE = "TEMPERATURE CHART";
     public static final String FILE_NAME = "file_name";
     public static final String CHART_DATA = "chart_data";
-    public static final String TEMPERATURE_LOG_WRITER_OBJECT = "temp_log_writer";
     public static final String CHAMBER_MODEL = "chamber_model";
     public static final String DELETE_MESSAGE = "DELETE";
     public static final String DELETE_LP = "DELETE LP";
@@ -46,7 +45,6 @@ public class Constants {
     public static final String ALERT_NOTIFICATION = "alert_notification";
     public static final String LP = "lp";
     public static final int POWER_ON_DELAY_MS = 2000;
-    public static final String LOG_FILE_CONTENTS = "log_file_contents";
     public static final String FILE_CONTENTS = "file_contents";
     public static final String EMPTY_LOG_FILE_CONTENTS = "Log file empty";
     public static final String LOG_FILE_NAME = "log_file_name";
