@@ -6,7 +6,7 @@
     <item
         android:id="@+id/bottom_bar_monitor"
         android:icon="@drawable/ic_monitor_temp"
-        android:title="Monitor"
+        android:title="@string/monitor"
         app:showAsAction="ifRoom">
 
     </item>
@@ -14,14 +14,14 @@
     <item
         android:id="@+id/bottom_bar_local_program"
         android:icon="@drawable/ic_lp_edit"
-        android:title="Local Program"
+        android:title="@string/local_program"
         app:showAsAction="ifRoom">
 
     </item>
     <item
         android:id="@+id/bottom_bar_communicate"
-        android:icon="@drawable/ic_communicate"
-        android:title="Communicate"
+        android:icon="@drawable/ic_action_chart"
+        android:title="@string/log_files"
         app:showAsAction="ifRoom">
 
     </item>

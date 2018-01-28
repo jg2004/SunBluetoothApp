@@ -8,9 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -29,6 +34,7 @@ import android.widget.Toast;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.fragments.MyAlertDialogFragment;
+import com.sunelectronics.sunbluetoothapp.fragments.PassiveDialogFragment;
 import com.sunelectronics.sunbluetoothapp.ui.DeviceListAdaptor;
 
 import java.util.ArrayList;
@@ -44,7 +50,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_DISCOVERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.VER_LESS_KITKAT_MESSAGE;
 
-public class BluetoothStartUp extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class BluetoothStartUp extends AppCompatActivity implements AdapterView.OnItemClickListener, PassiveDialogFragment.OnPassiveDialogFragmentListener {
     private static final String TAG = "BluetoothStartUp";
     public static final String MY_PREF = "myPrefs";
     public static final String BLUETOOTHDEV = "bluetoothDevice";
@@ -58,26 +64,25 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
     private boolean mIsDisplayingDiscovered, mStartDiscovery;
     private BluetoothConnectionService mBluetoothConnectionService;
     private ActionBar actionbar;
+    private boolean mShouldRequestPermissionDialogBeShown;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
+
 
     /*-----------------overriden methods of AppCompatActivity----------------------------------------*/
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d(TAG, "onCreate: started");
         Log.d(TAG, "phone version: " + Build.VERSION.CODENAME + " SDK " + Build.VERSION.SDK_INT);
         actionbar = getSupportActionBar();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mShouldRequestPermissionDialogBeShown = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION);
+            Log.d(TAG, "onCreate: shouldRequPermDialogBeShown: " + mShouldRequestPermissionDialogBeShown);
+        }
         mBluetoothConnectionService = BluetoothConnectionService.getInstance();
-        setContentView(R.layout.activity_bluetooth_startup);
-        mDeviceListView = (ListView) findViewById(R.id.deviceListView);
-        mTvDeviceList = (TextView) findViewById(R.id.textViewDeviceList);
-        mProgressBarTextView = (TextView) findViewById(R.id.textViewProgressBar);
-        mProgressBarContainer = (CardView) findViewById(R.id.progressBarWithText);
-        mProgressBarContainer.setVisibility(View.GONE);
-        mBluetoothDeviceList = new ArrayList<>();
-        mAdaptor = new DeviceListAdaptor(this, R.layout.disc_bt_devices, mBluetoothDeviceList);
-        mDeviceListView.setAdapter(mAdaptor);
-        mDeviceListView.setOnItemClickListener(this);
+
+        setUpViews();
         setUpReceiver();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -100,6 +105,19 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
         }
 
     }//end of OnCreate
+
+    private void setUpViews() {
+        setContentView(R.layout.activity_bluetooth_startup);
+        mDeviceListView = (ListView) findViewById(R.id.deviceListView);
+        mTvDeviceList = (TextView) findViewById(R.id.textViewDeviceList);
+        mProgressBarTextView = (TextView) findViewById(R.id.textViewProgressBar);
+        mProgressBarContainer = (CardView) findViewById(R.id.progressBarWithText);
+        mProgressBarContainer.setVisibility(View.GONE);
+        mBluetoothDeviceList = new ArrayList<>();
+        mAdaptor = new DeviceListAdaptor(this, R.layout.disc_bt_devices, mBluetoothDeviceList);
+        mDeviceListView.setAdapter(mAdaptor);
+        mDeviceListView.setOnItemClickListener(this);
+    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -146,8 +164,10 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
 
                 } else {
                     item.setIcon(R.drawable.ic_action_cancel_discovery);
-                    mAdaptor.setDiscoveredDeviceList(mBluetoothDeviceList);
-                    mDeviceListView.setAdapter(mAdaptor);
+                    //mAdaptor.setDiscoveredDeviceList(mBluetoothDeviceList);
+                    //mDeviceListView.setAdapter(mAdaptor);
+                    mAdaptor.clear();
+
                     discoverDevices();
                 }
                 break;
@@ -285,20 +305,89 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
             mBluetoothAdapter.cancelDiscovery();
         }
 
-        int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
+        //Must have location permission for discovery to work (android 6.0 and > ?)
+
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+    }
 
-        if (mBluetoothAdapter.startDiscovery()) {
-            Log.d(TAG, "discoverDevices: discovery started successfully");
-            actionbar.setTitle(R.string.disc_mode);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, "onRequestPermissionsResult: permissions is: " + permissions[0] + " results: " + grantResults[0]);
+        if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+            Log.d(TAG, "onRequestPermissionsResult: Access coarse location requested but permission denied");
 
-        } else {
-            Toast.makeText(this, "Discovery could not be started. Verify bluetooth is enabled", Toast.LENGTH_SHORT).show();
-            invalidateOptionsMenu();
-            Log.d(TAG, "discoverDevices: discovery could not be started");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Log.d(TAG, "onRequestPermissionResult: shouldRequPermDialogBeShown: " + shouldShowRequestPermissionRationale(permissions[0]));
+
+                if (!shouldShowRequestPermissionRationale(permissions[0]) && !mShouldRequestPermissionDialogBeShown) {
+                    Log.d(TAG, "onRequestPermissionsResult: never ask again was checked!");
+                    showLocationRationaleDialog();
+
+                } else if (!shouldShowRequestPermissionRationale(permissions[0]) && mShouldRequestPermissionDialogBeShown) {
+                    //this means dialog for permissions was shown so don't show location rational dialog as this causes exception
+                    //dialog fragments shouldn't be shown AFTER onSaveInstanceState??? not sure why, but exception occurs
+                    //So if dialog (from request permissions was shown, then permanently denied, just finish activity
+                    Log.d(TAG, "onRequestPermissionsResult: finishing activity");
+                    finish();
+
+                } else {
+                    mShouldRequestPermissionDialogBeShown = true;
+                    Log.d(TAG, "onRequestPermissionsResult: but was not pemanently denied");
+                    Snackbar.make(mDeviceListView, "Location permissions required for Bluetooth Discovery", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d(TAG, "onClick: snackbar starts");
+                                    discoverDevices();
+                                }
+                            }).show();
+                    invalidateOptionsMenu();
+                }
+            }
+
+        } else if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onRequestPermissionsResult: Permission was granted!");
+            if (mBluetoothAdapter.startDiscovery()) {
+                Log.d(TAG, "discoverDevices: discovery started successfully");
+                actionbar.setTitle(R.string.disc_mode);
+
+            } else {
+                Toast.makeText(this, "Discovery could not be started. Verify bluetooth is enabled", Toast.LENGTH_SHORT).show();
+                invalidateOptionsMenu();
+                Log.d(TAG, "discoverDevices: discovery could not be started");
+            }
         }
+    }
+
+    private void showLocationRationaleDialog() {
+
+        PassiveDialogFragment dialog = PassiveDialogFragment.newInstance("This app does not use your location data in any way. Permission is only required to allow discovering of nearby bluetooth devices." +
+                " In the app settings dialog displayed next, click on Permissions and turn on Location to enable discovery of Bluetooth devices.");
+        dialog.setCancelable(false);
+        Log.d(TAG, "showLocationRationaleDialog: it got here");
+
+        try {
+            dialog.show(getSupportFragmentManager(), "PassiveDialogFragment");
+
+        } catch (Exception e) {
+            Log.d(TAG, "showLocationRationaleDialog: exception occured");
+        }
+
+    }
+
+    //called from PassiveDialogFragment when OK pressed
+    @Override
+    public void dialogDismissed() {
+
+        //show app settings to allow user chance to change location permissions
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+        finish();
     }
 
     /**
@@ -462,7 +551,8 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
                     mTvDeviceList.setVisibility(View.INVISIBLE);
                     mDeviceListView.setVisibility(View.VISIBLE);
                     Toast.makeText(BluetoothStartUp.this, "Discovery started", Toast.LENGTH_SHORT).show();
-                    mBluetoothDeviceList.clear();
+                    mBluetoothDeviceSet.clear();
+                    mAdaptor.clear();
                     mIsDisplayingDiscovered = true;
                     invalidateOptionsMenu();
                     break;
@@ -484,10 +574,10 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
                 case BluetoothDevice.ACTION_FOUND://when BT discovery finds device
 
                     Log.d(TAG, "onReceive: device found");
-                    mBluetoothDeviceList.clear();
+                    mAdaptor.clear();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     mBluetoothDeviceSet.add(device);
-                    mBluetoothDeviceList.addAll(mBluetoothDeviceSet);
+                    mAdaptor.addAll(mBluetoothDeviceSet);
                     mAdaptor.notifyDataSetChanged();
                     Log.d(TAG, "device found: " + "name: " + device.getName() + ", device address: " + device.getAddress());
                     break;
@@ -516,5 +606,17 @@ public class BluetoothStartUp extends AppCompatActivity implements AdapterView.O
             } //end of outer switch statement to filter out intents
 
         }
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: called");
+        super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause: called");
+        super.onPause();
     }
 }

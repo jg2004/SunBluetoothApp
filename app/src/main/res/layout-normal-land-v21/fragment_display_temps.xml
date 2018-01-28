@@ -4,7 +4,6 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              android:layout_margin="10dp"
@@ -16,8 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="0dp"
         android:text="@string/cham"
         android:textColor="@android:color/black"
         android:textSize="18sp"
@@ -28,7 +26,6 @@
         android:id="@+id/textViewChamTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:text="###C"
         android:textColor="@android:color/black"
@@ -132,15 +129,16 @@
         android:id="@+id/switchOnOff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:thumb="@drawable/switch_thumb_selector"
+        android:track="@drawable/switch_track_selector"
+        android:layout_marginEnd="10dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:checked="false"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/toggleButtonHeatEnable"
+        app:layout_constraintRight_toLeftOf="@+id/toggleButtonCoolEnable"
         app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
 
     <Button
@@ -148,82 +146,58 @@
         android:layout_width="275dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="0dp"
         android:background="@drawable/white_rounded_button_accent"
         android:text="SET"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSetLabel"/>
+        app:layout_constraintTop_toTopOf="@+id/textViewLabelCham"/>
 
     <ToggleButton
         android:id="@+id/toggleButtonHeatEnable"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/button_on_off"
         android:checked="false"
+        android:text="ToggleButton"
         android:textOff="Heat"
         android:textOn="Heat"
         android:textSize="12sp"
-        app:layout_constraintRight_toLeftOf="@+id/switchOnOff"
-        app:layout_constraintTop_toTopOf="@+id/switchOnOff"/>
+        app:layout_constraintLeft_toLeftOf="@+id/buttonStatus"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
 
     <ToggleButton
         android:id="@+id/toggleButtonCoolEnable"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/button_on_off"
         android:checked="false"
         android:textOff="Cool"
         android:textOn="Cool"
         android:textSize="12sp"
-        app:layout_constraintLeft_toRightOf="@+id/switchOnOff"
-        app:layout_constraintTop_toTopOf="@+id/switchOnOff"/>
+        app:layout_constraintRight_toRightOf="@+id/buttonStatus"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="20dp"
-        tools:layout_editor_absoluteX="20dp"
-        tools:layout_editor_absoluteY="0dp"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="435dp"
-        tools:layout_editor_absoluteX="-49dp"
-        tools:layout_editor_absoluteY="0dp"/>
+        app:layout_constraintGuide_begin="90dp"/>
 
     <Button
         android:id="@+id/buttonStatus"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/white_rounded_button_accent"
         android:text="@string/status"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/buttonSingleSegment"
         app:layout_constraintTop_toBottomOf="@+id/buttonSingleSegment"/>
 
 

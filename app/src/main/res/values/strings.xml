@@ -57,6 +57,10 @@
     <string name="share_logging_file">Share temperature logging file…</string>
     <string name="exit_help">Exit help section</string>
     <string name="loading_file_message">Loading file…</string>
+    <string name="jerry"> jerry </string>
+    <string name="monitor">Monitor</string>
+    <string name="local_program">Local Program</string>
+    <string name="log_files">Log Files</string>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>
