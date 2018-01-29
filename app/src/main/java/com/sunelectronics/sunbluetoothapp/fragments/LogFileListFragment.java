@@ -11,16 +11,19 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.models.LogFileObject;
+import com.sunelectronics.sunbluetoothapp.ui.LogFileListAdaptor;
 import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogReader;
 
 import java.util.ArrayList;
@@ -42,10 +45,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMEN
 public class LogFileListFragment extends ListFragment {
 
     private static final String TAG = "LogFileListFragment";
-    private static final String EMPTY_LISTVIEW_MESSAGE = "No Temperature Logging Files";
-    private List<String> mLogFileList = new ArrayList<>();
+    private List<LogFileObject> mLogFileObjects = new ArrayList<>();
     private TemperatureLogReader mTemperatureLogReader;
-    private ArrayAdapter<String> mAdapter;
+    private LogFileListAdaptor mLogFileListAdaptor;
     private ActionBar mSupportActionBar;
     private View view;
     private boolean mIsLogging;
@@ -58,29 +60,24 @@ public class LogFileListFragment extends ListFragment {
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_log_file_list, container, false);
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated: called");
         super.onActivityCreated(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), Context.MODE_PRIVATE);
         mIsLogging = prefs.getBoolean(LOGGING_STATE, false);
-
         view = getView();
         mTemperatureLogReader = new TemperatureLogReader(getContext());
-        mLogFileList = mTemperatureLogReader.getLogFiles();
-        List<String> newFileList = customSort(mLogFileList);
-        Collections.sort(newFileList);
-        mLogFileList.clear();
-        rebuildFileList(newFileList);
-        Log.d(TAG, "after sort: " + newFileList);
+        mLogFileObjects = mTemperatureLogReader.getLogFileObjects();
+        Collections.sort(mLogFileObjects);
 
-        if (mLogFileList.isEmpty()) {
+        mLogFileListAdaptor = new LogFileListAdaptor(getContext(), R.layout.log_file_row, mLogFileObjects);
 
-            mLogFileList.add(EMPTY_LISTVIEW_MESSAGE);
-        }
-
-        mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, mLogFileList);
-
-        setListAdapter(mAdapter);
+        setListAdapter(mLogFileListAdaptor);
         setUpLongClickListener();
         mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (mSupportActionBar != null) {
@@ -90,63 +87,17 @@ public class LogFileListFragment extends ListFragment {
         setHasOptionsMenu(true);
     }
 
-    /**
-     * rebuilds array list with the original but now properly sorted file names
-     *
-     * @param newFileList list of file names to rename
-     */
-    private void rebuildFileList(List<String> newFileList) {
-        for (int i = 0; i < newFileList.size(); i++) {
-            String year = newFileList.get(i).substring(0, 4);
-            String month = newFileList.get(i).substring(4, 6);
-            String day = newFileList.get(i).substring(6, 8);
-            String time = newFileList.get(i).substring(8);
-            StringBuilder sb;
-            sb = new StringBuilder();
-            String originalName = sb.append(month).append("_").append(day).append("_")
-                    .append(year).append("_").append(time).append(".txt").toString();
-            mLogFileList.add(originalName);
-        }
-    }
-
-    /**
-     * This method renames the file so they can be sorted properly by renaming file with year
-     * first, month second, day third, time fourth
-     *
-     * @param logFileList list of file names
-     * @return returns list with new file names that will be sorted properly
-     */
-    private List<String> customSort(List<String> logFileList) {
-
-        List<String> namesToSort = new ArrayList<>();
-        for (int i = 0; i < logFileList.size(); i++) {
-            String year = logFileList.get(i).substring(6, 10);
-            String day = logFileList.get(i).substring(3, 5);
-            String month = logFileList.get(i).substring(0, 2);
-            String time = logFileList.get(i).substring(11, 17);
-            StringBuilder sb;
-            sb = new StringBuilder();
-            String name = sb.append(year).append(month).append(day).append(time).toString();
-            namesToSort.add(name);
-        }
-        return namesToSort;
-    }
-
     private void setUpLongClickListener() {
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (mLogFileList.get(position).contains(EMPTY_LISTVIEW_MESSAGE)) {
-                    return true;
-                }
-                if (position == mLogFileList.size() - 1 && mIsLogging) {
+                if (position == mLogFileObjects.size() - 1 && mIsLogging) {
                     Toast.makeText(getContext(), "Logging in progress, can't delete", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-
-                showAlertDialog(mLogFileList.get(position));
+                showAlertDialog(mLogFileObjects.get(position).getFileName());
                 return true;
             }
         });
@@ -160,14 +111,11 @@ public class LogFileListFragment extends ListFragment {
     public void deleteLogFile(String fileName) {
         if (mTemperatureLogReader.deleteFile(fileName)) {
             Snackbar.make(view, "File deleted!", Snackbar.LENGTH_SHORT).show();
-            mAdapter.remove(fileName);
 
-            if (mAdapter.getCount() == 0) {
-                mAdapter.add(EMPTY_LISTVIEW_MESSAGE);
-            }
+            mLogFileListAdaptor.remove(fileName);
+
         } else {
-
-            Snackbar.make(view, "Filel could not be deleted", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "File could not be deleted", Snackbar.LENGTH_SHORT).show();
         }
         getActivity().invalidateOptionsMenu();
     }
@@ -175,8 +123,8 @@ public class LogFileListFragment extends ListFragment {
     public void deleteAllLogFiles() {
 
         if (mTemperatureLogReader.deleteAllFilesInLogFilesDirectory()) {
-            mAdapter.clear();
-            mAdapter.add(EMPTY_LISTVIEW_MESSAGE);
+            mLogFileListAdaptor.clear();
+
         } else {
 
             Snackbar.make(view, "Some files could not be deleted", Snackbar.LENGTH_SHORT).show();
@@ -219,17 +167,13 @@ public class LogFileListFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
 
         Log.d(TAG, "onListItemClick: called");
-        if (mLogFileList.get(position).equals(EMPTY_LISTVIEW_MESSAGE)) {
-            return;
-        }
         goToLogFileViewer(position);
-
     }
 
     private void goToLogFileViewer(int position) {
         LogFileViewerFragment fragment = new LogFileViewerFragment();
         Bundle args = new Bundle();
-        args.putString(LOG_FILE_NAME, mLogFileList.get(position));
+        args.putString(LOG_FILE_NAME, mLogFileObjects.get(position).getFileName());
         fragment.setArguments(args);
         performTransaction(fragment, TAG_FRAGMENT_LOF_FILE_VIEWER);
 
@@ -248,13 +192,11 @@ public class LogFileListFragment extends ListFragment {
         Log.d(TAG, "onPrepareOptionsMenu: called");
         MenuItem deleteAllLogFileMenuItem = menu.findItem(R.id.action_deleteAllLogFiles);
 
-
-        if (mLogFileList.get(0).contains(EMPTY_LISTVIEW_MESSAGE) || mIsLogging) {
+        if (mIsLogging) {
             deleteAllLogFileMenuItem.setEnabled(false);
 
         } else {
             deleteAllLogFileMenuItem.setEnabled(true);
-
         }
     }
 
@@ -262,7 +204,6 @@ public class LogFileListFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
             case R.id.action_deleteAllLogFiles:
                 showAlertDialog();
                 return true;

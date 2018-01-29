@@ -61,6 +61,7 @@
     <string name="monitor">Monitor</string>
     <string name="local_program">Local Program</string>
     <string name="log_files">Log Files</string>
+    <string name="no_logging_files">No Temperature Logging Files</string>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>

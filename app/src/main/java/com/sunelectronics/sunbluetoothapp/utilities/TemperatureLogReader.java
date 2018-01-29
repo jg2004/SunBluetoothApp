@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.sunelectronics.sunbluetoothapp.models.LogFileObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,21 +52,19 @@ public class TemperatureLogReader {
         return allFilesDeleted;
     }
 
-    public List<String> getLogFiles() {
+    public List<LogFileObject> getLogFileObjects() {
 
-        ArrayList<String> fileList = new ArrayList<>();
+        ArrayList<LogFileObject> fileObjectList = new ArrayList<>();
         File logFilesDirectory = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY);
-
-        Log.d(TAG, "getLogFiles: created file: " + logFilesDirectory.getName());
+        Log.d(TAG, "getLogFileObjects: created file: " + logFilesDirectory.getName());
         File[] files = logFilesDirectory.listFiles();
-
         if (files != null) {
             for (File f : files) {
-                fileList.add(f.getName());
-                Log.d(TAG, "getLogFiles: added " + f.getName() + " to list");
+                fileObjectList.add(new LogFileObject(f.getName(), f.length()));
+                Log.d(TAG, "getLogFileObjects: added " + f.getName() + " to list");
             }
         }
-        return fileList;
+        return fileObjectList;
     }
 
     public String getFileContents(String fileName) {
@@ -95,7 +95,6 @@ public class TemperatureLogReader {
             Log.d(TAG, "getFileContents: I/O exception");
             fileContents = "ERROR OPENING FILE";
         }
-
         return fileContents;
     }
 }

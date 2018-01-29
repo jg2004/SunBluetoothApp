@@ -12,12 +12,11 @@ import com.sunelectronics.sunbluetoothapp.R;
 
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
 public class LogFileContentRecyclerViewAdapter extends RecyclerView.Adapter<LogFileContentRecyclerViewAdapter.ViewHolder> {
 
     private List<String> mFileContentList;
     private LayoutInflater mLayoutInflater;
+    private static final String TAG = "LogFileContentRecyclerV";
 
     public LogFileContentRecyclerViewAdapter(Context context, List<String> fileContentList) {
         mLayoutInflater = LayoutInflater.from(context);
