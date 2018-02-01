@@ -633,7 +633,7 @@ public class DisplayTemperatureFragment extends Fragment {
                 // TODO: 11/25/2017 take following Toast command out?
                 if (responseToCommandSent.length() < 12) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    Toast.makeText(getContext(), "Status length less than 12, re-syning", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Status length less than 12, re-syncing", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mChamberStatus.setStatusMessages(responseToCommandSent);

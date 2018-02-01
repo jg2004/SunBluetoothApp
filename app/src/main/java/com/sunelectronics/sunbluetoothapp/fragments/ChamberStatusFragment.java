@@ -107,7 +107,7 @@ public class ChamberStatusFragment extends Fragment {
         mStatusRunnable = new Runnable() {
             @Override
             public void run() {
-                if (BluetoothConnectionService.getInstance().getCurrentState()!= BluetoothConnectionService.STATE_CONNECTED){
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
                     mHandler.removeCallbacks(this);
                     return;
                 }
@@ -194,9 +194,19 @@ public class ChamberStatusFragment extends Fragment {
                     mChamberPoweredOnTv.setText(mChamberStatus.getChamberIsOnMessage());
 
                 } else if (commandSent.length() <= 3 && commandSent.contains("I"))// then In? sent
-
                 {
-                    mCycleNumberTv.setText(response);
+                    //check if response makes sense, if not clear command list to re-sync
+
+                    if (!isNumeric(response)) {
+                        //if it's not numeric, then display is out of sync with controller responses
+                        //re-sync by clearing out array of commands written list
+                        BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                        // TODO: 1/29/2018 remove log statement
+                        Log.d(TAG, "onReceive: non numeric response received from I0? command, resyncing");
+                    } else {
+                        mCycleNumberTv.setText(response);
+                    }
+
                 } else if (commandSent.equals(BKPNT))
 
                 {
@@ -210,6 +220,24 @@ public class ChamberStatusFragment extends Fragment {
                 new IntentFilter(BluetoothConnectionService.MY_INTENT_FILTER));
         mHandler = new Handler();
         mHandler.post(mStatusRunnable);
+    }
+
+    /**
+     * This verifies that commands sent has a valid numeric response
+     * if not, then controller sent back an invalid response that will cause display to be out of
+     * sync with controller responses
+     *
+     * @param responseToCommandSent this is the response to the command sent to controller
+     * @return true if valid double, return false otherwise
+     */
+    private boolean isNumeric(String responseToCommandSent) {
+
+        try {
+            Double test = Double.parseDouble(responseToCommandSent);
+            return !test.isNaN();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

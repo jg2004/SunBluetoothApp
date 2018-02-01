@@ -111,7 +111,6 @@ public class LogFileListFragment extends ListFragment {
     public void deleteLogFile(String fileName) {
         if (mTemperatureLogReader.deleteFile(fileName)) {
             Snackbar.make(view, "File deleted!", Snackbar.LENGTH_SHORT).show();
-
             mLogFileListAdaptor.remove(fileName);
 
         } else {
@@ -192,7 +191,7 @@ public class LogFileListFragment extends ListFragment {
         Log.d(TAG, "onPrepareOptionsMenu: called");
         MenuItem deleteAllLogFileMenuItem = menu.findItem(R.id.action_deleteAllLogFiles);
 
-        if (mIsLogging) {
+        if (mIsLogging || mLogFileObjects.isEmpty()) {
             deleteAllLogFileMenuItem.setEnabled(false);
 
         } else {

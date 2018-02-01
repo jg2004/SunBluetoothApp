@@ -19,16 +19,23 @@ public class LogFileObject implements Comparable<LogFileObject> {
     }
 
     public String getFileSizeAsString() {
+        double num;
 
         if (fileSize < 1000) {
             return String.valueOf(fileSize) + " B";
         } else if (fileSize < 10000000) {
-            return String.valueOf(fileSize / 1000) + " KB";
+            num = fileSize / 1000d;
+            num = Math.round(num * 10.0) / 10.0;
+            return String.valueOf(num) + " KB";
 
         } else if (fileSize < 1000000000) {
-            return String.valueOf(fileSize / 1000000) + " MB";
+            num = fileSize / 1000000d;
+            num = Math.round(num * 10.0) / 10.0;
+            return String.valueOf(num) + " MB";
         } else {
-            return String.valueOf(fileSize / 1000000) + " MB";
+            num = fileSize / 1000000000d;
+            num = Math.round(num * 10.0) / 10.0;
+            return String.valueOf(num) + " GB";
         }
     }
 
