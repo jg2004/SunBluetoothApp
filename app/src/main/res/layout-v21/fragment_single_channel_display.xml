@@ -12,11 +12,10 @@
 
 
     <TextView
-        android:id="@+id/textViewLabelCham"
+        android:id="@+id/textViewLabelCh1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
         android:text="@string/cham"
         android:textColor="@android:color/black"
@@ -25,40 +24,16 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/textViewChamTemp"
+        android:id="@+id/textViewCh1Temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:text="###C"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintLeft_toRightOf="@+id/textViewLabelCham"
-        app:layout_constraintTop_toTopOf="@+id/textViewLabelCham"/>
+        app:layout_constraintLeft_toRightOf="@+id/textViewLabelCh1"
+        app:layout_constraintTop_toTopOf="@+id/textViewLabelCh1"/>
 
-    <TextView
-        android:id="@+id/textViewUserLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/user"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintRight_toRightOf="@+id/textViewLabelCham"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLabelCham"
-        />
-
-    <TextView
-        android:id="@+id/textViewUserTemp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="###C"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="@+id/textViewChamTemp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewChamTemp"
-        />
 
     <TextView
         android:id="@+id/textViewWaitLabel"
@@ -113,8 +88,8 @@
         android:text="RATE:"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintRight_toRightOf="@+id/textViewUserLabel"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUserLabel"/>
+        app:layout_constraintRight_toRightOf="@+id/textViewLabelCh1"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLabelCh1"/>
 
     <TextView
         android:id="@+id/textViewRate"
@@ -124,8 +99,8 @@
         android:text="###C"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="@+id/textViewUserTemp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUserTemp"/>
+        app:layout_constraintLeft_toLeftOf="@+id/textViewCh1Temp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCh1Temp"/>
 
 
     <Switch
@@ -138,6 +113,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:checked="false"
+        android:thumb="@drawable/switch_thumb_selector"
+        android:track="@drawable/switch_track_selector"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -163,7 +140,6 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/button_on_off"
         android:checked="false"
@@ -177,7 +153,6 @@
         android:id="@+id/toggleButtonCoolEnable"
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/button_on_off"

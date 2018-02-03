@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -44,6 +45,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSA
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
@@ -64,6 +66,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     private BroadcastReceiver mReceiver;
     private Toolbar mToolbar;
     private Handler mHandler;
+    private String controllerType;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,6 +76,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         view = findViewById(R.id.activityLayout);
+        controllerType = getControllerType();
         buildFragmentList();
         setUpViews();
         if (savedInstanceState == null) {
@@ -82,6 +86,11 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         } else {
             Log.d(TAG, "onCreate: savedInstanceState was NOT NULL");
         }
+    }
+
+    private String getControllerType() {
+        SharedPreferences prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+        return prefs.getString(CONTROLLER_TYPE, "EC1X");
     }
 
     //-------------------------------private methods----------------------------------------------
@@ -287,7 +296,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         return true;
     }
 
@@ -295,11 +303,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: called CLOSING DB");
         mLPDataBaseHandler.close();
-        //set mIsLogging from DisplayTempFrag back to false
-
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //DisplayTemperatureFragment frag = (DisplayTemperatureFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        //frag.closeLoggingFile();
         super.onDestroy();
     }
 
@@ -368,7 +371,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         return false;
     }
 
-
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart: called");
@@ -402,7 +404,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                                     }
                                 }, 500);
 
-
                             }
                         }).show();
                         break;
@@ -425,6 +426,4 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         LocalBroadcastManager.getInstance(HomeActivity.this).unregisterReceiver(mReceiver);
         super.onStop();
     }
-
-
 }

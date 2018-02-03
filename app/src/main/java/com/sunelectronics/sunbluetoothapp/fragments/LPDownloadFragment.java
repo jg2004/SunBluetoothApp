@@ -32,7 +32,7 @@ import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
-import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
+import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
@@ -63,7 +63,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
     private ProgressBar mProgressBar;
     private BroadcastReceiver mLpBroadcastReceiver;
     private LPDataBaseHandler mLPDataBaseHandler;
-    private ChamberStatus mChamberStatus;
+    private ControllerStatus mControllerStatus;
     private BottomNavigationListenter mBottomNavigationListener;
     private boolean mIsLPRunning;
     private boolean mIsBusyUploadingLp;
@@ -299,7 +299,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 }
                 Log.d(TAG, "onClick: removing chamber status callback");
                 mGetChamberStatusHandler.removeCallbacks(mGetChamberStatusRunnable);
-                if (!mChamberStatus.isPowerOn()) {
+                if (!mControllerStatus.isPowerOn()) {
                     //turn on chamber
                     BluetoothConnectionService.getInstance().write(ON);
                 }
@@ -469,7 +469,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
 
         mGetChamberStatusHandler.postDelayed(mGetChamberStatusRunnable, GET_STATUS_DELAY_MS);
 
-        mChamberStatus = new ChamberStatus();
+        mControllerStatus = new ControllerStatus(getContext());
         mLpBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -499,9 +499,9 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     }
                 } else if (commandSent.equals(STATUS)) {
                     Log.d(TAG, "setting status of chamber status object");
-                    mChamberStatus.setStatusMessages(response);
+                    mControllerStatus.setStatusMessages(response);
                     //this field is checked to see if chamber in LP run mode before downloading and uploading an LP
-                    mIsLPRunning = mChamberStatus.isLPRunning();
+                    mIsLPRunning = mControllerStatus.isLPRunning();
                 }
             }
         };

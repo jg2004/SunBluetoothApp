@@ -4,7 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.sunelectronics.sunbluetoothapp.models.ChamberModel;
+import com.sunelectronics.sunbluetoothapp.models.DualChannelTemperatureController;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,13 +29,13 @@ public class TemperatureLogWriter implements Serializable {
     private BufferedWriter mBufferedWriter;
     private String mFileName;
     private Context mContext;
-    private ChamberModel mChamberModel;
+    private TemperatureController mTemperatureController;
 
-    public TemperatureLogWriter(Context context, ChamberModel chamberModel) {
+    public TemperatureLogWriter(Context context, TemperatureController temperatureController) {
 
         Log.d(TAG, "TemperatureLogWriter: creating a new TemperatureLogWriter");
         mContext = context;
-        mChamberModel = chamberModel;
+        mTemperatureController = temperatureController;
         mBufferedWriter = getBufferedWriter();
 
     }
@@ -43,10 +44,10 @@ public class TemperatureLogWriter implements Serializable {
         return mFileName;
     }
 
-    public TemperatureLogWriter(Context context, ChamberModel chamberModel, String fileName) {
+    public TemperatureLogWriter(Context context, TemperatureController controller, String fileName) {
         Log.d(TAG, "TemperatureLogWriter: creating Logwriter from existing fileName");
         mContext = context;
-        mChamberModel = chamberModel;
+        mTemperatureController = controller;
         mFileName = fileName;
         mBufferedWriter = getBufferedWriter(fileName);
 
@@ -74,9 +75,13 @@ public class TemperatureLogWriter implements Serializable {
         stringBuilderForFileHeader.append(month)
                 .append("/").append(dayOfMonth).append("/").append(year).append(SPACE)
                 .append(hour).append(":").append(minute).append(":").append(second).append(NEW_LINE)
-                .append("TIME").append(",").append(mChamberModel.getCh1Command()).append(",")
-                .append(mChamberModel.getCh2Command()).append(",")
-                .append(mChamberModel.getSetCommand()).append(NEW_LINE);
+                .append("TIME").append(",").append(mTemperatureController.getCh1Label()).append(",");
+        if (mTemperatureController instanceof DualChannelTemperatureController) {
+            stringBuilderForFileHeader.append(((DualChannelTemperatureController) mTemperatureController).getCh2Label());
+            stringBuilderForFileHeader.append(",");
+        }
+
+        stringBuilderForFileHeader.append("SET").append(NEW_LINE);
         String fileHeader = stringBuilderForFileHeader.toString();
 
         StringBuilder stringBuilderForFileName;
@@ -151,9 +156,13 @@ public class TemperatureLogWriter implements Serializable {
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);//HH is military time (no AM/PM)
 
-        sb.append(sdf.format(new Date(mChamberModel.getTimeStamp()))).append(",").append(mChamberModel.getCh1Reading())
-                .append(",").append(mChamberModel.getCh2Reading()).append(",")
-                .append(mChamberModel.getSetReading()).append(NEW_LINE);
+        sb.append(sdf.format(new Date(mTemperatureController.getTimeStampOfReading()))).append(",").append(mTemperatureController.getCh1Reading())
+                .append(",");
+        if (mTemperatureController instanceof DualChannelTemperatureController) {
+
+            sb.append(((DualChannelTemperatureController) mTemperatureController).getCh2Reading()).append(",");
+        }
+        sb.append(mTemperatureController.getCurrentSetPoint()).append(NEW_LINE);
         try {
             Log.d(TAG, "log: writing " + sb.toString() + "to file");
             mBufferedWriter.write(sb.toString());
@@ -178,8 +187,7 @@ public class TemperatureLogWriter implements Serializable {
     /**
      * used by DispTempFrag to write data to phone when pausing logger - called from onDetach
      */
-    public void flush(){
-
+    public void flush() {
         try {
             mBufferedWriter.flush();
         } catch (IOException e) {

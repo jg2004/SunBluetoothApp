@@ -29,11 +29,12 @@ public class Constants {
     public static final String LP_DOWNLOAD_FRAG_TITLE = "LP MODE";
     public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
     //constants used
+    public static final String CONTROLLER_TYPE = "controller_type";
     public static final String SEND_STOP = "SEND STOP COMMAND";
     public static final String CHART_TITLE = "TEMPERATURE CHART";
     public static final String FILE_NAME = "file_name";
     public static final String CHART_DATA = "chart_data";
-    public static final String CHAMBER_MODEL = "chamber_model";
+    public static final String TEMP_CONTROLLER = "chamber_model";
     public static final String DELETE_MESSAGE = "DELETE";
     public static final String DELETE_LP = "DELETE LP";
     public static final String DELETE_ALL_LP = "DELETE ALL LP";

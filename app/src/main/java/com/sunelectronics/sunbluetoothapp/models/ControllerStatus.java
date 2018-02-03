@@ -1,6 +1,10 @@
 package com.sunelectronics.sunbluetoothapp.models;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 
 /**
  * Class that stores the chamber status info contained in the response from the STATUS? command.
@@ -9,22 +13,21 @@ import android.util.Log;
  * program, has a valid set point etc...
  */
 
-public class ChamberStatus {
+public class ControllerStatus {
 
-    private String mTimeoutStatusMessage;
-    private String mWaitingForTimeOutStatusMessage;
-    private String mValidSetStatusMessage;
-    private String mCurrentlyRampingStatusMessage;
-    private String mLpRunningStatusMessage;
-    private String mWaitingAtBreakPointStatusMessage;
-    private String mChamberIsOnMessage;
+    private String mTimeoutStatusMessage, mWaitingForTimeOutStatusMessage, mValidSetStatusMessage;
+    private String mCurrentlyRampingStatusMessage, mLpRunningStatusMessage, mWaitingAtBreakPointStatusMessage;
+    private String mChamberIsOnMessage, mControllerType;
     private boolean mIsLPRunning, mHeatEnableOn, mCoolEnableOn, mWaitingAtBreakPoint, mPowerIsOn;
-    private static final String TAG = "ChamberStatus";
 
-    public ChamberStatus() {
-        Log.d(TAG, "ChamberStatus empty constructor called");
+    private static final String TAG = "ControllerStatus";
+
+    public ControllerStatus(Context context) {
+
+        SharedPreferences prefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC1X");
+        Log.d(TAG, "ControllerStatus: controller is type: " + mControllerType);
     }
-
 
     public void setStatusMessages(String statusString) {
         Log.d(TAG, "setStatusMessages: called");
@@ -34,20 +37,39 @@ public class ChamberStatus {
     private void setState(String statusString) {
         Log.d(TAG, "setState: called");
 
+        char currentlyRamping = 'N', waitingAtBreakPoint = 'N', lpRunning = 'N';
+
         if (statusString.length() < 12) {
             Log.d(TAG, "setState: possible invalid status string: " + statusString);
             return;
         }
+
+        char powerIsOn = statusString.charAt(0);
         char timeOutLedOn = statusString.charAt(2);
         char waitingForTimeOut = statusString.charAt(3);
-        char validSet = statusString.charAt(6);
-        char currentlyRamping = statusString.charAt(8);
-        char lpRunning = statusString.charAt(12);
-        char waitingAtBreakPoint = statusString.charAt(11);
-        char powerIsOn = statusString.charAt(0);
-        char coolEnableOn = statusString.charAt(5);
         char heatEnableOn = statusString.charAt(4);
+        char coolEnableOn = statusString.charAt(5);
+        char validSet = statusString.charAt(6);
 
+        switch (mControllerType) {
+
+            case "EC1X":
+            case "PC100-2":
+            case "TC02":
+            case "PC100":
+                currentlyRamping = statusString.charAt(8);
+                waitingAtBreakPoint = statusString.charAt(11);
+                lpRunning = statusString.charAt(12);
+                break;
+
+            case "PC1000":
+            case "EC127":
+                Log.d(TAG, "setState: controller is type pc1000 or ec127");
+                currentlyRamping = statusString.charAt(12);
+                waitingAtBreakPoint = statusString.charAt(19);
+                lpRunning = statusString.charAt(20);
+                break;
+        }
         if (powerIsOn == 'Y') {
             mChamberIsOnMessage = "POWER IS ON";
             mPowerIsOn = true;
