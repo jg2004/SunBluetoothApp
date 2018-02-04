@@ -100,7 +100,7 @@ public class DisplayTemperatureFragment extends Fragment {
         Log.d(TAG, "onCreate: CREATING A DISPLAYTEMPERATURE FRAGMENT!!!");
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC127");
+        mControllerType = prefs.getString(CONTROLLER_TYPE, "PC100");
 
         if (savedInstanceState != null) {
             Log.d(TAG, "savedInstanceState of DISPTEMPFRAG not null, restoring chamberModel!");
