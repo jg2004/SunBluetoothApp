@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -29,9 +30,9 @@ import android.widget.Toast;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_QUERY;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PARAMETER_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
@@ -52,6 +53,7 @@ public class ParameterFragment extends Fragment {
     private Context mContext;
     private View view;
     private boolean isBusyDownLoading;
+    private String mControllerType;
     private CountDownTimer mTimeOutTimer = new CountDownTimer(13000, 1000) {
         //Timer used to determine if getting controller parameters has taken too long
         @Override
@@ -71,6 +73,13 @@ public class ParameterFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName(),Context.MODE_PRIVATE);
+        mControllerType = prefs.getString(CONTROLLER_TYPE,"EC1X");
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,7 +87,7 @@ public class ParameterFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_parameters, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(PARAMETER_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s PARAMETERS", mControllerType));
             supportActionBar.show();
         }
         initializeViews(view);

@@ -5,11 +5,13 @@ import android.util.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-
 public abstract class TemperatureController implements Serializable {
 
     int numberOfChannels = 1;
-    String ch1QueryCommand, waitQueryCommand, setQueryCommand, ch1Label;
+    String ch1QueryCommand, waitQueryCommand, setQueryCommand, ch1Label, heatEnableCommand;
+    String pidHQueryCommand, pidCQueryCommand;
+    String coolEnableCommand, heatDisableCommand, coolDisableCommand;
+    String pidHCommand, pidCCommand;
     private String ch1Reading, currentSetPoint;
     ArrayList<String> pollingCommands;
     ArrayList<String> chartCommands;
@@ -83,6 +85,20 @@ public abstract class TemperatureController implements Serializable {
     public void setTimeStampOfReading(long timeStampOfReading) {
         this.timeStampOfReading = timeStampOfReading;
     }
+
+    public String getHeatEnableCommand() {
+        return heatEnableCommand;
+    }
+
+    public String getCoolEnableCommand() {
+        return coolEnableCommand;
+    }
+
+    public String getHeatDisableCommand() {
+        return heatDisableCommand;
+    }
+
+    public String getCoolDisableCommand() {
+        return coolDisableCommand;
+    }
 }
-
-

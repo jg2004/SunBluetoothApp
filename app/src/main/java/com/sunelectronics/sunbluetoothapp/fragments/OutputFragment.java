@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -30,9 +31,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_0;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_1;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_3;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT0_COMMAND_PREFIX;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT3_COMMAND_PREFIX;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUTPUT_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT_COMMAND_OFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT_COMMAND_ON;
 
@@ -45,12 +46,28 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
     private Context mContext;
     private StringBuilder mStringBuilderMessage;
     private View view;
+    private String mOutput2Text, mOutput4Text, mControllerType;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: called");
         mStringBuilderMessage = new StringBuilder();
+        SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
+        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC1X");
+        initializeButtonText(mControllerType);
+    }
+
+    private void initializeButtonText(String controllerType) {
+
+        if (controllerType.equals("EC1X")) {
+            mOutput2Text = "OUTPUT 2 (AB) ON";
+            mOutput4Text = "OUTPUT 4 (N2 GP) ON";
+        } else {
+
+            mOutput2Text = "OUTPUT 2 ON";
+            mOutput4Text = "OUTPUT 4 ON";
+        }
     }
 
     @Nullable
@@ -60,7 +77,7 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         view = inflater.inflate(R.layout.fragment_outputs, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(OUTPUT_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s OUTPUTS", mControllerType));
             supportActionBar.show();
         }
         intializeViews(view);
@@ -77,6 +94,7 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         ToggleButton toggleButtonOutput2 = (ToggleButton) view.findViewById(R.id.buttonOutput2);
         toggleButtonOutput2.setOnCheckedChangeListener(this);
         toggleButtonOutput2.setOnTouchListener(this);
+        toggleButtonOutput2.setText(mOutput2Text);
 
         ToggleButton toggleButtonOutput3 = (ToggleButton) view.findViewById(R.id.buttonOutput3);
         toggleButtonOutput3.setOnCheckedChangeListener(this);
@@ -85,6 +103,8 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         ToggleButton toggleButtonOutput4 = (ToggleButton) view.findViewById(R.id.buttonOutput4);
         toggleButtonOutput4.setOnCheckedChangeListener(this);
         toggleButtonOutput4.setOnTouchListener(this);
+        toggleButtonOutput4.setText(mOutput4Text);
+
 
         ToggleButton toggleButtonOutput5 = (ToggleButton) view.findViewById(R.id.buttonOutput5);
         toggleButtonOutput5.setOnCheckedChangeListener(this);

@@ -3,6 +3,11 @@ package com.sunelectronics.sunbluetoothapp.models;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_QUERY;
+
 public class SingleChannelTemperatureController extends TemperatureController {
 
     public static final String CH1_QUERY_COMMAND = "TEMP?";
@@ -10,6 +15,11 @@ public class SingleChannelTemperatureController extends TemperatureController {
     private static final String WAIT_QUERY_COMMAND = "WAIT?";
     private static final String SET_QUERY_COMMAND = "SET?";
     private static final String CH1_LABEL = "TEMP";
+    public static final String COOL_ENABLE_COMMAND = "CON";
+    public static final String HEAT_ENABLE_COMMAND = "HON";
+    public static final String COOL_DISABLE_COMMAND = "COFF";
+    public static final String HEAT_DISABLE_COMMAND = "HOFF";
+
 
     private String rateQueryCommand;
 
@@ -26,6 +36,14 @@ public class SingleChannelTemperatureController extends TemperatureController {
                 waitQueryCommand = WAIT_QUERY_COMMAND;
                 setQueryCommand = SET_QUERY_COMMAND;
                 rateQueryCommand = RATE_QUERY_COMMAND;
+                coolEnableCommand = COOL_ENABLE_COMMAND;
+                heatEnableCommand = HEAT_ENABLE_COMMAND;
+                heatDisableCommand = HEAT_DISABLE_COMMAND;
+                coolDisableCommand = COOL_DISABLE_COMMAND;
+                pidHQueryCommand = PIDH_QUERY;
+                pidCQueryCommand = PIDC_QUERY;
+                pidCCommand = PIDC_COMMAND;
+                pidHCommand= PIDH_COMMAND;
                 break;
         }
         pollingCommands.add(ch1QueryCommand);

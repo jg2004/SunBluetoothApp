@@ -46,12 +46,8 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COFF;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.FILE_NAME;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HOFF;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
@@ -104,7 +100,7 @@ public class DisplayTemperatureFragment extends Fragment {
         Log.d(TAG, "onCreate: CREATING A DISPLAYTEMPERATURE FRAGMENT!!!");
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mControllerType = prefs.getString(CONTROLLER_TYPE, "TC02");
+        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC127");
 
         if (savedInstanceState != null) {
             Log.d(TAG, "savedInstanceState of DISPTEMPFRAG not null, restoring chamberModel!");
@@ -241,10 +237,10 @@ public class DisplayTemperatureFragment extends Fragment {
             public void onClick(View v) {
 
                 if (mHeatEnableToggleButton.isChecked()) {
-                    BluetoothConnectionService.getInstance().write(HON);
+                    BluetoothConnectionService.getInstance().write(mTemperatureController.getHeatEnableCommand());
 
                 } else {
-                    BluetoothConnectionService.getInstance().write(HOFF);
+                    BluetoothConnectionService.getInstance().write(mTemperatureController.getHeatDisableCommand());
                 }
             }
         });
@@ -266,9 +262,9 @@ public class DisplayTemperatureFragment extends Fragment {
             public void onClick(View v) {
 
                 if (mCoolEnableToggleButton.isChecked()) {
-                    BluetoothConnectionService.getInstance().write(CON);
+                    BluetoothConnectionService.getInstance().write(mTemperatureController.getCoolEnableCommand());
                 } else {
-                    BluetoothConnectionService.getInstance().write(COFF);
+                    BluetoothConnectionService.getInstance().write(mTemperatureController.getCoolDisableCommand());
                 }
             }
         });
@@ -372,6 +368,9 @@ public class DisplayTemperatureFragment extends Fragment {
         Log.d(TAG, "onPrepareOptionsMenu: called");
         menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
         MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
+        MenuItem pidAMenuItem = menu.findItem(R.id.pidAMode);
+        MenuItem outputsMenuItem = menu.findItem(R.id.outputs);
+
         if (mIsLoggingData) {
             startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             startLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
@@ -381,6 +380,15 @@ public class DisplayTemperatureFragment extends Fragment {
             //not logging
             startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             startLoggingMenuItem.setIcon(null);
+        }
+
+        if (mControllerType.equals("TC02") || mControllerType.equals("PC100")) {
+
+            pidAMenuItem.setEnabled(false);
+
+        }
+        if (!mControllerType.equals("EC1X") && !mControllerType.equals("EC127")) {
+            outputsMenuItem.setTitle("Controller Outputs");
         }
     }
 

@@ -81,6 +81,13 @@ public class Constants {
     public static final String LTL_COMMAND = "LTL=";
     public static final String PIDH_QUERY = "PIDH?";
     public static final String PIDC_QUERY = "PIDC?";
+    public static final String PC1000_PIDH_QUERY = "PID1+?";
+    public static final String PC1000_PIDC_QUERY = "PID1-?";
+    public static final String PC1000_PIDH_COMMAND = "PID1+=";
+    public static final String PC1000_PIDC_COMMAND = "PID1-=";
+
+
+
     public static final String PWMP_QUERY = "PWMP?";
     public static final String UTL_QUERY = "UTL?";
     public static final String LTL_QUERY = "LTL?";
