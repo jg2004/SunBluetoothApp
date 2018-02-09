@@ -1,10 +1,16 @@
 package com.sunelectronics.sunbluetoothapp.models;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
+
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 
 /**
  * Class that stores the chamber status info contained in the response from the STATUS? command.
@@ -19,14 +25,27 @@ public class ControllerStatus {
     private String mCurrentlyRampingStatusMessage, mLpRunningStatusMessage, mWaitingAtBreakPointStatusMessage;
     private String mChamberIsOnMessage, mControllerType;
     private boolean mIsLPRunning, mHeatEnableOn, mCoolEnableOn, mWaitingAtBreakPoint, mPowerIsOn;
+    private static  ControllerStatus mControllerStatus;
 
     private static final String TAG = "ControllerStatus";
 
-    public ControllerStatus(Context context) {
+    private ControllerStatus(Context context) {
 
-        SharedPreferences prefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC1X");
+        mControllerType = PreferenceSetting.getControllerType(context);
+
         Log.d(TAG, "ControllerStatus: controller is type: " + mControllerType);
+    }
+
+    public static ControllerStatus getInstance(Context context) {
+
+        if (mControllerStatus == null) {
+            mControllerStatus = new ControllerStatus(context);
+            return mControllerStatus;
+        } else {
+
+            return mControllerStatus;
+        }
+
     }
 
     public void setStatusMessages(String statusString) {
@@ -53,17 +72,17 @@ public class ControllerStatus {
 
         switch (mControllerType) {
 
-            case "EC1X":
-            case "PC100-2":
-            case "TC02":
-            case "PC100":
+            case EC1X:
+            case PC100_2:
+            case TC02:
+            case PC100:
                 currentlyRamping = statusString.charAt(8);
                 waitingAtBreakPoint = statusString.charAt(11);
                 lpRunning = statusString.charAt(12);
                 break;
 
-            case "PC1000":
-            case "EC127":
+            case PC1000:
+            case EC127:
                 Log.d(TAG, "setState: controller is type pc1000 or ec127");
                 currentlyRamping = statusString.charAt(12);
                 waitingAtBreakPoint = statusString.charAt(19);
@@ -105,6 +124,7 @@ public class ControllerStatus {
         if (lpRunning == 'Y') {
             mLpRunningStatusMessage = "LP RUNNING";
             mIsLPRunning = true;
+            Log.d(TAG, "setState: set LP running to true");
         } else {
             mLpRunningStatusMessage = "LP NOT RUNNING";
             mIsLPRunning = false;

@@ -37,6 +37,7 @@ public class LogFileViewerFragment extends Fragment {
 
     private static final String TAG = "LogFileViewerFragment";
     private String mLogFileContents, mFileName;
+    private ActionBar mSupportActionBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class LogFileViewerFragment extends Fragment {
         }
     }
 
+
     @Nullable
     @Override
 
@@ -59,10 +61,10 @@ public class LogFileViewerFragment extends Fragment {
 
         Log.d(TAG, "onCreateView: called");
         View view = inflater.inflate(R.layout.fragment_log_file_viewer, container, false);
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.show();
-            supportActionBar.setTitle(LOG_FILE_VIEWER_TITLE);
+        mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (mSupportActionBar != null) {
+            mSupportActionBar.show();
+            mSupportActionBar.setTitle(LOG_FILE_VIEWER_TITLE);
         }
 
         setHasOptionsMenu(true);
@@ -144,5 +146,11 @@ public class LogFileViewerFragment extends Fragment {
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.share_logging_file)));
+    }
+
+    @Override
+    public void onStop() {
+        mSupportActionBar.hide();
+        super.onStop();
     }
 }

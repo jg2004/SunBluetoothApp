@@ -23,7 +23,10 @@ import android.widget.RadioGroup;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDA_MODE_0;
@@ -43,11 +46,13 @@ public class PidAModeFragment extends Fragment {
     private BroadcastReceiver mBroadcastReceiver;
     private Context mContext;
     private View view;
+    private String mControllerType;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
+        mControllerType = PreferenceSetting.getControllerType(getContext());
         view = inflater.inflate(R.layout.fragment_pida_mode, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
@@ -66,6 +71,7 @@ public class PidAModeFragment extends Fragment {
         mRadioButton_mode2 = (RadioButton) view.findViewById(R.id.slowlyForceUserRadioButton);
         mRadioButton_mode3 = (RadioButton) view.findViewById(R.id.userRadioButton);
         mRadioButton_mode4 = (RadioButton) view.findViewById(R.id.averageSlowlyForceUserRadioButton);
+        applyModeDescriptions();
         mRadioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
         Button getButton = (Button) view.findViewById(R.id.buttonGet);
         getButton.setOnClickListener(new View.OnClickListener() {
@@ -96,6 +102,20 @@ public class PidAModeFragment extends Fragment {
         });
     }
 
+    private void applyModeDescriptions() {
+
+        switch (mControllerType) {
+
+            case PC1000:
+            case PC100_2:
+                mRadioButton_mode0.setText(R.string.controller_mode_0_desc);
+                mRadioButton_mode1.setText(R.string.controller_mode_1_desc);
+                mRadioButton_mode2.setText(R.string.controller_mode_2_desc);
+                mRadioButton_mode3.setText(R.string.controller_mode_3_desc);
+                mRadioButton_mode4.setText(R.string.controller_mode_4_desc);
+        }
+    }
+
     private boolean isDampingCoefficientValid() {
 
         if (mDampingCoefficient.getText().toString().isEmpty()) {
@@ -116,7 +136,6 @@ public class PidAModeFragment extends Fragment {
         }
         return true;
     }
-
 
     private void sendPidAQuery() {
 

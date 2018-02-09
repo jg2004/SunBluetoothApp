@@ -24,10 +24,11 @@ import android.widget.TextView;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNTC;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAMBER_STATUS_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
 
 public class ControllerStatusFragment extends Fragment {
@@ -47,17 +48,18 @@ public class ControllerStatusFragment extends Fragment {
     private static final int GET_STATUS_MESSAGE_DELAY = 3000;
     private boolean mSentBKPNTCommand;
     private static final String TAG = "ContStatusFragment";
+    private String mControllerType;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView: called");
-
+        mControllerType = PreferenceSetting.getControllerType(getContext());
         View view = inflater.inflate(R.layout.fragment_chamber_status, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(CHAMBER_STATUS_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s STATUS", TemperatureController.getName(mControllerType)));
             supportActionBar.show();
         }
         initializeViews(view);
@@ -103,7 +105,7 @@ public class ControllerStatusFragment extends Fragment {
         super.onAttach(context);
         mContext = context;
         Log.d(TAG, "onAttach: called, creating a runnable and chamberStatus object");
-        mControllerStatus = new ControllerStatus(getContext());
+        mControllerStatus = ControllerStatus.getInstance(getContext());
         mStatusRunnable = new Runnable() {
             @Override
             public void run() {

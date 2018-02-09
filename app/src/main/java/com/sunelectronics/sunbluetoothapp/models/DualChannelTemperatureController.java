@@ -3,39 +3,55 @@ package com.sunelectronics.sunbluetoothapp.models;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
-import static com.sunelectronics.sunbluetoothapp.models.SingleChannelTemperatureController.COOL_DISABLE_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.SingleChannelTemperatureController.COOL_ENABLE_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.SingleChannelTemperatureController.HEAT_DISABLE_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.SingleChannelTemperatureController.HEAT_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_READING_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH2_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH2_READING_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAMBER_READING_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_CH2_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_COOL_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_COOL_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_HEAT_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_HEAT_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_LTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_LTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDC_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDH_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDH_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_UTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_UTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_RATE_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_SET_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_WAIT_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_RATE_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_SET_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_WAIT_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.USER_READING_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_QUERY;
 
 public class DualChannelTemperatureController extends TemperatureController {
 
-    private static final String TEMP_QUERY_COMMAND = "TEMP?";
-    public static final String EC1X_CH2_QUERY_COMMAND = "UCHAN?";
-    private static final String TC10_WAIT_QUERY_COMMAND = "WAIT?";
-    private static final String TC10_RATE_QUERY_COMMAND = "RATE?";
-    private static final String TC10_SET_QUERY_COMMAND = "SET?";
-    private static final String CHAMBER_READING_LABEL = "CHAM";
-    private static final String USER_READING_LABEL = "USER";
-    public static final String PC_QUERY_COMMAND = "C1?";
-    public static final String CH2_QUERY_COMMAND = "C2?";
-    private static final String PC_WAIT_QUERY_COMMAND = "WAIT1?";
-    private static final String PC_RATE_QUERY_COMMAND = "RATE1?";
-    private static final String PC_SET_QUERY_COMMAND = "SET1?";
-    private static final String CH1_READING_LABEL = "CH1";
-    private static final String CH2_READING_LABEL = "CH2";
-    public static final String PC1000_COOL_ENABLE_COMMAND = " C1ON-";
-    public static final String PC1000_HEAT_ENABLE_COMMAND = " C1ON+";
-    public static final String PC1000_COOL_DISABLE_COMMAND = " C1OFF-";
-    public static final String PC1000_HEAT_DISABLE_COMMAND = " C1OFF+";
 
     private String ch2QueryCommand, ch2Label, rateQueryCommand, ch2Reading;
 
@@ -53,9 +69,10 @@ public class DualChannelTemperatureController extends TemperatureController {
     DualChannelTemperatureController(String type) {
 
         this();
-        switch (type.toUpperCase()) {
+        switch (type) {
 
-            case "EC1X":
+            case EC1X:
+                name = EC1X_NAME;
                 setQueryCommand = TC10_SET_QUERY_COMMAND;
                 ch1QueryCommand = TEMP_QUERY_COMMAND;
                 ch2QueryCommand = EC1X_CH2_QUERY_COMMAND;
@@ -71,9 +88,14 @@ public class DualChannelTemperatureController extends TemperatureController {
                 pidCQueryCommand = PIDC_QUERY;
                 pidHCommand = PIDH_COMMAND;
                 pidCCommand = PIDC_COMMAND;
+                ltlqueryCommand = LTL_QUERY;
+                utlQueryCommand = UTL_QUERY;
+                ltlCommand = LTL_COMMAND;
+                utlCommand = UTL_COMMAND;
                 break;
 
-            case "EC127":
+            case EC127:
+                name = EC127_NAME;
                 setQueryCommand = PC_SET_QUERY_COMMAND;
                 ch1QueryCommand = PC_QUERY_COMMAND;
                 ch2QueryCommand = CH2_QUERY_COMMAND;
@@ -86,12 +108,17 @@ public class DualChannelTemperatureController extends TemperatureController {
                 coolEnableCommand = PC1000_COOL_ENABLE_COMMAND;
                 coolDisableCommand = PC1000_COOL_DISABLE_COMMAND;
                 pidHQueryCommand = PC1000_PIDH_QUERY;
-                pidCQueryCommand =PC1000_PIDC_QUERY;
+                pidCQueryCommand = PC1000_PIDC_QUERY;
                 pidHCommand = PC1000_PIDH_COMMAND;
                 pidCCommand = PC1000_PIDC_COMMAND;
+                ltlqueryCommand = PC1000_LTL_QUERY;
+                utlQueryCommand = PC1000_UTL_QUERY;
+                ltlCommand = PC1000_LTL_COMMAND;
+                utlCommand = PC1000_UTL_COMMAND;
                 break;
 
-            case "PC100-2":
+            case PC100_2:
+                name = PC100_2_NAME;
                 setQueryCommand = PC_SET_QUERY_COMMAND;
                 ch1QueryCommand = PC_QUERY_COMMAND;
                 ch2QueryCommand = CH2_QUERY_COMMAND;
@@ -107,8 +134,13 @@ public class DualChannelTemperatureController extends TemperatureController {
                 pidCQueryCommand = PIDC_QUERY;
                 pidHCommand = PIDH_COMMAND;
                 pidCCommand = PIDC_COMMAND;
+                ltlqueryCommand = LTL_QUERY;
+                utlQueryCommand = UTL_QUERY;
+                ltlCommand = LTL_COMMAND;
+                utlCommand = UTL_COMMAND;
                 break;
-            case "PC1000":
+            case PC1000:
+                name = PC1000_NAME;
                 setQueryCommand = PC_SET_QUERY_COMMAND;
                 ch1QueryCommand = PC_QUERY_COMMAND;
                 ch2QueryCommand = CH2_QUERY_COMMAND;
@@ -121,9 +153,13 @@ public class DualChannelTemperatureController extends TemperatureController {
                 coolEnableCommand = PC1000_COOL_ENABLE_COMMAND;
                 coolDisableCommand = PC1000_COOL_DISABLE_COMMAND;
                 pidHQueryCommand = PC1000_PIDH_QUERY;
-                pidCQueryCommand =PC1000_PIDC_QUERY;
+                pidCQueryCommand = PC1000_PIDC_QUERY;
                 pidHCommand = PC1000_PIDH_COMMAND;
                 pidCCommand = PC1000_PIDC_COMMAND;
+                ltlqueryCommand = PC1000_LTL_QUERY;
+                utlQueryCommand = PC1000_UTL_QUERY;
+                ltlCommand = PC1000_LTL_COMMAND;
+                utlCommand = PC1000_UTL_COMMAND;
                 break;
         }
         pollingCommands.add(ch1QueryCommand);

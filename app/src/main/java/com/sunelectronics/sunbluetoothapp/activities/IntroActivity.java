@@ -16,6 +16,7 @@ import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.fragments.IntroFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
 
+import static android.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 import static com.sunelectronics.sunbluetoothapp.activities.HomeActivity.TAG_FRAGMENT_LOGGER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_INTRO_FRAGMENT;
@@ -31,6 +32,7 @@ public class IntroActivity extends AppCompatActivity implements LogFileListFragm
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setVisibility(View.GONE);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Log.d(TAG, "PIXEL WIDTH: " + getResources().getDisplayMetrics().widthPixels);
         Log.d(TAG, "PIXEL HEIGHT: " + getResources().getDisplayMetrics().heightPixels);
         Log.d(TAG, "PIXEL DENSITY: " + getResources().getDisplayMetrics().density);
@@ -42,7 +44,6 @@ public class IntroActivity extends AppCompatActivity implements LogFileListFragm
         if (savedInstanceState == null) {
             performTransaction(new IntroFragment(), TAG_FRAGMENT_INTRO_FRAGMENT, false);
         }
-
     }
 
     public void performTransaction(Fragment fragment, String tag, boolean addTobackStack) {
@@ -52,6 +53,13 @@ public class IntroActivity extends AppCompatActivity implements LogFileListFragm
         fragmentTransaction.replace(R.id.homeContainer, fragment, tag).commit();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+
+        Log.d(TAG, "onSupportNavigateUp: was called bro");
+        getSupportFragmentManager().popBackStack(null, POP_BACK_STACK_INCLUSIVE);
+        return true;
+    }
 
     @Override
     public void deleteLogFile(String fileName) {

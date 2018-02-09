@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -24,6 +23,8 @@ import android.widget.ToggleButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import java.util.Locale;
 
@@ -31,7 +32,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_0;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_1;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_3;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT0_COMMAND_PREFIX;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT3_COMMAND_PREFIX;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT_COMMAND_OFF;
@@ -53,14 +54,13 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: called");
         mStringBuilderMessage = new StringBuilder();
-        SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
-        mControllerType = prefs.getString(CONTROLLER_TYPE, "EC1X");
+        mControllerType = PreferenceSetting.getControllerType(getContext());
         initializeButtonText(mControllerType);
     }
 
     private void initializeButtonText(String controllerType) {
 
-        if (controllerType.equals("EC1X")) {
+        if (controllerType.equals(EC1X)) {
             mOutput2Text = "OUTPUT 2 (AB) ON";
             mOutput4Text = "OUTPUT 4 (N2 GP) ON";
         } else {
@@ -77,7 +77,7 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         view = inflater.inflate(R.layout.fragment_outputs, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(String.format("%s OUTPUTS", mControllerType));
+            supportActionBar.setTitle(String.format("%s OUTPUTS", TemperatureController.getName(mControllerType)));
             supportActionBar.show();
         }
         intializeViews(view);

@@ -3,23 +3,29 @@ package com.sunelectronics.sunbluetoothapp.models;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_DISABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_ENABLE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.RATE_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SET_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.WAIT_QUERY_COMMAND;
 
 public class SingleChannelTemperatureController extends TemperatureController {
-
-    public static final String CH1_QUERY_COMMAND = "TEMP?";
-    private static final String RATE_QUERY_COMMAND = "RATE?";
-    private static final String WAIT_QUERY_COMMAND = "WAIT?";
-    private static final String SET_QUERY_COMMAND = "SET?";
-    private static final String CH1_LABEL = "TEMP";
-    public static final String COOL_ENABLE_COMMAND = "CON";
-    public static final String HEAT_ENABLE_COMMAND = "HON";
-    public static final String COOL_DISABLE_COMMAND = "COFF";
-    public static final String HEAT_DISABLE_COMMAND = "HOFF";
-
 
     private String rateQueryCommand;
 
@@ -27,10 +33,10 @@ public class SingleChannelTemperatureController extends TemperatureController {
 
         mResourceLayout = R.layout.fragment_single_channel_display;
 
-        switch (type.toUpperCase()) {
+        switch (type) {
 
-            case "PC100":
-            case "TC02":
+            case PC100:
+                name = PC100_NAME;
                 ch1Label = CH1_LABEL;
                 ch1QueryCommand = CH1_QUERY_COMMAND;
                 waitQueryCommand = WAIT_QUERY_COMMAND;
@@ -43,7 +49,31 @@ public class SingleChannelTemperatureController extends TemperatureController {
                 pidHQueryCommand = PIDH_QUERY;
                 pidCQueryCommand = PIDC_QUERY;
                 pidCCommand = PIDC_COMMAND;
-                pidHCommand= PIDH_COMMAND;
+                pidHCommand = PIDH_COMMAND;
+                ltlqueryCommand = LTL_QUERY;
+                utlQueryCommand = UTL_QUERY;
+                ltlCommand = LTL_COMMAND;
+                utlCommand = UTL_COMMAND;
+                break;
+            case TC02:
+                name = TC02_NAME;
+                ch1Label = CH1_LABEL;
+                ch1QueryCommand = CH1_QUERY_COMMAND;
+                waitQueryCommand = WAIT_QUERY_COMMAND;
+                setQueryCommand = SET_QUERY_COMMAND;
+                rateQueryCommand = RATE_QUERY_COMMAND;
+                coolEnableCommand = COOL_ENABLE_COMMAND;
+                heatEnableCommand = HEAT_ENABLE_COMMAND;
+                heatDisableCommand = HEAT_DISABLE_COMMAND;
+                coolDisableCommand = COOL_DISABLE_COMMAND;
+                pidHQueryCommand = PIDH_QUERY;
+                pidCQueryCommand = PIDC_QUERY;
+                pidCCommand = PIDC_COMMAND;
+                pidHCommand = PIDH_COMMAND;
+                ltlqueryCommand = LTL_QUERY;
+                utlQueryCommand = UTL_QUERY;
+                ltlCommand = LTL_COMMAND;
+                utlCommand = UTL_COMMAND;
                 break;
         }
         pollingCommands.add(ch1QueryCommand);

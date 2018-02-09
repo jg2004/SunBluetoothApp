@@ -35,22 +35,25 @@ import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
 import com.sunelectronics.sunbluetoothapp.models.DualChannelTemperatureController;
 import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogWriter;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.sunelectronics.sunbluetoothapp.models.DualChannelTemperatureController.CH2_QUERY_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.DualChannelTemperatureController.EC1X_CH2_QUERY_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.DualChannelTemperatureController.PC_QUERY_COMMAND;
-import static com.sunelectronics.sunbluetoothapp.models.SingleChannelTemperatureController.CH1_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH2_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_CH2_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.RATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SET_TEMP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
@@ -58,6 +61,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMEN
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_OUTPUT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PIDA_MODE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_CONTROLLER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TERMINATE_LOGGING_SESSION;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CHAMBER;
@@ -100,12 +104,14 @@ public class DisplayTemperatureFragment extends Fragment {
         Log.d(TAG, "onCreate: CREATING A DISPLAYTEMPERATURE FRAGMENT!!!");
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mControllerType = prefs.getString(CONTROLLER_TYPE, "PC100");
+        mControllerType = PreferenceSetting.getControllerType(getContext());
+        Log.d(TAG, "onCreate: mControllerType is " + mControllerType);
 
         if (savedInstanceState != null) {
             Log.d(TAG, "savedInstanceState of DISPTEMPFRAG not null, restoring chamberModel!");
             mIsLoggingData = savedInstanceState.getBoolean(LOGGING_STATE);
             mTemperatureController = (TemperatureController) savedInstanceState.getSerializable(TEMP_CONTROLLER);
+
             String fileName = savedInstanceState.getString(FILE_NAME);
             if (mIsLoggingData) {
                 mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
@@ -139,7 +145,7 @@ public class DisplayTemperatureFragment extends Fragment {
         view = inflater.inflate(mTemperatureController.getResourceLayout(), container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(String.format("%s MONITOR", mControllerType));
+            supportActionBar.setTitle(String.format("%s MONITOR", mTemperatureController.getName()));
             supportActionBar.show();
         }
         initializeRunnables();
@@ -169,6 +175,7 @@ public class DisplayTemperatureFragment extends Fragment {
                     stopLogger();
                     return;
                 }
+                Log.d(TAG, "run: inside displayupdate runnable");
                 String command = mTemperatureController.getNextPollingCommand();
                 BluetoothConnectionService.getInstance().write(command);
                 mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
@@ -363,88 +370,16 @@ public class DisplayTemperatureFragment extends Fragment {
         fragment.show(getFragmentManager(), "single_seg_frag");
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        Log.d(TAG, "onPrepareOptionsMenu: called");
-        menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
-        MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
-        MenuItem pidAMenuItem = menu.findItem(R.id.pidAMode);
-        MenuItem outputsMenuItem = menu.findItem(R.id.outputs);
-
-        if (mIsLoggingData) {
-            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            startLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
-            startLoggingMenuItem.setEnabled(true);
-
-        } else {
-            //not logging
-            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-            startLoggingMenuItem.setIcon(null);
-        }
-
-        if (mControllerType.equals("TC02") || mControllerType.equals("PC100")) {
-
-            pidAMenuItem.setEnabled(false);
-
-        }
-        if (!mControllerType.equals("EC1X") && !mControllerType.equals("EC127")) {
-            outputsMenuItem.setTitle("Controller Outputs");
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d(TAG, "onCreateOptionsMenu: called");
-        inflater.inflate(R.menu.menu_disp_temp_frag, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case R.id.startLogging:
-                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
-                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
-                    return true;
-                }
-
-                if (item.getIcon() == null) {
-
-                    mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController);
-                    startLogger();
-                } else {
-                    // stop recording icon is showing so show confirmation dialog. If user presses yes
-                    // then stopLogger will be called by HomeActivity via MyAlertDialogFragment
-                    showAlertDialog(TERMINATE_LOGGING_SESSION);
-                }
-                return true;
-
-            case R.id.outputs:
-                showOutputFragment();
-                return true;
-
-            case R.id.parameters:
-                showParametersFragment();
-                return true;
-            case R.id.pidAMode:
-                showPidAModeFragment();
-                return true;
-        }
-        return false;
-    }
-
     private void showPidAModeFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.homeContainer, new PidAModeFragment(), TAG_FRAGMENT_PIDA_MODE).commit();
     }
 
-
     private void showParametersFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.homeContainer, new ParameterFragment(), TAG_FRAGMENT_PARAMETER).commit();
+        fragmentTransaction.replace(R.id.homeContainer, ParameterFragment.newInstance(mTemperatureController), TAG_FRAGMENT_PARAMETER).commit();
     }
 
     private void showOutputFragment() {
@@ -496,6 +431,77 @@ public class DisplayTemperatureFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        Log.d(TAG, "onPrepareOptionsMenu: called");
+        menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
+        MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
+        MenuItem pidAMenuItem = menu.findItem(R.id.pidAMode);
+        MenuItem outputsMenuItem = menu.findItem(R.id.outputs);
+
+        if (mIsLoggingData) {
+            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            startLoggingMenuItem.setIcon(R.drawable.ic_action_stop_logger_red);
+            startLoggingMenuItem.setEnabled(true);
+
+        } else {
+            //not logging
+            startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            startLoggingMenuItem.setIcon(null);
+        }
+
+        if (mControllerType.equals(TC02) || mControllerType.equals(PC100)) {
+
+            pidAMenuItem.setEnabled(false);
+
+        }
+        if (!mControllerType.equals(EC1X) && !mControllerType.equals(EC127)) {
+            outputsMenuItem.setTitle("Controller Outputs");
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d(TAG, "onCreateOptionsMenu: called");
+        inflater.inflate(R.menu.menu_disp_temp_frag, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.startLogging:
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+                    Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                if (item.getIcon() == null) {
+
+                    mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController);
+                    startLogger();
+                } else {
+                    // stop recording icon is showing so show confirmation dialog. If user presses yes
+                    // then stopLogger will be called by HomeActivity via MyAlertDialogFragment
+                    showAlertDialog(TERMINATE_LOGGING_SESSION);
+                }
+                return true;
+
+            case R.id.outputs:
+                showOutputFragment();
+                return true;
+
+            case R.id.parameters:
+                showParametersFragment();
+                return true;
+            case R.id.pidAMode:
+                showPidAModeFragment();
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onDetach() {
 
         Log.d(TAG, "onDetach: called, removing displayUpdate callback from mHandler");
@@ -513,7 +519,7 @@ public class DisplayTemperatureFragment extends Fragment {
         super.onAttach(context);
         mContext = context;
         if (mControllerStatus == null) {
-            mControllerStatus = new ControllerStatus(getContext());
+            mControllerStatus = ControllerStatus.getInstance(getContext());
         }
 
         mDispTempBroadcastReceiver = new BroadcastReceiver() {

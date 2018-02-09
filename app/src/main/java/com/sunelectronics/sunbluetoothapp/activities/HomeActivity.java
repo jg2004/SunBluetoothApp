@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -45,7 +44,6 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSA
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
@@ -66,7 +64,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     private BroadcastReceiver mReceiver;
     private Toolbar mToolbar;
     private Handler mHandler;
-    private String controllerType;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +73,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         view = findViewById(R.id.activityLayout);
-        controllerType = getControllerType();
         buildFragmentList();
         setUpViews();
         if (savedInstanceState == null) {
@@ -88,10 +84,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         }
     }
 
-    private String getControllerType() {
-        SharedPreferences prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-        return prefs.getString(CONTROLLER_TYPE, "EC1X");
-    }
 
     //-------------------------------private methods----------------------------------------------
 
@@ -104,7 +96,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         setSupportActionBar(mToolbar);
         setToolbarSubTitle();
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
-
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -113,7 +104,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                 if (checkIfBusy()) {
                     return false; // so menu item is NOT selected
                 }
-
 
                 Log.d(TAG, "onNavigationItemSelected: called");
                 int itemId = item.getItemId();
@@ -265,6 +255,13 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
         LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
         lpDownloadFrag.downloadLP(lpNumber);
+    }
+
+    @Override
+    public void downloadLP() {
+        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
+        lpDownloadFrag.downloadLP();
+
     }
 
     /**

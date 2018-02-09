@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:background="@drawable/gradient_darkgray_lightgray_center"
-                android:layout_height="match_parent">
-
-    <TextView
-
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:text="EC1x Bluetooth"
-        android:textColor="@color/black"
-        android:textSize="18sp"/>
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_darkgray_lightgray_center">
 
     <LinearLayout
         android:id="@+id/mainLayout"
@@ -23,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-
         android:orientation="horizontal">
 
         <LinearLayout
@@ -58,7 +44,6 @@
                 android:text="DISCOVER"
                 android:textColor="@color/white"/>
 
-
         </LinearLayout>
 
         <LinearLayout
@@ -88,13 +73,22 @@
                 android:background="@drawable/blue_rounded_button"
                 android:drawableTop="@drawable/ic_action_help"
                 android:paddingTop="10dp"
-                android:text="Help"
+                android:text="@string/help"
                 android:textColor="@color/white"/>
-
-
         </LinearLayout>
 
     </LinearLayout>
 
-
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/buttonSettings"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/mainLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/blue_rounded_button"
+        android:drawableTop="@drawable/ic_action_settings"
+        android:paddingTop="10dp"
+        android:text="@string/action_settings"
+        android:textColor="@color/white"/>
 </RelativeLayout>

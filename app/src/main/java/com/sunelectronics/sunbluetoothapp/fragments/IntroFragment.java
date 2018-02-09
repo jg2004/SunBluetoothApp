@@ -1,11 +1,14 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +34,12 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMEN
 
 public class IntroFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "IntroFragment";
+    private ActionBar mSupportActionBar;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
 
         View view = inflater.inflate(R.layout.fragment_intro, container, false);
         initViews(view);
@@ -51,6 +56,8 @@ public class IntroFragment extends Fragment implements View.OnClickListener {
         buttonDiscover.setOnClickListener(this);
         Button buttonHelp = (Button) view.findViewById(R.id.buttonHelp);
         buttonHelp.setOnClickListener(this);
+        Button buttonSettings = (Button) view.findViewById(R.id.buttonSettings);
+        buttonSettings.setOnClickListener(this);
     }
 
     @Override
@@ -76,6 +83,12 @@ public class IntroFragment extends Fragment implements View.OnClickListener {
                     startActivity(intent);
                 }
 
+                break;
+            case R.id.buttonSettings:
+                performTransaction(new SettingsFragment(), "tag_frag_settings");
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String test = preferences.getString("pref_controller_type", "ec1x");
+                Log.d(TAG, "onClick: pref value is: " + test);
                 break;
 
             case R.id.buttonViewLog:

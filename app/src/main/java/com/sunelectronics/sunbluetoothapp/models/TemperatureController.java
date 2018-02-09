@@ -5,13 +5,39 @@ import android.util.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02_NAME;
+
 public abstract class TemperatureController implements Serializable {
 
     int numberOfChannels = 1;
     String ch1QueryCommand, waitQueryCommand, setQueryCommand, ch1Label, heatEnableCommand;
     String pidHQueryCommand, pidCQueryCommand;
     String coolEnableCommand, heatDisableCommand, coolDisableCommand;
-    String pidHCommand, pidCCommand;
+    String pidHCommand;
+    String pidCCommand;
+    String utlCommand;
+
+    public String getUtlCommand() {
+        return utlCommand;
+    }
+
+    public String getLtlCommand() {
+        return ltlCommand;
+    }
+
+    String ltlCommand;
+    String name, utlQueryCommand, ltlqueryCommand;
     private String ch1Reading, currentSetPoint;
     ArrayList<String> pollingCommands;
     ArrayList<String> chartCommands;
@@ -19,6 +45,31 @@ public abstract class TemperatureController implements Serializable {
     int mResourceLayout;
     private long timeStampOfReading;
     private static final String TAG = "TemperatureController";
+
+    public String getPidHQueryCommand() {
+        return pidHQueryCommand;
+    }
+
+    public String getPidCQueryCommand() {
+        return pidCQueryCommand;
+    }
+
+    public String getPidHCommand() {
+        return pidHCommand;
+    }
+
+    public String getPidCCommand() {
+        return pidCCommand;
+    }
+
+    public String getUtlQueryCommand() {
+        return utlQueryCommand;
+    }
+
+    public String getLtlqueryCommand() {
+        return ltlqueryCommand;
+    }
+
 
     TemperatureController() {
 
@@ -45,16 +96,16 @@ public abstract class TemperatureController implements Serializable {
     public static TemperatureController createController(String type) {
 
 
-        switch (type.toUpperCase()) {
+        switch (type) {
 
-            case "EC1X":
-            case "EC127":
-            case "PC1000":
-            case "PC100-2":
+            case EC1X:
+            case EC127:
+            case PC1000:
+            case PC100_2:
                 return new DualChannelTemperatureController(type);
 
-            case "PC100":
-            case "TC02":
+            case PC100:
+            case TC02:
                 return new SingleChannelTemperatureController(type);
 
             default:
@@ -72,6 +123,10 @@ public abstract class TemperatureController implements Serializable {
 
     public String getCh1Reading() {
         return ch1Reading;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setCh1Reading(String ch1Reading) {
@@ -100,5 +155,26 @@ public abstract class TemperatureController implements Serializable {
 
     public String getCoolDisableCommand() {
         return coolDisableCommand;
+    }
+
+    public static String getName(String controllerType) {
+        switch (controllerType) {
+
+            case EC1X:
+                return EC1X_NAME;
+            case PC100:
+                return PC100_NAME;
+            case EC127:
+                return EC127_NAME;
+            case PC1000:
+                return PC1000_NAME;
+            case PC100_2:
+                return PC100_2_NAME;
+            case TC02:
+                return TC02_NAME;
+            default:
+                return "N/A";
+
+        }
     }
 }
