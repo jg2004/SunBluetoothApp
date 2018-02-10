@@ -7,6 +7,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_READING
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH2_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH2_READING_LABEL;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAMBER_READING_LABEL;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_RS_ECHO_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_DISABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_ENABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
@@ -14,6 +15,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_CH2_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X_RS_ECHO_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_DISABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_ENABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
@@ -35,8 +37,11 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_UTL_
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_RATE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_RATE_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_SET_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_SET_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_WAIT_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_WAIT_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
@@ -45,13 +50,15 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_RATE_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_SET_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_WAIT_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_RATE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_SET_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_WAIT_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.USER_READING_LABEL;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_QUERY;
 
 public class DualChannelTemperatureController extends TemperatureController {
-
 
     private String ch2QueryCommand, ch2Label, rateQueryCommand, ch2Reading;
 
@@ -92,6 +99,10 @@ public class DualChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = UTL_QUERY;
                 ltlCommand = LTL_COMMAND;
                 utlCommand = UTL_COMMAND;
+                rs232EchoMessage = EC1X_RS_ECHO_MESSAGE;
+                rateCommand = TC_RATE_COMMAND;
+                waitCommand = TC_WAIT_COMMAND;
+                setCommand = TC_SET_COMMAND;
                 break;
 
             case EC127:
@@ -115,6 +126,10 @@ public class DualChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = PC1000_UTL_QUERY;
                 ltlCommand = PC1000_LTL_COMMAND;
                 utlCommand = PC1000_UTL_COMMAND;
+                rs232EchoMessage = EC1X_RS_ECHO_MESSAGE;
+                rateCommand = TC_RATE_COMMAND;
+                waitCommand = TC_WAIT_COMMAND;
+                setCommand = TC_SET_COMMAND;
                 break;
 
             case PC100_2:
@@ -138,6 +153,10 @@ public class DualChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = UTL_QUERY;
                 ltlCommand = LTL_COMMAND;
                 utlCommand = UTL_COMMAND;
+                rs232EchoMessage = CONTROLLER_RS_ECHO_MESSAGE;
+                rateCommand = TC_RATE_COMMAND;
+                waitCommand = TC_WAIT_COMMAND;
+                setCommand = TC_SET_COMMAND;
                 break;
             case PC1000:
                 name = PC1000_NAME;
@@ -146,8 +165,8 @@ public class DualChannelTemperatureController extends TemperatureController {
                 ch2QueryCommand = CH2_QUERY_COMMAND;
                 ch1Label = CH1_READING_LABEL;
                 ch2Label = CH2_READING_LABEL;
-                waitQueryCommand = TC10_WAIT_QUERY_COMMAND;
-                rateQueryCommand = TC10_RATE_QUERY_COMMAND;
+                waitQueryCommand = PC_WAIT_QUERY_COMMAND;
+                rateQueryCommand = PC_RATE_QUERY_COMMAND;
                 heatEnableCommand = PC1000_HEAT_ENABLE_COMMAND;
                 heatDisableCommand = PC1000_HEAT_DISABLE_COMMAND;
                 coolEnableCommand = PC1000_COOL_ENABLE_COMMAND;
@@ -160,6 +179,10 @@ public class DualChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = PC1000_UTL_QUERY;
                 ltlCommand = PC1000_LTL_COMMAND;
                 utlCommand = PC1000_UTL_COMMAND;
+                rs232EchoMessage = CONTROLLER_RS_ECHO_MESSAGE;
+                rateCommand = PC_RATE_COMMAND;
+                waitCommand = PC_WAIT_COMMAND;
+                setCommand = PC_SET_COMMAND;
                 break;
         }
         pollingCommands.add(ch1QueryCommand);

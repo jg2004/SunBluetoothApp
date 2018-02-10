@@ -37,6 +37,7 @@ public class Constants {
     public static final String DELETE_ALL_LP = "DELETE ALL LP";
     public static final String ALERT_TYPE = "type";
     public static final String ALERT_TITLE = "title";
+    public static final String DIALOG_TITLE = "title";
     public static final String ALERT_MESSAGE = "message";
     public static final String ALERT_CONFIRM_EXIT = "exit";
     public static final String ALERT_ICON = "alert";
@@ -69,6 +70,9 @@ public class Constants {
     public static final String EC127_NAME = "EC127";
     public static final String PC100_2_NAME = "PC100-2";
     public static final String CONTROLLER = "controller";
+    public static final String EC1X_RS_ECHO_MESSAGE = "RS232 ECHO ON! Go to SDEF MENU and set RS Char Echo to N";
+    public static final String CONTROLLER_RS_ECHO_MESSAGE = "RS232 ECHO ON! Go to MENU and set RS Char Echo to N";
+
 
 
     //Fragment TAGS
@@ -84,6 +88,13 @@ public class Constants {
 
 
     //controller commands
+    public static final String TC_RATE_COMMAND = "RATE=";
+    public static final String TC_WAIT_COMMAND = "WAIT=";
+    public static final String TC_SET_COMMAND = "SET=";
+    public static final String PC_RATE_COMMAND = "RATE1=";
+    public static final String PC_WAIT_COMMAND = "WAIT1=";
+    public static final String PC_SET_COMMAND = "SET1=";
+
     public static final String PIDH_COMMAND = "PIDH=";
     public static final String PIDC_COMMAND = "PIDC=";
     public static final String PWMP_COMMAND = "PWMP=";

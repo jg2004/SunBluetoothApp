@@ -385,8 +385,8 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                     case CONNECTION_LOST:
                         //close out activity and start BluetoothStartup activity
                         mToolbar.setSubtitle(R.string.connection_lost);
-                        Snackbar snackbar = Snackbar.make(view, "Bluetooth Connection Lost", Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction("RECONNECT", new View.OnClickListener() {
+                        Snackbar snackbar = Snackbar.make(view, R.string.bluetooth_connection_lost, Snackbar.LENGTH_INDEFINITE);
+                        snackbar.setAction(R.string.reconnect, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 final Intent intent = new Intent(HomeActivity.this, BluetoothStartUp.class);

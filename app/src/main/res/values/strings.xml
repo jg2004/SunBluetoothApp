@@ -23,7 +23,10 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="delete_lp">Delete LP</string>
     <string name="lp_download_hint"> Select a local program location (0-9) and press the download button to
-        download the local program from chamber \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
+        download the local program from controller to this device \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
+
+    <string name="tc02_lp_download_hint">Press the download button to
+        download the local program from TC02 controller to this device \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
     <string name="status">STATUS</string>
     <string name="status_unavailable">Status unavailable</string>
     <string name="pound_sign">###</string>
@@ -70,6 +73,10 @@
     <string name="controller_mode_2_desc">Slowly force CH2 to set</string>
     <string name="controller_mode_3_desc">Control to CH2 probe</string>
     <string name="controller_mode_4_desc">Control to avg of CH1 and CH2, then slowly force CH2 to set</string>
+    <string name="bluetooth_connection_lost">Bluetooth Connection Lost</string>
+    <string name="reconnect">RECONNECT</string>
+    <string name="ec1x_rs_echo_message">RS232 ECHO is ON. Please turn off ECHO by entering SDEF MENU and setting RS Char Echo to N</string>
+    <string name="no_resp_message">No response. Verify RS handshaking off, baud rate = 9600</string>
 
     <string-array name="controller_types">
         <item>EC1x</item>

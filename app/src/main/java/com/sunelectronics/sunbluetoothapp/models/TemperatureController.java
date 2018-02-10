@@ -22,11 +22,18 @@ public abstract class TemperatureController implements Serializable {
 
     int numberOfChannels = 1;
     String ch1QueryCommand, waitQueryCommand, setQueryCommand, ch1Label, heatEnableCommand;
-    String pidHQueryCommand, pidCQueryCommand;
+    String pidHQueryCommand, pidCQueryCommand, rs232EchoMessage;
     String coolEnableCommand, heatDisableCommand, coolDisableCommand;
-    String pidHCommand;
-    String pidCCommand;
-    String utlCommand;
+    String pidHCommand, pidCCommand, utlCommand;
+    String ltlCommand, rateCommand, waitCommand, setCommand;
+    String name, utlQueryCommand, ltlqueryCommand;
+    private String ch1Reading, currentSetPoint;
+    ArrayList<String> pollingCommands;
+    ArrayList<String> chartCommands;
+    private int mPollCommandIterator;
+    int mResourceLayout;
+    private long timeStampOfReading;
+    private static final String TAG = "TemperatureController";
 
     public String getUtlCommand() {
         return utlCommand;
@@ -36,15 +43,21 @@ public abstract class TemperatureController implements Serializable {
         return ltlCommand;
     }
 
-    String ltlCommand;
-    String name, utlQueryCommand, ltlqueryCommand;
-    private String ch1Reading, currentSetPoint;
-    ArrayList<String> pollingCommands;
-    ArrayList<String> chartCommands;
-    private int mPollCommandIterator;
-    int mResourceLayout;
-    private long timeStampOfReading;
-    private static final String TAG = "TemperatureController";
+    public String getRs232EchoMessage() {
+        return rs232EchoMessage;
+    }
+
+    public String getRateCommand() {
+        return rateCommand;
+    }
+
+    public String getWaitCommand() {
+        return waitCommand;
+    }
+
+    public String getSetCommand() {
+        return setCommand;
+    }
 
     public String getPidHQueryCommand() {
         return pidHQueryCommand;

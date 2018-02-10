@@ -5,6 +5,7 @@ import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_LABEL;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CH1_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_RS_ECHO_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_DISABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.COOL_ENABLE_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.HEAT_DISABLE_COMMAND;
@@ -21,6 +22,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.RATE_QUERY_
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SET_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_RATE_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_SET_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC_WAIT_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.WAIT_QUERY_COMMAND;
@@ -54,6 +58,10 @@ public class SingleChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = UTL_QUERY;
                 ltlCommand = LTL_COMMAND;
                 utlCommand = UTL_COMMAND;
+                rs232EchoMessage = CONTROLLER_RS_ECHO_MESSAGE;
+                rateCommand=TC_RATE_COMMAND;
+                waitCommand=TC_WAIT_COMMAND;
+                setCommand=TC_SET_COMMAND;
                 break;
             case TC02:
                 name = TC02_NAME;
@@ -74,6 +82,10 @@ public class SingleChannelTemperatureController extends TemperatureController {
                 utlQueryCommand = UTL_QUERY;
                 ltlCommand = LTL_COMMAND;
                 utlCommand = UTL_COMMAND;
+                rs232EchoMessage = CONTROLLER_RS_ECHO_MESSAGE;
+                rateCommand=TC_RATE_COMMAND;
+                waitCommand=TC_WAIT_COMMAND;
+                setCommand=TC_SET_COMMAND;
                 break;
         }
         pollingCommands.add(ch1QueryCommand);

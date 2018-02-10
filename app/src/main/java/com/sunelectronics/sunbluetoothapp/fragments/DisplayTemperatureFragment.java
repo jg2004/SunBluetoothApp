@@ -54,6 +54,9 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_RATE_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_SET_QUERY_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC_WAIT_QUERY_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.RATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SET_TEMP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
@@ -82,7 +85,7 @@ public class DisplayTemperatureFragment extends Fragment {
     private TemperatureController mTemperatureController;
     private ControllerStatus mControllerStatus;
     private TemperatureLogWriter mTemperatureLogWriter;
-    private boolean mIsLoggingData;
+    private boolean mIsLoggingData, mControllerResponding;
     private View view;
     private String mControllerType;
 
@@ -176,6 +179,15 @@ public class DisplayTemperatureFragment extends Fragment {
                     return;
                 }
                 Log.d(TAG, "run: inside displayupdate runnable");
+                // this checks if no response to commands sent, turn off and display message
+                //it's set to true in broadcast receive method
+                if (!mControllerResponding) {
+                    mSwitchOnOff.setChecked(false);
+                    Snackbar.make(view, R.string.no_resp_message, Snackbar.LENGTH_INDEFINITE).show();
+                    return;
+                }
+                // TODO: 2/9/2018 take this out if it causes problems
+                mControllerResponding = false; //reset to false
                 String command = mTemperatureController.getNextPollingCommand();
                 BluetoothConnectionService.getInstance().write(command);
                 mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
@@ -365,7 +377,7 @@ public class DisplayTemperatureFragment extends Fragment {
     }
 
     private void showSingleSegmentDialog() {
-        SingleSegDialogFragment fragment = SingleSegDialogFragment.newInstance("Enter segment");
+        SingleSegDialogFragment fragment = SingleSegDialogFragment.newInstance("Enter segment", mTemperatureController);
         Log.d(TAG, "showSingleSegmentDialog: showing dialog");
         fragment.show(getFragmentManager(), "single_seg_frag");
     }
@@ -525,6 +537,7 @@ public class DisplayTemperatureFragment extends Fragment {
         mDispTempBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                mControllerResponding = true;
                 String commandSent = intent.getStringExtra(BluetoothConnectionService.COMMAND_SENT);
                 String responseToCommandSent = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
                 String action = intent.getAction();
@@ -581,6 +594,7 @@ public class DisplayTemperatureFragment extends Fragment {
                 break;
 
             case SET_TEMP:
+            case PC_SET_QUERY_COMMAND:
                 if (!isNumeric(responseToCommandSent) && !responseToCommandSent.contains("NONE")) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
                     // TODO: 1/2/2018 temporary code!!
@@ -597,6 +611,7 @@ public class DisplayTemperatureFragment extends Fragment {
                 break;
 
             case WAIT_TIME:
+            case PC_WAIT_QUERY_COMMAND:
 
                 if (!responseToCommandSent.contains(":") && !responseToCommandSent.contains("FOREVER")) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
@@ -612,6 +627,7 @@ public class DisplayTemperatureFragment extends Fragment {
                 break;
 
             case RATE:
+            case PC_RATE_QUERY_COMMAND:
 
                 if (!isNumeric(responseToCommandSent)) {
                     //if it's not, then display is out of sync with controller responses
@@ -626,7 +642,15 @@ public class DisplayTemperatureFragment extends Fragment {
 
             case STATUS:
 
-                // TODO: 11/25/2017 take following Toast command out?
+                if (responseToCommandSent.contains(STATUS)) {
+                    //then RS232 echo is on. display message to disable echo.
+                    Snackbar snackbar = Snackbar.make(view, mTemperatureController.getRs232EchoMessage(), Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                    mSwitchOnOff.setChecked(false);
+                }
+
+                // TODO: 1/2/2018 temporary code!!
+
                 if (responseToCommandSent.length() < 12) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
                     Toast.makeText(getContext(), "Status length less than 12, re-syncing", Toast.LENGTH_SHORT).show();

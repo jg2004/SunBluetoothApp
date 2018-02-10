@@ -32,6 +32,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_0;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_1;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_3;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT0_COMMAND_PREFIX;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT3_COMMAND_PREFIX;
@@ -74,7 +75,13 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
-        view = inflater.inflate(R.layout.fragment_outputs, container, false);
+        if (mControllerType.equals(EC127)) {
+            view = inflater.inflate(R.layout.fragment_outputs_ec127, container, false);
+
+        } else {
+            view = inflater.inflate(R.layout.fragment_outputs, container, false);
+
+        }
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setTitle(String.format("%s OUTPUTS", TemperatureController.getName(mControllerType)));
@@ -99,21 +106,6 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         ToggleButton toggleButtonOutput3 = (ToggleButton) view.findViewById(R.id.buttonOutput3);
         toggleButtonOutput3.setOnCheckedChangeListener(this);
         toggleButtonOutput3.setOnTouchListener(this);
-
-        ToggleButton toggleButtonOutput4 = (ToggleButton) view.findViewById(R.id.buttonOutput4);
-        toggleButtonOutput4.setOnCheckedChangeListener(this);
-        toggleButtonOutput4.setOnTouchListener(this);
-        toggleButtonOutput4.setText(mOutput4Text);
-
-
-        ToggleButton toggleButtonOutput5 = (ToggleButton) view.findViewById(R.id.buttonOutput5);
-        toggleButtonOutput5.setOnCheckedChangeListener(this);
-        toggleButtonOutput5.setOnTouchListener(this);
-
-        ToggleButton toggleButtonOutput6 = (ToggleButton) view.findViewById(R.id.buttonOutput6);
-        toggleButtonOutput6.setOnCheckedChangeListener(this);
-        toggleButtonOutput6.setOnTouchListener(this);
-
         SeekBar seekBar0 = (SeekBar) view.findViewById(R.id.seekbarChannel0);
         seekBar0.setOnSeekBarChangeListener(this);
         mAnalogChannel0TextView.setText(String.valueOf(seekBar0.getProgress()));
@@ -129,6 +121,22 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         SeekBar seekBar3 = (SeekBar) view.findViewById(R.id.seekbarChannel3);
         seekBar3.setOnSeekBarChangeListener(this);
         mAnalogChannel3TextView.setText(String.valueOf(seekBar3.getProgress()));
+
+        if (mControllerType.equals(EC127)) return;
+        //don't instantiate if EC127 chamber
+        ToggleButton toggleButtonOutput4 = (ToggleButton) view.findViewById(R.id.buttonOutput4);
+        toggleButtonOutput4.setOnCheckedChangeListener(this);
+        toggleButtonOutput4.setOnTouchListener(this);
+        toggleButtonOutput4.setText(mOutput4Text);
+
+
+        ToggleButton toggleButtonOutput5 = (ToggleButton) view.findViewById(R.id.buttonOutput5);
+        toggleButtonOutput5.setOnCheckedChangeListener(this);
+        toggleButtonOutput5.setOnTouchListener(this);
+
+        ToggleButton toggleButtonOutput6 = (ToggleButton) view.findViewById(R.id.buttonOutput6);
+        toggleButtonOutput6.setOnCheckedChangeListener(this);
+        toggleButtonOutput6.setOnTouchListener(this);
     }
 
     @Override

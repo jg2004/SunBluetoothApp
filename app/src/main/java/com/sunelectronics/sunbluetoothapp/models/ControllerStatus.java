@@ -25,7 +25,7 @@ public class ControllerStatus {
     private String mCurrentlyRampingStatusMessage, mLpRunningStatusMessage, mWaitingAtBreakPointStatusMessage;
     private String mChamberIsOnMessage, mControllerType;
     private boolean mIsLPRunning, mHeatEnableOn, mCoolEnableOn, mWaitingAtBreakPoint, mPowerIsOn;
-    private static  ControllerStatus mControllerStatus;
+    private static ControllerStatus mControllerStatus;
 
     private static final String TAG = "ControllerStatus";
 
@@ -85,8 +85,10 @@ public class ControllerStatus {
             case EC127:
                 Log.d(TAG, "setState: controller is type pc1000 or ec127");
                 currentlyRamping = statusString.charAt(12);
-                waitingAtBreakPoint = statusString.charAt(19);
-                lpRunning = statusString.charAt(20);
+                if (statusString.length() > 21) {
+                    waitingAtBreakPoint = statusString.charAt(19);
+                    lpRunning = statusString.charAt(20);
+                }
                 break;
         }
         if (powerIsOn == 'Y') {

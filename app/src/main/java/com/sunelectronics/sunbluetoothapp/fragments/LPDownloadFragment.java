@@ -61,6 +61,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
     private Context mContext;
     private Spinner mSpinner;
     private String mSpinnerSelectionNumber, mLpname, mControllerType;
+    private String mLpContentHint;
     private ProgressBar mProgressBar;
     private BroadcastReceiver mLpBroadcastReceiver;
     private LPDataBaseHandler mLPDataBaseHandler;
@@ -89,6 +90,11 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mControllerType = PreferenceSetting.getControllerType(getContext());
+        if (mControllerType.equals(TC02)){
+            mLpContentHint = getString(R.string.tc02_lp_download_hint);
+        } else{
+            mLpContentHint = getString(R.string.lp_download_hint);
+        }
     }
 
     @Nullable
@@ -187,6 +193,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         Log.d(TAG, "initializeViews: setting lp name to " + mLpname);
         mLpName.setText(mLpname);
         mLpContent = (EditText) view.findViewById(R.id.lpContent);
+        mLpContent.setHint(mLpContentHint);
         Log.d(TAG, "initializeViews: clearing lp content");
 
         if (mLocalProgram == null) {
