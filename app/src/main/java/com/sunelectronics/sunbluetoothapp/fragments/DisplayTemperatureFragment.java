@@ -179,15 +179,16 @@ public class DisplayTemperatureFragment extends Fragment {
                     return;
                 }
                 Log.d(TAG, "run: inside displayupdate runnable");
-                // this checks if no response to commands sent, turn off and display message
-                //it's set to true in broadcast receive method
+                // this checks if no response to the initial STATUS? command is sent, as in the case where controller has no
+                // power or faulty RS232 setting such as baud rate not 9600 or Handshaking turne on.
+                // It then turns off switch off and displays message. It's initally false, then
+                // set to true in broadcast receive method. Check is done JUST ONCE.
                 if (!mControllerResponding) {
                     mSwitchOnOff.setChecked(false);
                     Snackbar.make(view, R.string.no_resp_message, Snackbar.LENGTH_INDEFINITE).show();
                     return;
                 }
-                // TODO: 2/9/2018 take this out if it causes problems
-                mControllerResponding = false; //reset to false
+
                 String command = mTemperatureController.getNextPollingCommand();
                 BluetoothConnectionService.getInstance().write(command);
                 mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
