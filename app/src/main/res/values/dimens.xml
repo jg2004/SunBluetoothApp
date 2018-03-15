@@ -1,4 +1,13 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="cardview_large_radius">4dp</dimen>
+    <dimen name="edit_text_tc01_wait">70dp</dimen>
+    <dimen name="edit_text_tc01_set">60dp</dimen>
+    <dimen name="edit_text_cycles">75dp</dimen>
+    <dimen name="profile_margin">5dp</dimen>
+    <dimen name="profile_textview_set_temp_width">125dp</dimen>
+    <dimen name="profile_textview_wait_time_width">150dp</dimen>
+    <dimen name="profile_textview_cycles_width">150dp</dimen>
+    <dimen name="profile_name_width">300dp</dimen>
+    <dimen name="tc01_param_text_size">14sp</dimen>
 </resources>

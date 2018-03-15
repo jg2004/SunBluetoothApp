@@ -40,6 +40,7 @@ public class BluetoothConnectionService {
     private static final String TAG = "BluetoothConnectionServ";
     //The following UUID is a common UUID for serial bluetooth devices
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
     private ConnectedThread mConnectedThread;
     private ConnectThread mConnectThread;
     private BluetoothDevice mDevice;
@@ -76,6 +77,7 @@ public class BluetoothConnectionService {
         return mDevice;
     }
 
+
     /**
      * This method is called from activity to create a connection  with a bluetooth device.
      *
@@ -110,13 +112,28 @@ public class BluetoothConnectionService {
 
         mCommandsWrittenList.add(stringToSend); // used to determine expected response
 
-
         // append carriage return and convert to byte array
         StringBuilder sb;
         sb = new StringBuilder();
         sb.append(stringToSend);
         sb.append("\r");
         byte[] out = sb.toString().getBytes();
+        mConnectedThread.write(out);
+    }
+
+    /**
+     * convenience method to write strings to bluetooth without appending a carriage return
+     *
+     * @param stringToSend this is the command to send to Sun controller
+     */
+    public void writeNoCr(String stringToSend) {
+
+        if (mCurrentState != STATE_CONNECTED) {
+            //if not connected, then don't write
+            Log.d(TAG, "attempt to write, but bluetooth is not connected. Current state is: " + mCurrentState);
+            return;
+        }
+        byte[] out = stringToSend.getBytes();
         mConnectedThread.write(out);
     }
 

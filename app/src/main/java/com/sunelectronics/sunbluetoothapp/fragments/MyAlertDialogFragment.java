@@ -3,6 +3,7 @@ package com.sunelectronics.sunbluetoothapp.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -13,8 +14,9 @@ import android.widget.Toast;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.activities.IntroActivity;
-import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
-import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
+import com.sunelectronics.sunbluetoothapp.interfaces.IDelete;
+import com.sunelectronics.sunbluetoothapp.interfaces.IStop;
+import com.sunelectronics.sunbluetoothapp.interfaces.Iid;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_CONFIRM_EXIT;
@@ -24,12 +26,12 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_NOTIF
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LOG_FILES;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_PROFILES;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LOG_FILE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_PROFILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILE_NAME;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PROFILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SEND_STOP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TERMINATE_LOGGING_SESSION;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CHAMBER;
@@ -38,7 +40,8 @@ public class MyAlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyAlertDialogFragment";
     private LogFileListFragment.DeleteLogFileListener mDeleteLogFileListener;
     private DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks mDisplayTemperatureFragmentCallBacks;
-    private LPDataBaseHandler mLPDataBaseHandler;
+    private IDelete mIDelete;
+    private IStop mIstop;
 
     //create an instance of MyAlertDialogFragment with bundle containing title, icon, objects passed in as argument
 
@@ -71,7 +74,7 @@ public class MyAlertDialogFragment extends DialogFragment {
                     }
                 });
         // only set a negative button if not a notification type of alert
-        if ( type != null && !type.equals(ALERT_NOTIFICATION)) {
+        if (type != null && !type.equals(ALERT_NOTIFICATION)) {
 
             builder.setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
                 @Override
@@ -97,7 +100,9 @@ public class MyAlertDialogFragment extends DialogFragment {
             Log.d(TAG, "context is instance of HomeActivity");
             mDeleteLogFileListener = (HomeActivity) context;
             mDisplayTemperatureFragmentCallBacks = (HomeActivity) context;
-            mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
+            SQLiteOpenHelper helper = ((HomeActivity) context).getDataBaseHelper();
+            mIDelete = (IDelete) helper;
+            mIstop = (HomeActivity) context;
         } else if (context instanceof IntroActivity) {
 
             Log.d(TAG, "context is instance of IntroActivity");
@@ -147,32 +152,32 @@ public class MyAlertDialogFragment extends DialogFragment {
                 mDeleteLogFileListener.deleteAllLogFiles();
                 break;
 
-            case DELETE_LP:
+            case DELETE_PROFILE:
 
-                LocalProgram lp = (LocalProgram) getArguments().getSerializable(LP);
-                if (lp != null) {
-                    mLPDataBaseHandler.deleteLPFromDB(lp.getId());
-                    if (getFragmentManager().getBackStackEntryCount() > 0) {
-                        getFragmentManager().popBackStack();
-                    } else {
-                        getFragmentManager().beginTransaction().replace(R.id.homeContainer, new LocalProgramListFragment()).commit();
+                Iid profile = (Iid) getArguments().getSerializable(PROFILE);
+                if (profile != null) {
+                    mIDelete.deleteProfile(profile.getId());
+
+                    if (profile instanceof LocalProgram) {
+
+                        if (getFragmentManager().getBackStackEntryCount() > 0) {
+                            getFragmentManager().popBackStack();
+                        } else {
+                            getFragmentManager().beginTransaction().replace(R.id.homeContainer, new LocalProgramListFragment()).commit();
+                        }
                     }
-                } else {
-                    Toast.makeText(getContext(), "Local Program was null", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
-            case DELETE_ALL_LP:
 
-               mLPDataBaseHandler.deleteAllLocalPrograms();
-
+            case DELETE_ALL_PROFILES:
+                mIDelete.deleteAllProfiles();
                 // TODO: 11/2/2017 should the frag trans code above be added to this case as well?
 
                 break;
 
             case SEND_STOP:
-
-                BluetoothConnectionService.getInstance().write("STOP");
+                mIstop.sendStop();
                 break;
 
             case ALERT_CONFIRM_EXIT:

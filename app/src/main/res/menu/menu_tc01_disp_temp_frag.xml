@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/displayTempFragMenuGroup"
+        android:enabled="false">
+        <item
+            android:id="@+id/startLogging"
+            android:orderInCategory="1"
+            android:title="Start Logging"
+            app:showAsAction="never"
+            />
+
+
+        <item
+            android:id="@+id/parameters"
+            android:orderInCategory="3"
+            android:title="Parameters &amp; I/O"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/controllerReset"
+            android:orderInCategory="4"
+            android:title="Reset Controller"
+            app:showAsAction="never"/>
+
+
+    </group>
+
+</menu>

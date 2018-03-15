@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.interfaces.IBusy;
 import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
 import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
@@ -47,7 +48,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PWMP_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UTL_QUERY;
 
-public class ParameterFragment extends Fragment {
+public class ParameterFragment extends Fragment implements IBusy {
     private static final String TAG = "ParameterFragment";
     public static final int DELAY = 1000;
     private EditText mPwmp, mUtl, mLtl, mPH, mIH, mDH, mPC, mIC, mDC;
@@ -158,10 +159,10 @@ public class ParameterFragment extends Fragment {
         });
     }
 
-    public boolean isBusyDownLoading() {
+    @Override
+    public boolean isBusy() {
         return isBusyDownLoading;
     }
-
     private void setParameters() {
         mProgressBarLayout.setVisibility(View.VISIBLE);
         mProgressBarTextView.setText(R.string.set_param_message);
@@ -483,4 +484,6 @@ public class ParameterFragment extends Fragment {
         }
         return false;
     }
+
+
 }

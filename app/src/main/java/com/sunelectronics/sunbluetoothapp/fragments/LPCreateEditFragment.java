@@ -1,6 +1,7 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -17,7 +18,7 @@ import android.widget.ImageButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
-import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
+import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHelper;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
@@ -26,7 +27,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
 public class LPCreateEditFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "LPCreateEditFragment";
-    private LPDataBaseHandler mLPDataBaseHandler;
+    private LPDataBaseHelper mLPDataBaseHelper;
     private EditText mLpName, mLpContent;
     private boolean isEdit;
     private LocalProgram localProgram;
@@ -140,7 +141,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
 
         LocalProgram lp = new LocalProgram(lpName, lpContent);
         lp.setId(localProgram.getId());
-        mLPDataBaseHandler.upDateExistingLP(lp);
+        mLPDataBaseHelper.upDateExistingLP(lp);
 
         //update the LPDetail fragment with the edited LP
         mRefreshFragment.refreshLPDetailFragment(lp);
@@ -165,7 +166,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
         String lpContent = mLpContent.getText().toString();
 
         LocalProgram lp = new LocalProgram(lpName, lpContent);
-        mLPDataBaseHandler.addLocalProgramToDB(lp);
+        mLPDataBaseHelper.addLocalProgramToDB(lp);
         //return to previous fragment
         Log.d(TAG, "addLPtoDB: popBackStack called");
         if (getFragmentManager().getBackStackEntryCount() > 0) {
@@ -192,7 +193,8 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called");
-        mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
+        SQLiteOpenHelper helper = ((HomeActivity) context).getDataBaseHelper();
+        mLPDataBaseHelper = (LPDataBaseHelper)helper;
         //RefreshFragment is an interface implemented by HomeActivity that is used to send
         //bundle local program to LPDetailFragment after local program is edited
         mRefreshFragment = (RefreshFragment) getActivity();
@@ -208,7 +210,7 @@ public class LPCreateEditFragment extends Fragment implements View.OnClickListen
     public void onDetach() {
         super.onDetach();
         Log.d(TAG, "onDetach: called");
-        mLPDataBaseHandler.close();
+        mLPDataBaseHelper.close();
     }
 
     @Override

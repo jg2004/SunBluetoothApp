@@ -36,7 +36,7 @@ public class ControllerStatus {
         Log.d(TAG, "ControllerStatus: controller is type: " + mControllerType);
     }
 
-    public static ControllerStatus getInstance(Context context) {
+    public static synchronized ControllerStatus getInstance(Context context) {
 
         if (mControllerStatus == null) {
             mControllerStatus = new ControllerStatus(context);
@@ -45,7 +45,12 @@ public class ControllerStatus {
 
             return mControllerStatus;
         }
+    }
 
+    public static synchronized void init() {
+        //used by Preference Frag to initialize to null when changing controller types
+        Log.d(TAG, "init: setting controller status to NULL");
+        mControllerStatus = null;
     }
 
     public void setStatusMessages(String statusString) {

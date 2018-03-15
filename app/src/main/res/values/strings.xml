@@ -49,7 +49,7 @@
     <string name="set_param_message">Setting parameters, please wait…</string>
     <string name="get_param_message">Getting parameters, please wait…</string>
     <string name="bluetooth_not_connected">Bluetooth not connected</string>
-    <string name="lp_busy_uploading">Uploading LP, please wait</string>
+    <string name="controller_busy">Controller busy, please wait</string>
     <string name="download_parameters_message">Downloading parameters, please wait</string>
     <string name="disc_mode">Discovery mode</string>
     <string name="connecting">Connecting…</string>
@@ -77,6 +77,22 @@
     <string name="reconnect">RECONNECT</string>
     <string name="ec1x_rs_echo_message">RS232 ECHO is ON. Please turn off ECHO by entering SDEF MENU and setting RS Char Echo to N</string>
     <string name="no_resp_message">No response. Verify RS handshaking off, baud rate = 9600</string>
+    <string name="infinity">INFINITY</string>
+    <string name="enter_segment">Enter Segment</string>
+    <string name="timeout_message">Timeout occurred</string>
+    <string name="reset">RESET</string>
+    <string name="continuous">Continuous</string>
+    <string name="delete_all_profiles">Delete All Profiles</string>
+    <string name="save_profile">Save Profile to database</string>
+    <string name="sample_profile_low_temp">-50</string>
+    <string name="sample_profile_high_temp">150</string>
+    <string name="sample_profile_room_temp">25</string>
+    <string name="sample_profile_hour">60</string>
+    <string name="sample_profile_five_min">5</string>
+    <string name="sample_profile_cycles">10</string>
+    <string name="none">NONE</string>
+    <string name="input">RESULT:</string>
+    <string name="profile">Profiles</string>
 
     <string-array name="controller_types">
         <item>EC1x</item>
@@ -85,6 +101,8 @@
         <item>TC02</item>
         <item>PC1000</item>
         <item>PC100–2</item>
+        <item>TC01/EC0X</item>
+
 
     </string-array>
     <array name="cont_type_values">
@@ -94,6 +112,8 @@
         <item>tc02</item>
         <item>pc1000</item>
         <item>pc100_2</item>
+        <item>tc01</item>
+
     </array>
 
     <string-array name="lp_dropdown_array">
@@ -123,4 +143,26 @@
         <item>I9</item>
 
     </array>
+
+    <string-array name="pid_values">
+        <item>-9</item>
+        <item>-8</item>
+        <item>-7</item>
+        <item>-6</item>
+        <item>-5</item>
+        <item>-4</item>
+        <item>-3</item>
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
 </resources>

@@ -4,8 +4,11 @@ package com.sunelectronics.sunbluetoothapp.utilities;
 public class Constants {
 
     public static final String LP_DB_NAME = "localPrograms.db";
+    public static final String TC01_PROF_DB_NAME = "tc01Profiles.db";
+    public static final String TC01_PROF_TABLE = "PROFILE";
     public static final String LP_TABLE = "lp_table";
     public static final int LP_DB_VER = 1;
+    public static final int TC01_DB_VER = 1;
     public static final String SAMPLE_LP_NAME = "LP1";
     public static final String SAMPLE_LP = "FOR I0 = 0,10\nRATE=20\nWAIT=00:30:00\n" +
             "SET=-50\nWAIT=00:30:00\nSET=125\n" +
@@ -13,19 +16,24 @@ public class Constants {
 
     // Columns:
 
-    public static final String LP_ID = "_id";
+    public static final String PROFILE_ID = "_id";
     public static final String LP_NAME = "lp_name";
     public static final String LP_CONTENT = "lp_content";
 
     //Titles for fragments/activities
     public static final String LOCAL_PROGRAM_LIST_FRAG_TITLE = "STORED LP's";
+    public static final String PROFILE_LIST_FRAG_TITLE = "PROFILES";
     public static final String LOG_FILE_LIST_FRAG_TITLE = "LOG FILES";
     public static final String CHAMBER_STATUS_FRAG_TITLE = "CHAMBER STATUS";
     public static final String LP_DETAIL_FRAG_TITLE = "LP DETAIL";
     public static final String PIDA_FRAG_TITLE = "ADVANCED PID MODE";
     public static final String LP_DOWNLOAD_FRAG_TITLE = "LP MODE";
     public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
+    public static final String SCAN_MODE_TITLE = "SCAN MODE";
     //constants used
+    public static final String TC01_NO_SET_POINT = "NONE";
+    public static final String TC01_INFINITY_WAIT_TIME = "FOREV";
+    public static final String TC01_INFINITY = "1999.9";
     public static final String CONTROLLER_TYPE = "controller_type";
     public static final String SEND_STOP = "SEND STOP COMMAND";
     public static final String CHART_TITLE = "TEMPERATURE CHART";
@@ -34,7 +42,8 @@ public class Constants {
     public static final String TEMP_CONTROLLER = "chamber_model";
     public static final String DELETE_MESSAGE = "DELETE";
     public static final String DELETE_LP = "DELETE LP";
-    public static final String DELETE_ALL_LP = "DELETE ALL LP";
+    public static final String DELETE_PROFILE = "DELETE PROFILE";
+    public static final String DELETE_ALL_PROFILES = "DELETE ALL PROFILES";
     public static final String ALERT_TYPE = "type";
     public static final String ALERT_TITLE = "title";
     public static final String DIALOG_TITLE = "title";
@@ -43,7 +52,9 @@ public class Constants {
     public static final String ALERT_ICON = "alert";
     public static final String ALERT_NOTIFICATION = "alert_notification";
     public static final String LP = "lp";
+    public static final String PROFILE = "profile";
     public static final int POWER_ON_DELAY_MS = 2000;
+    public static final int DELAY_2000MS = 2000;
     public static final String FILE_CONTENTS = "file_contents";
     public static final String LOG_FILE_NAME = "log_file_name";
     public static final String LOG_FILES_DIRECTORY = "logFiles";
@@ -57,12 +68,14 @@ public class Constants {
     public static final String CONNECTION_LOST = "connection_lost";
     public static final String UPDATE_BT_STATE = "update_bt_state";
     public static final String VER_LESS_KITKAT_MESSAGE = "VER 4.3 OR BELOW";
+    public static final String TC01 = "tc01";
     public static final String EC1X = "ec1x";
     public static final String PC1000 = "pc1000";
     public static final String PC100 = "pc100";
     public static final String PC100_2 = "pc100_2";
     public static final String TC02 = "tc02";
     public static final String EC127 = "ec127";
+    public static final String TC01_NAME = "TC01";
     public static final String PC100_NAME = "PC100";
     public static final String TC02_NAME = "TC02";
     public static final String EC1X_NAME = "EC1x";
@@ -72,7 +85,6 @@ public class Constants {
     public static final String CONTROLLER = "controller";
     public static final String EC1X_RS_ECHO_MESSAGE = "RS232 ECHO ON! Go to SDEF MENU and set RS Char Echo to N";
     public static final String CONTROLLER_RS_ECHO_MESSAGE = "RS232 ECHO ON! Go to MENU and set RS Char Echo to N";
-
 
 
     //Fragment TAGS
@@ -85,9 +97,14 @@ public class Constants {
     public static final String TAG_FRAGMENT_TEMP_CHART = "temp_chart_fragment";
     public static final String TAG_FRAGMENT_LOF_FILE_VIEWER = "log_file_viewer_fragment";
     public static final String TAG_FRAGMENT_INTRO_FRAGMENT = "intro_fragment";
+    public static final String TAG_FRAGMENT_PROFILE_LIST = "profile_list_fragment";
+    public static final String TAG_FRAGMENT_MONITOR = "tag_frag_monitor";
+    public static final String TAG_FRAGMENT_TEMP_PROF = "tag_frag_prof";
+    public static final String TAG_FRAGMENT_LOGGER = "tag_frag_logger";
 
 
     //controller commands
+    public static final String TC10_STOP_COMMAND = "STOP";
     public static final String TC_RATE_COMMAND = "RATE=";
     public static final String TC_WAIT_COMMAND = "WAIT=";
     public static final String TC_SET_COMMAND = "SET=";
@@ -155,6 +172,27 @@ public class Constants {
     public static final String OUT_COMMAND_ON = ",1";
     public static final String OUT_COMMAND_OFF = ",0";
     public static final String OUT3_COMMAND_PREFIX = "OUT3:";
+
+    //TC01 commands
+    public static final String TC01_UTL_INT = "O";
+    public static final String TC01_RESET_COMMAND = "R";
+    public static final String TC01_TEMP_QUERY = "T";
+    public static final String TC01_WAIT_QUERY = "M";
+    public static final String TC01_SET_QUERY = "C";
+    public static final String TC01_CYCLE_QUERY = "B-";
+    public static final String TC01_STOP_SCANMODE = "BA";
+    public static final String TC01_START_SCANMODE = "AB";
+    public static final String TC01_CMD_ERROR = "CMD ERROR";
+    public static final String TC01_PID_QUERY = "PID?";
+    public static final String TC01_PID_COMMAND = "PID=";
+    public static final String TC01_UTL_QUERY = "UTL";
+    public static final String TC01_OPT_QUERY = "OPT";
+    public static final String TC01_READ_INPUT_COMMAND = "IN1";
+    public static final String TC01_385_RTD = ".385RTD";
+    public static final String TC01_392_RTD = ".392RTD";
+    public static final char TC01_T_TC = 'T';
+    public static final char TC01_J_TC = 'J';
+    public static final char TC01_K_TC = 'K';
 
     //command descriptions
     public static final String PIDA_MODE_0 = "CONTROL TO CHAMBER PROBE";

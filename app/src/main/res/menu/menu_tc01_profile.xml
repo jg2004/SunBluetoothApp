@@ -1,0 +1,33 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <group android:id="@+id/menu_group_profiles">
+        <item
+            android:id="@+id/action_showSavedProfiles"
+            android:orderInCategory="1"
+            android:title="Saved Profiles"
+            app:showAsAction="ifRoom"
+            />
+        <item
+            android:id="@+id/action_loadSampleProfile"
+            android:orderInCategory="2"
+            android:title="Load Sample"
+            app:showAsAction="never"/>
+
+
+        <item
+            android:id="@+id/action_clear_fields"
+            android:orderInCategory="3"
+            android:title="Clear fields"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/action_deleteAllProfiles"
+            android:orderInCategory="4"
+            android:title="@string/delete_all_profiles"
+            app:showAsAction="never"/>
+
+
+    </group>
+
+</menu>

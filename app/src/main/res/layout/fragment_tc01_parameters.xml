@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <LinearLayout
+                android:id="@+id/pidLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PID: "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/tc01_param_text_size"/>
+
+                <Spinner
+                    android:id="@+id/proportionalSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/pid_values">
+                </Spinner>
+
+                <Spinner
+                    android:id="@+id/integralSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/pid_values">
+                </Spinner>
+
+                <Spinner
+                    android:id="@+id/derivativeSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/pid_values">
+                </Spinner>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/utlLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/utlEditText"
+                android:layout_alignLeft="@+id/pidLayout"
+                android:layout_alignStart="@+id/pidLayout"
+                android:layout_below="@+id/pidLayout"
+                android:layout_marginBottom="10dp"
+                android:gravity="bottom"
+                android:text="UTL: "
+                android:textColor="@color/black"
+                android:textSize="@dimen/tc01_param_text_size"/>
+
+            <EditText
+                android:id="@+id/utlEditText"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/tc01_param_text_size"
+                android:layout_below="@+id/pidLayout"
+                android:layout_toEndOf="@+id/utlLabel"
+                android:layout_toRightOf="@+id/utlLabel"
+                android:inputType="numberDecimal"/>
+
+
+            <LinearLayout
+                android:id="@+id/probeTypeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/utlEditText"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Probe Type (REV F and higher only) "/>
+
+                <RadioGroup
+                    android:id="@+id/probeTypeRadioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radioButton392Rtd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text=".392 RTD"/>
+
+                    <RadioButton
+                        android:id="@+id/radioButton385Rtd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=".385 RTD"/>
+
+                    <RadioButton
+                        android:id="@+id/radioButtonTthermocouple"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="T Thermocouple"/>
+
+                    <RadioButton
+                        android:id="@+id/radioButtonJthermocouple"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="J Thermocouple"/>
+
+                    <RadioButton
+                        android:id="@+id/radioButtonKthermocouple"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="K Thermocouple"/>
+
+                </RadioGroup>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/optionTvLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/utlLabel"
+                android:layout_alignStart="@+id/utlLabel"
+                android:layout_below="@+id/probeTypeLayout"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:text="OPTIONS: "
+                android:textColor="@color/black"
+                android:textSize="@dimen/tc01_param_text_size"/>
+
+            <TextView
+                android:id="@+id/optionTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/probeTypeLayout"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@+id/optionTvLabel"
+                android:layout_toRightOf="@+id/optionTvLabel"
+                />
+
+            <LinearLayout
+                android:id="@+id/outputLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/optionTv"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+
+                <ToggleButton
+                    android:id="@+id/buttonOutput1"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/white_rounded_button"
+                    android:checked="false"
+                    android:tag="OUT1"
+                    android:textOff="OUT1 ON"
+                    android:textOn="OUT1 OFF"/>
+
+                <ToggleButton
+                    android:id="@+id/buttonOutput2"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/white_rounded_button"
+                    android:checked="false"
+                    android:tag="OUT2"
+                    android:textOff="OUT2 ON"
+                    android:textOn="OUT2 OFF"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/inputLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/outputLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+
+                <Button
+                    android:id="@+id/buttonInput"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/white_rounded_button"
+                    android:text="READ IN1"
+                    />
+
+                <TextView
+                    android:id="@+id/inputTextViewLabel"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:gravity="center_horizontal"
+                    />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:gravity="center_horizontal">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonGet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_down_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="GET"
+            android:textColor="@color/white"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blue_rounded_button"
+            android:drawableTop="@drawable/ic_action_up_arrow"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="SET"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+</RelativeLayout>
+

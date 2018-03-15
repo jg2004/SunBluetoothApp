@@ -17,9 +17,9 @@ import com.sunelectronics.sunbluetoothapp.fragments.IntroFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
 
 import static android.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
-import static com.sunelectronics.sunbluetoothapp.activities.HomeActivity.TAG_FRAGMENT_LOGGER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_INTRO_FRAGMENT;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOGGER;
 
 public class IntroActivity extends AppCompatActivity implements LogFileListFragment.DeleteLogFileListener {
     private static final String TAG = "IntroActivity";

@@ -38,13 +38,15 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_PROFILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LP_DETAIL_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.POWER_ON_DELAY_MS;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PROFILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_TEMP_PROF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 
 public class LPDetailFragment extends Fragment implements View.OnClickListener {
@@ -111,7 +113,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (mIsBusyUploadingLp) {
-            Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, R.string.controller_busy, Snackbar.LENGTH_SHORT).show();
             return true;
         }
         switch (item.getItemId()) {
@@ -119,10 +121,10 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
             case R.id.action_deleteLocalProgram:
                 Log.d(TAG, "onClick: delete pressed");
                 Bundle lpArgs = new Bundle();
-                lpArgs.putSerializable(LP, mLocalProgram);
+                lpArgs.putSerializable(PROFILE, mLocalProgram);
                 lpArgs.putString(ALERT_TITLE, DELETE_MESSAGE);
                 lpArgs.putString(ALERT_MESSAGE, "OK to Delete LP " + mLocalProgram.getName() + "?");
-                lpArgs.putString(ALERT_TYPE, DELETE_LP);
+                lpArgs.putString(ALERT_TYPE, DELETE_PROFILE);
                 lpArgs.putInt(ALERT_ICON, R.drawable.ic_delete_black_48dp);
                 showDialog(lpArgs);
                 return true;
@@ -226,7 +228,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 if (mIsBusyUploadingLp) {
-                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, R.string.controller_busy, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 Log.d(TAG, "onClick: removing chamber status callback");
@@ -236,7 +238,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     //remove all fragment transactions from backstack
                     getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
-                LPDownloadFragment fragment = (LPDownloadFragment) getFragmentManager().findFragmentByTag(HomeActivity.TAG_FRAGMENT_LOCAL_PROGRAM);
+                LPDownloadFragment fragment = (LPDownloadFragment) getFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
                 //send lp number to LPDownloadFragment so that it can perform download of LP at that location
 
                 BluetoothConnectionService.getInstance().clearCommandsWrittenList();
@@ -262,7 +264,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 if (mIsBusyUploadingLp) {
-                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, R.string.controller_busy, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -283,7 +285,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
 
             case R.id.editButton:
                 if (mIsBusyUploadingLp) {
-                    Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, R.string.controller_busy, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 LPCreateEditFragment lpcreateEditFragment = new LPCreateEditFragment();
@@ -455,7 +457,7 @@ public class LPDetailFragment extends Fragment implements View.OnClickListener {
                     mLpUploadHandler.removeCallbacks(mLpUploadRunnable);
                     mProgressBar.setVisibility(View.INVISIBLE);
                     Toast.makeText(mContext, "Upload cancelled", Toast.LENGTH_LONG).show();
-                    mIsBusyUploadingLp=false;
+                    mIsBusyUploadingLp = false;
                 } else if (commandSent.equals(STATUS)) {
                     Log.d(TAG, "setting status of chamber status object");
                     ControllerStatus.getInstance(getContext()).setStatusMessages(response);

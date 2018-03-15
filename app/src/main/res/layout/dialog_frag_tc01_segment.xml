@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="10dp">
+
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/editTextWait"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Wait time (minutes)"
+        android:inputType="numberDecimal"/>
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/editTextSetPoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Set point"
+        android:inputType="number|numberSigned|numberDecimal"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonOk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="@string/alert_dialog_ok"
+            />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/buttonCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rounded_button_accent"
+            android:text="@string/cancel"
+            />
+    </LinearLayout>
+</LinearLayout>
+

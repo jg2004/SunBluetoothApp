@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -23,15 +24,23 @@ import android.view.View;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
-import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
+import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHelper;
+import com.sunelectronics.sunbluetoothapp.database.Tc01ProfDataBaseHelper;
 import com.sunelectronics.sunbluetoothapp.fragments.DisplayTemperatureFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPCreateEditFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPDetailFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LPDownloadFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
 import com.sunelectronics.sunbluetoothapp.fragments.MyAlertDialogFragment;
-import com.sunelectronics.sunbluetoothapp.fragments.ParameterFragment;
+import com.sunelectronics.sunbluetoothapp.fragments.TC01DispTempFragment;
+import com.sunelectronics.sunbluetoothapp.fragments.TC01ProfileDetailFragment;
+import com.sunelectronics.sunbluetoothapp.interfaces.IBottomNavigationListener;
+import com.sunelectronics.sunbluetoothapp.interfaces.IBusy;
+import com.sunelectronics.sunbluetoothapp.interfaces.IChamberOffSwitch;
+import com.sunelectronics.sunbluetoothapp.interfaces.ILogger;
+import com.sunelectronics.sunbluetoothapp.interfaces.IStop;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,35 +54,38 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOGGER;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_MONITOR;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_TEMP_PROF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_LP_DETAIL_FRAG;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.UPDATE_BT_STATE;
 
 public class HomeActivity extends AppCompatActivity implements LogFileListFragment.DeleteLogFileListener,
-        LPDownloadFragment.BottomNavigationListenter, LPCreateEditFragment.RefreshFragment,
-        LPDownloadFragment.DownloadPInterface, DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks {
+        IBottomNavigationListener, LPCreateEditFragment.RefreshFragment,
+        LPDownloadFragment.DownloadPInterface, DisplayTemperatureFragment.DisplayTemperatureFragmentCallBacks,
+        IStop {
 
     private static final String TAG = "HomeActivity";
     private List<Fragment> mFragmentList = new ArrayList<>();
-    public static final String TAG_FRAGMENT_MONITOR = "tag_frag_monitor";
-    public static final String TAG_FRAGMENT_LOCAL_PROGRAM = "tag_frag_lp";
-    public static final String TAG_FRAGMENT_LOGGER = "tag_frag_logger";
     private View view;
-    private LPDataBaseHandler mLPDataBaseHandler;
+    private SQLiteOpenHelper mDataBaseHelper;
     private BottomNavigationView mBottomNavigationView;
     private BroadcastReceiver mReceiver;
     private Toolbar mToolbar;
     private Handler mHandler;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreate: called");
-        mLPDataBaseHandler = new LPDataBaseHandler(HomeActivity.this);
+        mDataBaseHelper = getDBHelper();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         view = findViewById(R.id.activityLayout);
-        buildFragmentList();
+        buildFragmentList(PreferenceSetting.getControllerType(getApplicationContext()));
         setUpViews();
         if (savedInstanceState == null) {
             Log.d(TAG, "onCreate: savedInstanceState was NULL");
@@ -96,6 +108,12 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         setSupportActionBar(mToolbar);
         setToolbarSubTitle();
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
+        if (PreferenceSetting.getControllerType(HomeActivity.this).equals(TC01)) {
+            //change title from Local Program to Profiles if TC01
+            MenuItem profileMenuItem = mBottomNavigationView.getMenu().findItem(R.id.bottom_bar_local_program);
+            profileMenuItem.setTitle(R.string.profile);
+
+        }
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -115,7 +133,8 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                         return true;
 
                     case R.id.bottom_bar_local_program:
-                        switchFragment(1, TAG_FRAGMENT_LOCAL_PROGRAM);
+
+                        switchFragment(1, TAG_FRAGMENT_TEMP_PROF);
                         return true;
 
 
@@ -128,8 +147,8 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         });
     }
 
-    public LPDataBaseHandler getLPDataBaseHandler() {
-        return mLPDataBaseHandler;
+    public SQLiteOpenHelper getDataBaseHelper() {
+        return mDataBaseHelper;
     }
 
     private void setToolbarSubTitle() {
@@ -138,7 +157,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         Log.d(TAG, "setToolbarSubTitle: state of bluetooth is: " + BluetoothConnectionService.getInstance().getCurrentState());
         switch (BluetoothConnectionService.getInstance().getCurrentState()) {
             case STATE_CONNECTED:
-                mToolbar.setSubtitle("Connected to: " +
+                mToolbar.setSubtitle("Connected: " +
                         BluetoothConnectionService.getInstance().getDevice().getName());
                 break;
             case STATE_CONNECTING:
@@ -154,11 +173,20 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     /**
      * add fragments to fragment array list
      */
-    private void buildFragmentList() {
+    private void buildFragmentList(String controllerType) {
 
-        mFragmentList.add(new DisplayTemperatureFragment());
-        mFragmentList.add(new LPDownloadFragment());
-        mFragmentList.add(new LogFileListFragment());
+        if (controllerType.equals(TC01)) {
+            mFragmentList.add(new TC01DispTempFragment());
+            mFragmentList.add(new TC01ProfileDetailFragment());
+            mFragmentList.add(new LogFileListFragment());
+
+        } else {
+
+            mFragmentList.add(new DisplayTemperatureFragment());
+            mFragmentList.add(new LPDownloadFragment());
+            mFragmentList.add(new LogFileListFragment());
+        }
+
     }
 
     /**
@@ -198,6 +226,17 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         myAlertDialogFragment.show(getSupportFragmentManager(), null);
     }
 
+    private SQLiteOpenHelper getDBHelper() {
+
+        String controllerType = PreferenceSetting.getControllerType(HomeActivity.this);
+        if (controllerType.equals(TC01)) {
+            return new Tc01ProfDataBaseHelper(HomeActivity.this);
+
+        } else {
+            return new LPDataBaseHelper(HomeActivity.this);
+        }
+    }
+
     /*------------interface implemented methods--------------------------------------------------*/
 
     @Override
@@ -205,9 +244,27 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         //called by MyAlertDialogFragment if user presses Yes button on dialog
         Log.d(TAG, "stopLoggingSession: called");
         FragmentManager fragmentManager = getSupportFragmentManager();
-        DisplayTemperatureFragment displayTemperatureFragment = (DisplayTemperatureFragment) fragmentManager
+        Fragment fragment = fragmentManager
                 .findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        displayTemperatureFragment.stopLogger();
+
+        if (fragment instanceof ILogger) {
+            ILogger logger = (ILogger) fragment;
+            logger.stopLogger();
+        }
+    }
+
+    @Override
+    public void turnOffChamber() {
+        //called by MyAlertDialogFragment if user presses Yes button on dialog
+        Log.d(TAG, "turnOffChamber: called");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager
+                .findFragmentByTag(TAG_FRAGMENT_MONITOR);
+
+        if (fragment instanceof IChamberOffSwitch) {
+            IChamberOffSwitch chamberOffSwitch = (IChamberOffSwitch) fragment;
+            chamberOffSwitch.turnOffChamberSwitch();
+        }
     }
 
     @Override
@@ -218,15 +275,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         finish();
     }
 
-    @Override
-    public void turnOffChamber() {
-        //called by MyAlertDialogFragment if user presses Yes button on dialog
-        Log.d(TAG, "turnOffChamber: called");
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        DisplayTemperatureFragment displayTemperatureFragment = (DisplayTemperatureFragment) fragmentManager
-                .findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        displayTemperatureFragment.turnOffChamberSwitch();
-    }
 
     @Override
     public void deleteLogFile(String fileName) {
@@ -253,15 +301,14 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     public void downloadLP(String lpNumber) {
         //interface used to send lp number from LPDetailFrag to LPDownloadFrag
 
-        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
+        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
         lpDownloadFrag.downloadLP(lpNumber);
     }
 
     @Override
     public void downloadLP() {
-        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
+        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
         lpDownloadFrag.downloadLP();
-
     }
 
     /**
@@ -279,6 +326,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         // TODO: 11/12/2017 is following necessary? since its done in switchFragment method above
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);//this clears all fragments off backstack
+            Log.d(TAG, "setNavigationItem: to: " + position);
         }
         switch (position) {
 
@@ -299,7 +347,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: called CLOSING DB");
-        mLPDataBaseHandler.close();
+        mDataBaseHelper.close();
         super.onDestroy();
     }
 
@@ -312,8 +360,11 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
             return;
         }
 
-        DisplayTemperatureFragment tempMonitorFrag = (DisplayTemperatureFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        if (tempMonitorFrag == null) {
+        Fragment tempMonitorFrag = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_MONITOR);
+
+        if (tempMonitorFrag == null && PreferenceSetting.getControllerType(HomeActivity.this).equals(TC01)) {
+            tempMonitorFrag = new TC01DispTempFragment();
+        } else if (tempMonitorFrag == null && !PreferenceSetting.getControllerType(HomeActivity.this).equals(TC01)) {
             tempMonitorFrag = new DisplayTemperatureFragment();
         }
 
@@ -322,7 +373,10 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
             mBottomNavigationView.setSelectedItemId(R.id.bottom_bar_monitor);
 
         } else {
-            if (tempMonitorFrag.isLoggingData()) {
+            //if it is visible, then cast to logger and check that it's logging
+            ILogger logger = (ILogger) tempMonitorFrag;
+
+            if (logger.isLoggingData()) {
                 // if logging data, show alert dialog to confirm closing of app
                 showAlertDialog();
 
@@ -342,20 +396,31 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
      */
     private boolean checkIfBusy() {
 
-        ParameterFragment parameterFragment = (ParameterFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_PARAMETER);
-        if (parameterFragment != null) {
-            if (parameterFragment.isBusyDownLoading()) {
+        IBusy paramfrag = (IBusy) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_PARAMETER);
+        if (paramfrag != null) {
+            if (paramfrag.isBusy()) {
                 Snackbar.make(view, R.string.download_parameters_message, Snackbar.LENGTH_SHORT).show();
                 return true; //prevents backing out of parameter fragment until download is complete
             }
         }
+        // TODO: 3/14/2018  get rid of
 
-        LPDownloadFragment lpDownloadFragment = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
-        if (lpDownloadFragment != null) {
-            if (lpDownloadFragment.isBusyUploadingLp()) {
-                Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
-                return true; //prevents backing out of download fragment until download is complete
+//        LPDownloadFragment lpDownloadFragment = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
+//        if (lpDownloadFragment != null) {
+//            if (lpDownloadFragment.isBusyUploadingLp()) {
+//                Snackbar.make(view, R.string.lp_busy_uploading, Snackbar.LENGTH_SHORT).show();
+//                return true; //prevents backing out of download fragment until download is complete
+//            }
+//        }
+
+        IBusy fragment = (IBusy) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
+
+        if (fragment != null) {
+            if (fragment.isBusy()) {
+                Snackbar.make(view, R.string.controller_busy, Snackbar.LENGTH_SHORT).show();
+                return true; //prevents backing out of fragment thats busy uploading or downloading lp or tc01 profile
             }
+
         }
 
         LPDetailFragment lpDetailFragment = (LPDetailFragment) getSupportFragmentManager().findFragmentByTag(TAG_LP_DETAIL_FRAG);
@@ -422,5 +487,18 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         Log.d(TAG, "onStop: called");
         LocalBroadcastManager.getInstance(HomeActivity.this).unregisterReceiver(mReceiver);
         super.onStop();
+    }
+
+    @Override
+    public void sendStop() {
+
+        IStop fragment = (IStop) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
+
+        if (fragment != null) {
+
+            fragment.sendStop();
+
+        }
+
     }
 }

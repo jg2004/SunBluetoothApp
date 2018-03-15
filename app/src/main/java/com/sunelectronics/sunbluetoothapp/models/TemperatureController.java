@@ -15,6 +15,8 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_NAME
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_2_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC100_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02_NAME;
 
@@ -24,7 +26,7 @@ public abstract class TemperatureController implements Serializable {
     String ch1QueryCommand, waitQueryCommand, setQueryCommand, ch1Label, heatEnableCommand;
     String pidHQueryCommand, pidCQueryCommand, rs232EchoMessage;
     String coolEnableCommand, heatDisableCommand, coolDisableCommand;
-    String pidHCommand, pidCCommand, utlCommand;
+    String pidHCommand, pidCCommand, utlCommand, cycleNumberQuery;
     String ltlCommand, rateCommand, waitCommand, setCommand;
     String name, utlQueryCommand, ltlqueryCommand;
     private String ch1Reading, currentSetPoint;
@@ -120,6 +122,8 @@ public abstract class TemperatureController implements Serializable {
             case PC100:
             case TC02:
                 return new SingleChannelTemperatureController(type);
+            case TC01:
+                return new TC01Controller();
 
             default:
                 return null;
@@ -170,6 +174,8 @@ public abstract class TemperatureController implements Serializable {
         return coolDisableCommand;
     }
 
+
+
     public static String getName(String controllerType) {
         switch (controllerType) {
 
@@ -185,9 +191,10 @@ public abstract class TemperatureController implements Serializable {
                 return PC100_2_NAME;
             case TC02:
                 return TC02_NAME;
+            case TC01:
+                return TC01_NAME;
             default:
                 return "N/A";
-
         }
     }
 }

@@ -20,6 +20,7 @@ import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.BluetoothStartUp;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.utilities.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import static com.sunelectronics.sunbluetoothapp.activities.HomeActivity.TAG_FRAGMENT_LOGGER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_DISCOVERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_HELP_DIALOG;
 
@@ -93,7 +93,7 @@ public class IntroFragment extends Fragment implements View.OnClickListener {
 
             case R.id.buttonViewLog:
 
-                performTransaction(new LogFileListFragment(), TAG_FRAGMENT_LOGGER);
+                performTransaction(new LogFileListFragment(), Constants.TAG_FRAGMENT_LOGGER);
 
                 break;
 

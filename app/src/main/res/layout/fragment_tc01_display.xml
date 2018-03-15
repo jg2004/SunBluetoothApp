@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:layout_margin="10dp"
+                                             android:background="@drawable/border_curved_padding">
+
+
+    <TextView
+        android:id="@+id/textViewLabelCh1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/cham"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewCh1Temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/textViewLabelCh1"
+        app:layout_constraintTop_toTopOf="@+id/textViewLabelCh1"/>
+
+
+    <TextView
+        android:id="@+id/textViewWaitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/wait"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewLabelCh1"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLabelCh1"/>
+
+    <TextView
+        android:id="@+id/textViewWait"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="##:##:##"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewCh1Temp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCh1Temp"/>
+
+    <TextView
+        android:id="@+id/textViewSetLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/set"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewWaitLabel"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaitLabel"/>
+
+    <TextView
+        android:id="@+id/textViewSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="###C"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewWait"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWait"/>
+
+    <TextView
+        android:id="@+id/textViewCycleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="CYCLE:"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="@+id/textViewSetLabel"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSetLabel"/>
+
+    <TextView
+        android:id="@+id/textViewCycleNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="###"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textViewSet"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSet"/>
+
+
+    <Switch
+        android:id="@+id/switchOnOff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:checked="false"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSingleSegment"/>
+
+    <Button
+        android:id="@+id/buttonSingleSegment"
+        android:layout_width="275dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/white_rounded_button_accent"
+        android:text="SET"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCycleLabel"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp"
+        tools:layout_editor_absoluteX="20dp"
+        tools:layout_editor_absoluteY="0dp"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="435dp"
+        tools:layout_editor_absoluteX="-49dp"
+        tools:layout_editor_absoluteY="0dp"/>
+
+</android.support.constraint.ConstraintLayout>

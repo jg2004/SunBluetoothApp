@@ -8,7 +8,6 @@
         android:icon="@drawable/ic_monitor_temp"
         android:title="@string/monitor"
         app:showAsAction="ifRoom">
-
     </item>
 
     <item
@@ -16,7 +15,6 @@
         android:icon="@drawable/ic_lp_edit"
         android:title="@string/local_program"
         app:showAsAction="ifRoom">
-
     </item>
     <item
         android:id="@+id/bottom_bar_communicate"

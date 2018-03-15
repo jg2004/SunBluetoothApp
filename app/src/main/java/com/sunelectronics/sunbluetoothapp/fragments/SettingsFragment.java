@@ -10,6 +10,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
 
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -40,7 +41,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 ((ListPreference) preference).setValueIndex(0);
             }
         }
-
     }
 
     @Override
@@ -48,7 +48,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (key.equals(PREF_CONT_TYPE)) {
             Log.d(TAG, "onSharedPreferenceChanged: the controller type was changed");
-
+            ControllerStatus.init();
             Preference preference = findPreference(key);
             if (preference instanceof ListPreference) {
                 String value = ((ListPreference) preference).getEntry().toString();

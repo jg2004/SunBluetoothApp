@@ -1,12 +1,14 @@
 package com.sunelectronics.sunbluetoothapp.models;
 
+import com.sunelectronics.sunbluetoothapp.interfaces.Iid;
+
 import java.io.Serializable;
 
 /**
  * Simple POJO to store local program name, content and id assigned by database
  */
 
-public class LocalProgram implements Serializable {
+public class LocalProgram implements Serializable, Iid {
 
     private int id;
     private String name;

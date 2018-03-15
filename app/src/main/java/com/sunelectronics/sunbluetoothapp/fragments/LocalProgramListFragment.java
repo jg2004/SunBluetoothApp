@@ -1,6 +1,7 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -21,7 +22,7 @@ import android.view.ViewGroup;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
-import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
+import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHelper;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
 import com.sunelectronics.sunbluetoothapp.ui.LPRecyclerViewAdapter;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
@@ -32,7 +33,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_LP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_ALL_PROFILES;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DELETE_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOCAL_PROGRAM_LIST_FRAG_TITLE;
 
@@ -41,7 +42,7 @@ public class LocalProgramListFragment extends Fragment {
     public static final String TAG_FRAG_LP_LIST = "LP_LIST_FRAG";
     private LPRecyclerViewAdapter mLPRecyclerViewAdapter;
     private List<LocalProgram> lpList;
-    private LPDataBaseHandler mLPDataBaseHandler;
+    private LPDataBaseHelper mLPDataBaseHelper;
 
     public LocalProgramListFragment() {
     }
@@ -61,7 +62,7 @@ public class LocalProgramListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_lp_list, container, false);
 
-        lpList = mLPDataBaseHandler.getLocalPrograms();
+        lpList = mLPDataBaseHelper.getLocalPrograms();
         mLPRecyclerViewAdapter = new LPRecyclerViewAdapter(getContext(), lpList);
         setUpRecyclerView(view);
 
@@ -92,7 +93,7 @@ public class LocalProgramListFragment extends Fragment {
     private void setUpRecyclerView(View view) {
 
         RecyclerView lpRecyclerView = (RecyclerView) view.findViewById(R.id.lpRecyclerView);
-        mLPDataBaseHandler.setRecyclerView(lpRecyclerView);
+        mLPDataBaseHelper.setRecyclerView(lpRecyclerView);
         lpRecyclerView.setHasFixedSize(true);
         lpRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         lpRecyclerView.setAdapter(mLPRecyclerViewAdapter);
@@ -131,7 +132,7 @@ public class LocalProgramListFragment extends Fragment {
                 Bundle args = new Bundle();
                 args.putString(ALERT_TITLE, DELETE_MESSAGE);
                 args.putString(ALERT_MESSAGE, "Ok to delete all local programs from this device?");
-                args.putString(ALERT_TYPE, DELETE_ALL_LP);
+                args.putString(ALERT_TYPE, DELETE_ALL_PROFILES);
                 args.putInt(ALERT_ICON, R.drawable.ic_delete_black_48dp);
                 showDialog(args);
                 return true;
@@ -140,8 +141,8 @@ public class LocalProgramListFragment extends Fragment {
 
                 LocalProgram lp = new LocalProgram("sample local program", null);
                 lp.setContent(Constants.SAMPLE_LP);
-                mLPDataBaseHandler.addLocalProgramToDB(lp);
-                lpList = mLPDataBaseHandler.getLocalPrograms();
+                mLPDataBaseHelper.addLocalProgramToDB(lp);
+                lpList = mLPDataBaseHelper.getLocalPrograms();
                 mLPRecyclerViewAdapter.setLocalProgramList(lpList);
                 mLPRecyclerViewAdapter.notifyDataSetChanged();
                 getActivity().invalidateOptionsMenu();
@@ -162,13 +163,13 @@ public class LocalProgramListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach: called, context: " + context.getClass().getName());
-        mLPDataBaseHandler = ((HomeActivity) context).getLPDataBaseHandler();
-    }
+        SQLiteOpenHelper helper = ((HomeActivity) context).getDataBaseHelper();
+        mLPDataBaseHelper = (LPDataBaseHelper)helper;     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mLPDataBaseHandler.close();
+        mLPDataBaseHelper.close();
         Log.d(TAG, "onDetach: called");
     }
 
