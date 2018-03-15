@@ -28,10 +28,11 @@ import java.util.ArrayList;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_DATA;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_TITLE;
 
-
 public class TemperatureChartFragment extends Fragment {
     private static final String TAG = "TemperatureChartFragmen";
     private String mLogFileContents;
+    private LineChart mLineChart;
+    private ActionBar mSupportActionBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,15 +46,14 @@ public class TemperatureChartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
         View view = inflater.inflate(R.layout.fragment_chart, container, false);
-        LineChart lineChart = (LineChart) view.findViewById(R.id.lineChart);
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+         mLineChart = (LineChart) view.findViewById(R.id.lineChart);
+         mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         Log.d(TAG, "onCreateView: orientation is: " + getActivity().getResources().getConfiguration().orientation);
 
-        if (supportActionBar != null && getActivity().getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            supportActionBar.show();
-            supportActionBar.setTitle(CHART_TITLE);
+        if (mSupportActionBar != null && getActivity().getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            mSupportActionBar.show();
+            mSupportActionBar.setTitle(CHART_TITLE);
         }
-        populateChart(lineChart);
         return view;
     }
 
@@ -63,51 +63,46 @@ public class TemperatureChartFragment extends Fragment {
         Log.d(TAG, "onCreateView: mLogFileContents split into: " + mLogFileContentsArray.length + " lines");
         String chartTitle = mLogFileContentsArray[0];
         String[] headers = mLogFileContentsArray[1].split(",");
+        int yValuesToPlot = headers.length - 1;
+        yValuesToPlot = yValuesToPlot > 6 ? 6 : yValuesToPlot;//plot no more than 6 values since color array has only 6 values
         final String[] xValues = new String[mLogFileContentsArray.length - 2];
-        ArrayList<Entry> yChamberValues = new ArrayList<>();
-        ArrayList<Entry> yUserValues = new ArrayList<>();
-        ArrayList<Entry> ySetValues = new ArrayList<>();
+
+        // an arraylist of arraylist<Entry>
+        ArrayList<ArrayList<Entry>> yValuesArrayList = new ArrayList<>();
+
+        for (int i = 0; i < yValuesToPlot; i++) {
+            yValuesArrayList.add(new ArrayList<Entry>());
+        }
+
         for (int i = 0; i < mLogFileContentsArray.length - 2; i++) {
 
             String[] row = mLogFileContentsArray[i + 2].split(",");
             xValues[i] = row[0];
-            float chamberValue = Float.parseFloat(row[1]);
-            float userValue = Float.parseFloat(row[2]);
-            float setValue;
+            for (int j = 0; j < yValuesToPlot; j++) {
 
-            //to handle set = "none" string value, convert to 0 if string
-            try {
-                setValue = Float.parseFloat(row[3]);
-            } catch (NumberFormatException e) {
-                setValue = 0f;
+                float temp;
+                //try catch is used to catch non -numeric values such as SET=NONE
+                try {
+                    temp = Float.parseFloat(row[j + 1]);
+                } catch (NumberFormatException e) {
+                    temp = 0f;
+                }
+                yValuesArrayList.get(j).add(new Entry(i, temp));
             }
-            yChamberValues.add(new Entry(i, chamberValue));
-            yUserValues.add(new Entry(i, userValue));
-            ySetValues.add(new Entry(i, setValue));
-
         }
+
+        int[] colorArray = {Color.BLUE, Color.GREEN, Color.BLACK, Color.CYAN, Color.DKGRAY, Color.MAGENTA};
         Log.d(TAG, "onCreateView: size of xValues: " + xValues.length);
-
-        LineDataSet lineDataSet1 = new LineDataSet(yChamberValues, headers[1]);
-        lineDataSet1.setDrawCircles(false);
-        lineDataSet1.setColor(Color.BLUE);
-        lineDataSet1.setDrawValues(false);
-
-        LineDataSet lineDataSet2 = new LineDataSet(yUserValues, headers[2]);
-        lineDataSet2.setDrawCircles(false);
-        lineDataSet2.setColor(Color.GREEN);
-        lineDataSet2.setDrawValues(false);
-
-
-        LineDataSet lineDataSet3 = new LineDataSet(ySetValues, headers[3]);
-        lineDataSet3.setDrawCircles(false);
-        lineDataSet3.setColor(Color.BLACK);
-        lineDataSet3.setDrawValues(false);
-
+        LineDataSet[] lineDataSetArray = new LineDataSet[yValuesToPlot];
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(lineDataSet1);
-        dataSets.add(lineDataSet2);
-        dataSets.add(lineDataSet3);
+
+        for (int i = 0; i < yValuesToPlot; i++) {
+            lineDataSetArray[i] = new LineDataSet(yValuesArrayList.get(i), headers[i + 1]);
+            lineDataSetArray[i].setDrawCircles(false);
+            lineDataSetArray[i].setDrawValues(false);
+            lineDataSetArray[i].setColor(colorArray[i]);
+            dataSets.add(lineDataSetArray[i]);
+        }
 
         lineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
             @Override
@@ -124,5 +119,18 @@ public class TemperatureChartFragment extends Fragment {
         lineChart.setDescription(description);
         lineChart.setData(new LineData(dataSets));
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        populateChart(mLineChart);
+
+    }
+
+    @Override
+    public void onStop() {
+        mSupportActionBar.hide();
+        super.onStop();
     }
 }

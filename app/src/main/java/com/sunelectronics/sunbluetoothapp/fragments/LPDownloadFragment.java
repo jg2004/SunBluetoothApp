@@ -21,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -32,8 +31,9 @@ import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.database.LPDataBaseHandler;
-import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
+import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
 import com.sunelectronics.sunbluetoothapp.models.LocalProgram;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
@@ -47,31 +47,33 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.POWER_ON_DELAY_MS;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SEND_STOP;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC02;
 
 public class LPDownloadFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "LPDownloadFrag";
     private static final int UPLOAD_DELAY_MS = 500;
-    private static final int GET_STATUS_DELAY_MS = 2000;
+    private static final int GET_STATUS_DELAY_MS = 3000;
     private EditText mLpName, mLpContent;
     private LocalProgram mLocalProgram;
     private Handler mLpUploadHandler, mLpInitializeLPHandler, mGetChamberStatusHandler;
     private Runnable mLpUploadRunnable, mGetChamberStatusRunnable;
     private Context mContext;
     private Spinner mSpinner;
-    private String mSpinnerSelectionNumber, mLpname;
+    private String mSpinnerSelectionNumber, mLpname, mControllerType;
+    private String mLpContentHint;
     private ProgressBar mProgressBar;
     private BroadcastReceiver mLpBroadcastReceiver;
     private LPDataBaseHandler mLPDataBaseHandler;
-    private ChamberStatus mChamberStatus;
     private BottomNavigationListenter mBottomNavigationListener;
-    private boolean mIsLPRunning;
     private boolean mIsBusyUploadingLp;
     private View view;
 
     public interface DownloadPInterface {
         //interface implemented by HomeActivity to send LP number from LPDetailFragment to LPDownloadFragment
         void downloadLP(String lpNumber);
+
+        void downloadLP();
     }
 
     public interface BottomNavigationListenter {
@@ -87,6 +89,12 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mControllerType = PreferenceSetting.getControllerType(getContext());
+        if (mControllerType.equals(TC02)){
+            mLpContentHint = getString(R.string.tc02_lp_download_hint);
+        } else{
+            mLpContentHint = getString(R.string.lp_download_hint);
+        }
     }
 
     @Nullable
@@ -185,6 +193,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         Log.d(TAG, "initializeViews: setting lp name to " + mLpname);
         mLpName.setText(mLpname);
         mLpContent = (EditText) view.findViewById(R.id.lpContent);
+        mLpContent.setHint(mLpContentHint);
         Log.d(TAG, "initializeViews: clearing lp content");
 
         if (mLocalProgram == null) {
@@ -195,6 +204,10 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         }
 
         mSpinner = (Spinner) view.findViewById(R.id.spinner);
+        if (mControllerType.equals(TC02)) {
+            mSpinner.setVisibility(View.INVISIBLE);
+        }
+
         try {
 
             Log.d(TAG, "initializeViews: inside try block, setting spinner to " + mSpinnerSelectionNumber);
@@ -231,7 +244,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsLPRunning) {
+                if (ControllerStatus.getInstance(getContext()).isLPRunning()) {
                     Log.d(TAG, "onClick: download button pressed. Cannot Download while LP is running");
                     Snackbar.make(view, "Cannot Download while LP is running", Snackbar.LENGTH_SHORT).show();
                     return;
@@ -244,7 +257,12 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 //stop the getStatushandler before downloading;
                 Log.d(TAG, "onClick: removing chamber status callback");
                 mGetChamberStatusHandler.removeCallbacks(mGetChamberStatusRunnable);
-                downloadLP(lpNumber);
+                BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+                if (mControllerType.equals(TC02)) {
+                    downloadLP();
+                } else {
+                    downloadLP(lpNumber);
+                }
                 mGetChamberStatusHandler.postDelayed(mGetChamberStatusRunnable, GET_STATUS_DELAY_MS);
                 break;
 
@@ -253,7 +271,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsLPRunning) {
+                if (ControllerStatus.getInstance(getContext()).isLPRunning()) {
                     Snackbar.make(view, "LP is already running", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -262,7 +280,12 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     return;
                 }
                 mGetChamberStatusHandler.removeCallbacks(mGetChamberStatusRunnable);
-                BluetoothConnectionService.getInstance().write("RUN" + lpNumber);
+                if (mControllerType.equals(TC02)) {
+                    BluetoothConnectionService.getInstance().write("RUN");
+
+                } else {
+                    BluetoothConnectionService.getInstance().write("RUN" + lpNumber);
+                }
                 break;
 
             case R.id.stopLPButton:
@@ -288,7 +311,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                     Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (mIsLPRunning) {
+                if (ControllerStatus.getInstance(getContext()).isLPRunning()) {
                     Log.d(TAG, "LP is running. Cannot upload while LP is running");
                     Snackbar.make(view, "Cannot Upload while LP is running", Snackbar.LENGTH_SHORT).show();
                     return;
@@ -299,11 +322,15 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 }
                 Log.d(TAG, "onClick: removing chamber status callback");
                 mGetChamberStatusHandler.removeCallbacks(mGetChamberStatusRunnable);
-                if (!mChamberStatus.isPowerOn()) {
+                if (!ControllerStatus.getInstance(getContext()).isPowerOn()) {
                     //turn on chamber
                     BluetoothConnectionService.getInstance().write(ON);
                 }
-                uploadLocalProgram(lpNumber);
+                if (mControllerType.equals(TC02)) {
+                    uploadLocalProgram();
+                } else {
+                    uploadLocalProgram(lpNumber);
+                }
                 break;
 
             case R.id.editButton:
@@ -329,6 +356,36 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 break;
         }
     }
+
+    private void uploadLocalProgram() {
+        String lp = mLpContent.getText().toString();
+        if (lp.isEmpty()) {
+            Snackbar.make(view, "Enter an LP to upload", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        Log.d(TAG, "lp content is: " + lp);
+        String[] lpArray = lp.split("\n");
+        Log.d(TAG, "lpArray size is " + lpArray.length);
+
+        mLpInitializeLPHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "run: deleting LP ");
+                BluetoothConnectionService.getInstance().write("DEL");
+            }
+        }, POWER_ON_DELAY_MS);
+        mLpInitializeLPHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                BluetoothConnectionService.getInstance().write("STORE");
+            }
+        }, POWER_ON_DELAY_MS + 1000);
+
+        mLpUploadRunnable = new LpUploadRunnable(lpArray);
+        mLpUploadHandler.postDelayed(mLpUploadRunnable, POWER_ON_DELAY_MS + 2000);
+    }
+
 
     private void uploadLocalProgram(final String lpNumber) {
         String lp = mLpContent.getText().toString();
@@ -359,6 +416,11 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         mLpUploadHandler.postDelayed(mLpUploadRunnable, POWER_ON_DELAY_MS + 2000);
     }
 
+    /**
+     * method used by controller's that aren't TC02
+     *
+     * @param lpNumber represents the Local program storage number 0-9
+     */
     public void downloadLP(String lpNumber) {
 
         Log.d(TAG, "downloadLP: called");
@@ -370,6 +432,19 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         mSpinnerSelectionNumber = lpNumber;
         mSpinner.setSelection(Integer.parseInt(mSpinnerSelectionNumber));
         BluetoothConnectionService.getInstance().write("LIST" + lpNumber);
+    }
+
+    /**
+     * downloadLP method used for TC02
+     */
+
+    public void downloadLP() {
+        Log.d(TAG, "downloadLP for TC02: called");
+        mLpname = "Local Program";
+        mLpName.setText(mLpname);
+        mLpContent.setHint("");
+        mLpContent.setText("");
+        BluetoothConnectionService.getInstance().write("LIST");
     }
 
     //------the addLptoDb method and validate input are methods used in LPCreateEditFrag------------
@@ -387,7 +462,6 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         //if valid input create lp and store to database
         String lpName = mLpName.getText().toString();
         String lpContent = mLpContent.getText().toString();
-
         LocalProgram lp = new LocalProgram(lpName, lpContent);
         mLPDataBaseHandler.addLocalProgramToDB(lp);
     }
@@ -420,9 +494,6 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
             mProgressBar.setProgress(counter);
             mProgressBar.setMax(lpArray.length);
             mProgressBar.setVisibility(View.VISIBLE);
-            //disable window...not implementing this anymore
-            //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            //WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             mIsBusyUploadingLp = true;
         }
 
@@ -442,8 +513,7 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 invisible and start getStatus runnable back up*/
                 mLpUploadHandler.removeCallbacks(this);
                 mProgressBar.setVisibility(View.INVISIBLE);
-                mGetChamberStatusHandler.post(mGetChamberStatusRunnable);
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                mGetChamberStatusHandler.postDelayed(mGetChamberStatusRunnable, GET_STATUS_DELAY_MS);
                 mIsBusyUploadingLp = false;
                 Toast.makeText(mContext, "Upload complete", Toast.LENGTH_LONG).show();
             }
@@ -464,12 +534,11 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
         super.onStart();
         Log.d(TAG, "onStart: called, creating chamber status object, starting getStatus runnable and registering broadcast receiver");
 
-        //this kicks off the runnable to get the STATUS? string every 5 seconds. Give it a delay
+        //this kicks off the runnable to get the STATUS? string every 2 seconds. Give it a delay
         //to allow downloadLP to retrieve lp before polling with STATUS command
 
-        mGetChamberStatusHandler.postDelayed(mGetChamberStatusRunnable, GET_STATUS_DELAY_MS);
+        mGetChamberStatusHandler.postDelayed(mGetChamberStatusRunnable, 500);
 
-        mChamberStatus = new ChamberStatus();
         mLpBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -477,9 +546,25 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                 String response = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
                 Log.d(TAG, "onReceive: called with action: " + intent.getAction());
                 Log.d(TAG, "Command sent:  " + commandSent + ", response received was: " + response);
+                if (response.equals("?")) {
+                    Log.d(TAG, "onReceive: received a command error when " + commandSent + " was sent");
+                    Snackbar.make(view, "INVALID COMMAND SENT: " + commandSent, Snackbar.LENGTH_LONG).show();
+                    if (mIsBusyUploadingLp) {
+                        //exit EDIT MODE by sending the  "STOP" commmand
+                        Toast.makeText(mContext, "Upload cancelled", Toast.LENGTH_LONG).show();
+                        BluetoothConnectionService.getInstance().write("STOP");
+                        mLpUploadHandler.removeCallbacks(mLpUploadRunnable);
+                        mIsBusyUploadingLp = false;
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                    return;
+                }
 
                 if (commandSent.contains("LIST") || commandSent.contains("NO COMMAND SENT")) {
 
+                    if (response.startsWith("Y")) return; //just ignore status response as this can
+                    //happen when starting up this fragment from DispTempFragment which is polling with
+                    //STATUS? command and will cause the undesired result of the status string to be displayed
                     if (mLpContent.getText().toString().isEmpty()) {
                         mLpContent.setText(mLpContent.getText().toString() + response);
 
@@ -493,15 +578,14 @@ public class LPDownloadFragment extends Fragment implements View.OnClickListener
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                //automatically switch back to  DispTemp Fragment
                                 mBottomNavigationListener.setNavigationItem(0);//implemented in HomeActivity
                             }
                         }, 2000);
                     }
                 } else if (commandSent.equals(STATUS)) {
                     Log.d(TAG, "setting status of chamber status object");
-                    mChamberStatus.setStatusMessages(response);
-                    //this field is checked to see if chamber in LP run mode before downloading and uploading an LP
-                    mIsLPRunning = mChamberStatus.isLPRunning();
+                    ControllerStatus.getInstance(getContext()).setStatusMessages(response);
                 }
             }
         };

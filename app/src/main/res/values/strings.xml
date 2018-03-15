@@ -23,7 +23,10 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="delete_lp">Delete LP</string>
     <string name="lp_download_hint"> Select a local program location (0-9) and press the download button to
-        download the local program from chamber \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
+        download the local program from controller to this device \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
+
+    <string name="tc02_lp_download_hint">Press the download button to
+        download the local program from TC02 controller to this device \n\n-  or select SAVED LP\'s from the menu to display a list of saved Local Programs on this device.</string>
     <string name="status">STATUS</string>
     <string name="status_unavailable">Status unavailable</string>
     <string name="pound_sign">###</string>
@@ -57,11 +60,41 @@
     <string name="share_logging_file">Share temperature logging file…</string>
     <string name="exit_help">Exit help section</string>
     <string name="loading_file_message">Loading file…</string>
-    <string name="jerry"> jerry </string>
     <string name="monitor">Monitor</string>
     <string name="local_program">Local Program</string>
     <string name="log_files">Log Files</string>
     <string name="no_logging_files">No Temperature Logging Files</string>
+    <string name="def_cont_type">ec1x</string>
+    <string name="pref_cont_type">pref_controller_type</string>
+    <string name="help">Help</string>
+    <string name="settings">Settings</string>
+    <string name="controller_mode_0_desc">Control to CH1 probe</string>
+    <string name="controller_mode_1_desc">Control to avg of CH1 and CH2 probes</string>
+    <string name="controller_mode_2_desc">Slowly force CH2 to set</string>
+    <string name="controller_mode_3_desc">Control to CH2 probe</string>
+    <string name="controller_mode_4_desc">Control to avg of CH1 and CH2, then slowly force CH2 to set</string>
+    <string name="bluetooth_connection_lost">Bluetooth Connection Lost</string>
+    <string name="reconnect">RECONNECT</string>
+    <string name="ec1x_rs_echo_message">RS232 ECHO is ON. Please turn off ECHO by entering SDEF MENU and setting RS Char Echo to N</string>
+    <string name="no_resp_message">No response. Verify RS handshaking off, baud rate = 9600</string>
+
+    <string-array name="controller_types">
+        <item>EC1x</item>
+        <item>EC127</item>
+        <item>PC100</item>
+        <item>TC02</item>
+        <item>PC1000</item>
+        <item>PC100–2</item>
+
+    </string-array>
+    <array name="cont_type_values">
+        <item>ec1x</item>
+        <item>ec127</item>
+        <item>pc100</item>
+        <item>tc02</item>
+        <item>pc1000</item>
+        <item>pc100_2</item>
+    </array>
 
     <string-array name="lp_dropdown_array">
         <item>0</item>

@@ -230,6 +230,7 @@ public class LogFileListFragment extends ListFragment {
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart: ");
         super.onStart();
         mSupportActionBar.show();
     }

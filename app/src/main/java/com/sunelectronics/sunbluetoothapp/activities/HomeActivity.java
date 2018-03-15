@@ -84,6 +84,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         }
     }
 
+
     //-------------------------------private methods----------------------------------------------
 
     /**
@@ -95,7 +96,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         setSupportActionBar(mToolbar);
         setToolbarSubTitle();
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
-
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -104,7 +104,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                 if (checkIfBusy()) {
                     return false; // so menu item is NOT selected
                 }
-
 
                 Log.d(TAG, "onNavigationItemSelected: called");
                 int itemId = item.getItemId();
@@ -258,6 +257,13 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         lpDownloadFrag.downloadLP(lpNumber);
     }
 
+    @Override
+    public void downloadLP() {
+        LPDownloadFragment lpDownloadFrag = (LPDownloadFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOCAL_PROGRAM);
+        lpDownloadFrag.downloadLP();
+
+    }
+
     /**
      * @param position and int representing the bottom navigation view position
      *                 this method can be called from any fragment to switch to another fragment
@@ -287,7 +293,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         return true;
     }
 
@@ -295,11 +300,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: called CLOSING DB");
         mLPDataBaseHandler.close();
-        //set mIsLogging from DisplayTempFrag back to false
-
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //DisplayTemperatureFragment frag = (DisplayTemperatureFragment) fragmentManager.findFragmentByTag(TAG_FRAGMENT_MONITOR);
-        //frag.closeLoggingFile();
         super.onDestroy();
     }
 
@@ -368,7 +368,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         return false;
     }
 
-
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart: called");
@@ -386,8 +385,8 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                     case CONNECTION_LOST:
                         //close out activity and start BluetoothStartup activity
                         mToolbar.setSubtitle(R.string.connection_lost);
-                        Snackbar snackbar = Snackbar.make(view, "Bluetooth Connection Lost", Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction("RECONNECT", new View.OnClickListener() {
+                        Snackbar snackbar = Snackbar.make(view, R.string.bluetooth_connection_lost, Snackbar.LENGTH_INDEFINITE);
+                        snackbar.setAction(R.string.reconnect, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 final Intent intent = new Intent(HomeActivity.this, BluetoothStartUp.class);
@@ -401,7 +400,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
                                         Log.d(TAG, "run: starting Bluetoothstartup activity with .25 sec delay");
                                     }
                                 }, 500);
-
 
                             }
                         }).show();
@@ -425,6 +423,4 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         LocalBroadcastManager.getInstance(HomeActivity.this).unregisterReceiver(mReceiver);
         super.onStop();
     }
-
-
 }

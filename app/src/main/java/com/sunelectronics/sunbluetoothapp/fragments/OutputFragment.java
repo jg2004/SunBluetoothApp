@@ -23,6 +23,8 @@ import android.widget.ToggleButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import java.util.Locale;
 
@@ -30,9 +32,10 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_0;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_1;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_2;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ANALOG_3;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC127;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EC1X;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT0_COMMAND_PREFIX;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT3_COMMAND_PREFIX;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUTPUT_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT_COMMAND_OFF;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.OUT_COMMAND_ON;
 
@@ -45,22 +48,43 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
     private Context mContext;
     private StringBuilder mStringBuilderMessage;
     private View view;
+    private String mOutput2Text, mOutput4Text, mControllerType;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: called");
         mStringBuilderMessage = new StringBuilder();
+        mControllerType = PreferenceSetting.getControllerType(getContext());
+        initializeButtonText(mControllerType);
+    }
+
+    private void initializeButtonText(String controllerType) {
+
+        if (controllerType.equals(EC1X)) {
+            mOutput2Text = "OUTPUT 2 (AB) ON";
+            mOutput4Text = "OUTPUT 4 (N2 GP) ON";
+        } else {
+
+            mOutput2Text = "OUTPUT 2 ON";
+            mOutput4Text = "OUTPUT 4 ON";
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
-        view = inflater.inflate(R.layout.fragment_outputs, container, false);
+        if (mControllerType.equals(EC127)) {
+            view = inflater.inflate(R.layout.fragment_outputs_ec127, container, false);
+
+        } else {
+            view = inflater.inflate(R.layout.fragment_outputs, container, false);
+
+        }
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(OUTPUT_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s OUTPUTS", TemperatureController.getName(mControllerType)));
             supportActionBar.show();
         }
         intializeViews(view);
@@ -77,23 +101,11 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         ToggleButton toggleButtonOutput2 = (ToggleButton) view.findViewById(R.id.buttonOutput2);
         toggleButtonOutput2.setOnCheckedChangeListener(this);
         toggleButtonOutput2.setOnTouchListener(this);
+        toggleButtonOutput2.setText(mOutput2Text);
 
         ToggleButton toggleButtonOutput3 = (ToggleButton) view.findViewById(R.id.buttonOutput3);
         toggleButtonOutput3.setOnCheckedChangeListener(this);
         toggleButtonOutput3.setOnTouchListener(this);
-
-        ToggleButton toggleButtonOutput4 = (ToggleButton) view.findViewById(R.id.buttonOutput4);
-        toggleButtonOutput4.setOnCheckedChangeListener(this);
-        toggleButtonOutput4.setOnTouchListener(this);
-
-        ToggleButton toggleButtonOutput5 = (ToggleButton) view.findViewById(R.id.buttonOutput5);
-        toggleButtonOutput5.setOnCheckedChangeListener(this);
-        toggleButtonOutput5.setOnTouchListener(this);
-
-        ToggleButton toggleButtonOutput6 = (ToggleButton) view.findViewById(R.id.buttonOutput6);
-        toggleButtonOutput6.setOnCheckedChangeListener(this);
-        toggleButtonOutput6.setOnTouchListener(this);
-
         SeekBar seekBar0 = (SeekBar) view.findViewById(R.id.seekbarChannel0);
         seekBar0.setOnSeekBarChangeListener(this);
         mAnalogChannel0TextView.setText(String.valueOf(seekBar0.getProgress()));
@@ -109,6 +121,22 @@ public class OutputFragment extends Fragment implements CompoundButton.OnChecked
         SeekBar seekBar3 = (SeekBar) view.findViewById(R.id.seekbarChannel3);
         seekBar3.setOnSeekBarChangeListener(this);
         mAnalogChannel3TextView.setText(String.valueOf(seekBar3.getProgress()));
+
+        if (mControllerType.equals(EC127)) return;
+        //don't instantiate if EC127 chamber
+        ToggleButton toggleButtonOutput4 = (ToggleButton) view.findViewById(R.id.buttonOutput4);
+        toggleButtonOutput4.setOnCheckedChangeListener(this);
+        toggleButtonOutput4.setOnTouchListener(this);
+        toggleButtonOutput4.setText(mOutput4Text);
+
+
+        ToggleButton toggleButtonOutput5 = (ToggleButton) view.findViewById(R.id.buttonOutput5);
+        toggleButtonOutput5.setOnCheckedChangeListener(this);
+        toggleButtonOutput5.setOnTouchListener(this);
+
+        ToggleButton toggleButtonOutput6 = (ToggleButton) view.findViewById(R.id.buttonOutput6);
+        toggleButtonOutput6.setOnCheckedChangeListener(this);
+        toggleButtonOutput6.setOnTouchListener(this);
     }
 
     @Override

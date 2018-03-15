@@ -14,6 +14,10 @@ import android.widget.Button;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DIALOG_TITLE;
 
 
 public class SingleSegDialogFragment extends DialogFragment {
@@ -21,6 +25,7 @@ public class SingleSegDialogFragment extends DialogFragment {
     public static final int DELAY = 1000;
     private TextInputEditText mTextInputEditTextRate, mTextInputEditTextWait, mTextInputEditTextSet;
     private Handler mHandler = new Handler();
+    private TemperatureController mTemperatureController;
 
 
     public SingleSegDialogFragment() {
@@ -36,12 +41,13 @@ public class SingleSegDialogFragment extends DialogFragment {
         }
     }
 
-    public static SingleSegDialogFragment newInstance(String title) {
+    public static SingleSegDialogFragment newInstance(String title, TemperatureController controller) {
 
         Log.d(TAG, "newInstance: creating instance of SignleSegDialogFragment");
         SingleSegDialogFragment fragment = new SingleSegDialogFragment();
         Bundle args = new Bundle();
-        args.putString("TITLE", title);
+        args.putString(DIALOG_TITLE, title);
+        args.putSerializable(CONTROLLER,controller);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,8 +65,9 @@ public class SingleSegDialogFragment extends DialogFragment {
         Log.d(TAG, "onViewCreated: called");
         super.onViewCreated(view, savedInstanceState);
         Bundle args = getArguments();
-        String title = args.getString("TITLE", "DEFAULT TITLE");
+        String title = args.getString(DIALOG_TITLE, "DEFAULT TITLE");
         getDialog().setTitle(title);
+        mTemperatureController = (TemperatureController) args.getSerializable(CONTROLLER);
         initializeViews(view);
     }
 
@@ -87,7 +94,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                     public void run() {
                         if (!mTextInputEditTextRate.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the rate...");
-                            String rateCommand = "RATE=" + mTextInputEditTextRate.getText().toString();
+                            String rateCommand = mTemperatureController.getRateCommand() + mTextInputEditTextRate.getText().toString();
                             BluetoothConnectionService.getInstance().write(rateCommand);
                         }
                     }
@@ -98,7 +105,7 @@ public class SingleSegDialogFragment extends DialogFragment {
 
                         if (!mTextInputEditTextWait.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the wait...");
-                            String waitCommand = "WAIT=" + mTextInputEditTextWait.getText().toString();
+                            String waitCommand = mTemperatureController.getWaitCommand() + mTextInputEditTextWait.getText().toString();
                             BluetoothConnectionService.getInstance().write(waitCommand);
                         }
 
@@ -109,7 +116,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                     public void run() {
                         if (!mTextInputEditTextSet.getText().toString().isEmpty()) {
                             Log.d(TAG, "setting the set...");
-                            String setCommand = "SET=" + mTextInputEditTextSet.getText().toString();
+                            String setCommand = mTemperatureController.getSetCommand() + mTextInputEditTextSet.getText().toString();
                             BluetoothConnectionService.getInstance().write(setCommand);
                         }
 

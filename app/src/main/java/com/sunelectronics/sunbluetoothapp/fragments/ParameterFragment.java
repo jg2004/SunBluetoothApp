@@ -28,13 +28,19 @@ import android.widget.Toast;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LTL_QUERY;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PARAMETER_FRAG_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_LTL_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDC_COMMAND;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDC_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_PIDH_QUERY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PC1000_UTL_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDC_QUERY;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PIDH_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PWMP_COMMAND;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.PWMP_QUERY;
@@ -52,6 +58,8 @@ public class ParameterFragment extends Fragment {
     private Context mContext;
     private View view;
     private boolean isBusyDownLoading;
+    private String mControllerType;
+    private TemperatureController mTemperatureController;
     private CountDownTimer mTimeOutTimer = new CountDownTimer(13000, 1000) {
         //Timer used to determine if getting controller parameters has taken too long
         @Override
@@ -71,6 +79,23 @@ public class ParameterFragment extends Fragment {
         }
     };
 
+    public static ParameterFragment newInstance(TemperatureController controller) {
+
+        Bundle args = new Bundle();
+        args.putSerializable(CONTROLLER, controller);
+        ParameterFragment fragment = new ParameterFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mControllerType = PreferenceSetting.getControllerType(getContext());
+        mTemperatureController = (TemperatureController) getArguments().getSerializable(CONTROLLER);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,7 +103,7 @@ public class ParameterFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_parameters, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(PARAMETER_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s PARAMETERS", TemperatureController.getName(mControllerType)));
             supportActionBar.show();
         }
         initializeViews(view);
@@ -234,7 +259,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDC query");
-                BluetoothConnectionService.getInstance().write(PIDC_QUERY);
+                BluetoothConnectionService.getInstance().write(mTemperatureController.getPidCQueryCommand());
             }
         }, DELAY * 8);
     }
@@ -244,7 +269,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending PIDH query");
-                BluetoothConnectionService.getInstance().write(PIDH_QUERY);
+                BluetoothConnectionService.getInstance().write(mTemperatureController.getPidHQueryCommand());
             }
         }, DELAY * 4);
     }
@@ -254,7 +279,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending LTL query");
-                BluetoothConnectionService.getInstance().write(LTL_QUERY);
+                BluetoothConnectionService.getInstance().write(mTemperatureController.getLtlqueryCommand());
             }
         }, DELAY * 3);
     }
@@ -264,7 +289,7 @@ public class ParameterFragment extends Fragment {
             @Override
             public void run() {
                 Log.d(TAG, "run: sending UTL query");
-                BluetoothConnectionService.getInstance().write(UTL_QUERY);
+                BluetoothConnectionService.getInstance().write(mTemperatureController.getUtlQueryCommand());
             }
         }, DELAY * 2);
     }
@@ -305,7 +330,7 @@ public class ParameterFragment extends Fragment {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run: sending UTL command " + LTL_COMMAND + mLtl.getText().toString());
+                Log.d(TAG, "run: sending UTL command " + mTemperatureController.getLtlCommand() + mLtl.getText().toString());
                 BluetoothConnectionService.getInstance().write(LTL_COMMAND + mLtl.getText().toString());
             }
         }, DELAY * 3);
@@ -315,7 +340,7 @@ public class ParameterFragment extends Fragment {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run: sending UTL command " + UTL_COMMAND + mUtl.getText().toString());
+                Log.d(TAG, "run: sending UTL command " + mTemperatureController.getUtlCommand() + mUtl.getText().toString());
                 BluetoothConnectionService.getInstance().write(UTL_COMMAND + mUtl.getText().toString());
             }
         }, DELAY * 2);
@@ -335,7 +360,7 @@ public class ParameterFragment extends Fragment {
     private String getPidHCommand() {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(PIDH_COMMAND).append(mPH.getText().toString()).append(",").append(mIH.getText().toString())
+        sb.append(mTemperatureController.getPidHCommand()).append(mPH.getText().toString()).append(",").append(mIH.getText().toString())
                 .append(",").append(mDH.getText().toString());
         return sb.toString();
     }
@@ -343,7 +368,7 @@ public class ParameterFragment extends Fragment {
     private String getPidCCommand() {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(PIDC_COMMAND).append(mPC.getText().toString()).append(",").append(mIC.getText().toString())
+        sb.append(mTemperatureController.getPidCCommand()).append(mPC.getText().toString()).append(",").append(mIC.getText().toString())
                 .append(",").append(mDC.getText().toString());
         return sb.toString();
     }
@@ -369,7 +394,7 @@ public class ParameterFragment extends Fragment {
                 String response = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
                 Log.d(TAG, "onReceive: called, command sent: " + commandSent + " response received: " + response);
 
-                if (commandSent.contains(PIDC_COMMAND)) {
+                if (commandSent.contains(PIDC_COMMAND) || commandSent.contains(PC1000_PIDC_COMMAND)) {
                     Log.d(TAG, "last set command was sent");
                     mProgressBarLayout.setVisibility(View.INVISIBLE);
                     makeLayoutsVisible();
@@ -377,6 +402,7 @@ public class ParameterFragment extends Fragment {
                 switch (commandSent) {
 
                     case PIDH_QUERY:
+                    case PC1000_PIDH_QUERY:
 
                         Log.d(TAG, "Inside PIDH_QUERY case, response: " + response);
                         mPH.setText(response);
@@ -384,6 +410,7 @@ public class ParameterFragment extends Fragment {
                         break;
 
                     case PIDC_QUERY:
+                    case PC1000_PIDC_QUERY:
 
                         Log.d(TAG, "Inside PIDC_QUERY case, response: " + response);
                         mPC.setText(response);
@@ -391,10 +418,12 @@ public class ParameterFragment extends Fragment {
                         break;
 
                     case UTL_QUERY:
+                    case PC1000_UTL_QUERY:
                         mUtl.setText(response);
                         break;
 
                     case LTL_QUERY:
+                    case PC1000_LTL_QUERY:
                         mLtl.setText(response);
                         break;
 

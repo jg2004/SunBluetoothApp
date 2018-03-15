@@ -23,14 +23,15 @@ import android.widget.TextView;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
-import com.sunelectronics.sunbluetoothapp.models.ChamberStatus;
+import com.sunelectronics.sunbluetoothapp.models.ControllerStatus;
+import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.BKPNTC;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHAMBER_STATUS_FRAG_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.STATUS;
 
-public class ChamberStatusFragment extends Fragment {
+public class ControllerStatusFragment extends Fragment {
 
     private TextView mLprunningTv, mWaitingAtBreakPointTv, mCycleNumberTv, mTimeOutLedTv;
     private TextView mChamberWaitingToTimeOutTv, mChamberNotRampingTv, mChamberValidSetPointTv;
@@ -42,22 +43,23 @@ public class ChamberStatusFragment extends Fragment {
     private Context mContext;
     private Runnable mStatusRunnable, mGetCycleRunnable, mGetBreakPointRunnable;
     private BroadcastReceiver mStatusBroadcastReceiver;
-    private ChamberStatus mChamberStatus;
+    private ControllerStatus mControllerStatus;
     private String mCycleVariable;
     private static final int GET_STATUS_MESSAGE_DELAY = 3000;
     private boolean mSentBKPNTCommand;
-    private static final String TAG = "ChamberStatusFragment";
+    private static final String TAG = "ContStatusFragment";
+    private String mControllerType;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView: called");
-
+        mControllerType = PreferenceSetting.getControllerType(getContext());
         View view = inflater.inflate(R.layout.fragment_chamber_status, container, false);
         ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle(CHAMBER_STATUS_FRAG_TITLE);
+            supportActionBar.setTitle(String.format("%s STATUS", TemperatureController.getName(mControllerType)));
             supportActionBar.show();
         }
         initializeViews(view);
@@ -103,7 +105,7 @@ public class ChamberStatusFragment extends Fragment {
         super.onAttach(context);
         mContext = context;
         Log.d(TAG, "onAttach: called, creating a runnable and chamberStatus object");
-        mChamberStatus = new ChamberStatus();
+        mControllerStatus = ControllerStatus.getInstance(getContext());
         mStatusRunnable = new Runnable() {
             @Override
             public void run() {
@@ -160,38 +162,38 @@ public class ChamberStatusFragment extends Fragment {
 
                 if (commandSent.equals(STATUS)) {
                     Log.d(TAG, "STATUS command sent. Setting status inside chamberStatus object to: " + response);
-                    mChamberStatus.setStatusMessages(response);
+                    mControllerStatus.setStatusMessages(response);
 
-                    if (mChamberStatus.isLPRunning()) {
+                    if (mControllerStatus.isLPRunning()) {
                         mCycleLayout.setVisibility(View.VISIBLE);
                         mHandler.post(mGetCycleRunnable);
                     } else {
                         mCycleLayout.setVisibility(View.INVISIBLE);
                         mHandler.removeCallbacks(mGetCycleRunnable);
                     }
-                    if (mChamberStatus.isWaitingAtBreakPoint() && !mSentBKPNTCommand) {
+                    if (mControllerStatus.isWaitingAtBreakPoint() && !mSentBKPNTCommand) {
                         //the mSentBKPNTCommand is a flag used to send BKPNT? command once as there
                         //is a bug that clears this value to 0 after first read. So when subsequent
                         // reads are performed, the value 0 is read. So send just once!!!
                         mHandler.postDelayed(mGetBreakPointRunnable, 1000);
                         mSentBKPNTCommand = true;
-                    } else if (mChamberStatus.isWaitingAtBreakPoint() && mSentBKPNTCommand) {
+                    } else if (mControllerStatus.isWaitingAtBreakPoint() && mSentBKPNTCommand) {
                         //do nothing at all if BKPNT? was sent once
 
                     } else {
                         //otherwise if not waiting at breakpoint, set BKPNTC button to invisible
                         // and reset the text view and the mSentBKPNTflag
                         mBreakPointContinueImageButton.setVisibility(View.INVISIBLE);
-                        mWaitingAtBreakPointTv.setText(mChamberStatus.getWaitingAtBreakPointStatusMessage());
+                        mWaitingAtBreakPointTv.setText(mControllerStatus.getWaitingAtBreakPointStatusMessage());
                         mSentBKPNTCommand = false;
                     }
-                    //get status messages from status object mChamberStatus and set to appropriate textView
-                    mLprunningTv.setText(mChamberStatus.getLpRunningStatusMessage());
-                    mTimeOutLedTv.setText(mChamberStatus.getTimeoutStatusMessage());
-                    mChamberWaitingToTimeOutTv.setText(mChamberStatus.getWaitingForTimeOutStatusMessage());
-                    mChamberNotRampingTv.setText(mChamberStatus.getCurrentlyRampingStatusMessage());
-                    mChamberValidSetPointTv.setText(mChamberStatus.getValidSetStatusMessage());
-                    mChamberPoweredOnTv.setText(mChamberStatus.getChamberIsOnMessage());
+                    //get status messages from status object mControllerStatus and set to appropriate textView
+                    mLprunningTv.setText(mControllerStatus.getLpRunningStatusMessage());
+                    mTimeOutLedTv.setText(mControllerStatus.getTimeoutStatusMessage());
+                    mChamberWaitingToTimeOutTv.setText(mControllerStatus.getWaitingForTimeOutStatusMessage());
+                    mChamberNotRampingTv.setText(mControllerStatus.getCurrentlyRampingStatusMessage());
+                    mChamberValidSetPointTv.setText(mControllerStatus.getValidSetStatusMessage());
+                    mChamberPoweredOnTv.setText(mControllerStatus.getChamberIsOnMessage());
 
                 } else if (commandSent.length() <= 3 && commandSent.contains("I"))// then In? sent
                 {
@@ -211,7 +213,7 @@ public class ChamberStatusFragment extends Fragment {
 
                 {
                     Log.d(TAG, "onReceive: command sent was BKPNT?, response was " + response);
-                    mWaitingAtBreakPointTv.setText(mChamberStatus.getWaitingAtBreakPointStatusMessage() + " " + response);
+                    mWaitingAtBreakPointTv.setText(mControllerStatus.getWaitingAtBreakPointStatusMessage() + " " + response);
                     mBreakPointContinueImageButton.setVisibility(View.VISIBLE);
                 }
             }
