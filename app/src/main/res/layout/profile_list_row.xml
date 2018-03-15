@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/lightGray"
+              android:orientation="vertical"
+              android:padding="3dp"
+    >
+
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="@dimen/cardview_large_radius">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingEnd="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingStart="10dp">
+
+            <TextView
+                android:id="@+id/profileNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="Profile 1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp0"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime0"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp1"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime1"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp2"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime2"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp3"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime3"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp4"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime4"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp5"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime5"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp6"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime6"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp7"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime7"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp8"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=250C"/>
+
+                <TextView
+                    android:id="@+id/scanTime8"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=1800M"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/scanTemp9"
+                    android:layout_width="@dimen/profile_textview_set_temp_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/profile_margin"
+                    android:layout_marginRight="@dimen/profile_margin"
+                    android:text="SET=NONE"/>
+
+                <TextView
+                    android:id="@+id/scanTime9"
+                    android:layout_width="@dimen/profile_textview_wait_time_width"
+                    android:layout_height="wrap_content"
+                    android:text="WAIT=FOREV"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/cycles"
+                android:layout_width="@dimen/profile_textview_cycles_width"
+                android:layout_height="wrap_content"
+                android:text="CYCLES=1800"/>
+
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>
