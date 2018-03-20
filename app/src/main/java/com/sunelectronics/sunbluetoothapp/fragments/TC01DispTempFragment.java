@@ -47,6 +47,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.FILE_NAME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SWITCH_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_CMD_ERROR;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_CYCLE_QUERY;
@@ -75,7 +76,8 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     private boolean mIsLoggingData;
     private boolean mResponseReceived = true;
     private View view;
-    private String mControllerType, mCommandSent;
+    private String mControllerType;
+    private String mCommandSent = "NO COMMAND SENT";
     private TC01SerialSendAgent mSerialSendAgent;
     private int mMissedResponses;
     private Button mButtonSingleSegment;
@@ -260,6 +262,10 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 }
             }
         });
+
+        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
+        mSwitchOnOff.setChecked(prefs.getBoolean(SWITCH_STATE,false));
+        Log.d(TAG, "initializeViews: set switch state from prefs to: " + prefs.getBoolean(SWITCH_STATE,false));
     }
 
     private void showAlertDialog(String alertType) {
@@ -513,11 +519,6 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         snackbar.show();
     }
 
-    private boolean isCycleInfinity(String responseToCommandSent) {
-
-        Double test = Double.parseDouble(responseToCommandSent);
-        return (test > 1800);
-    }
 
     private boolean isWaitForever(String responseToCommandSent) {
         try {
@@ -582,6 +583,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         prefs.edit().putBoolean(LOGGING_STATE, mIsLoggingData).apply();
         Log.d(TAG, "storing saved preference in: " + getActivity().getPackageName());
         Log.d(TAG, "mIsLogginData value is " + mIsLoggingData);
+        prefs.edit().putBoolean(SWITCH_STATE, mSwitchOnOff.isChecked()).apply();
         if (mIsLoggingData && mTemperatureLogWriter != null) {
             prefs.edit().putString(FILE_NAME, mTemperatureLogWriter.getFileName()).apply();
         }

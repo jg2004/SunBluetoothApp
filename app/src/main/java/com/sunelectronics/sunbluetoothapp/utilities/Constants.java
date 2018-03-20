@@ -35,6 +35,7 @@ public class Constants {
     public static final String TC01_INFINITY_WAIT_TIME = "FOREV";
     public static final String TC01_INFINITY = "1999.9";
     public static final String CONTROLLER_TYPE = "controller_type";
+    public static final String SWITCH_STATE = "switch_state";
     public static final String SEND_STOP = "SEND STOP COMMAND";
     public static final String CHART_TITLE = "TEMPERATURE CHART";
     public static final String FILE_NAME = "file_name";

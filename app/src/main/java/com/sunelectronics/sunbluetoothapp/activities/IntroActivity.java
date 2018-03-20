@@ -18,6 +18,7 @@ import com.sunelectronics.sunbluetoothapp.fragments.LogFileListFragment;
 
 import static android.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SWITCH_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_INTRO_FRAGMENT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOGGER;
 
@@ -93,11 +94,11 @@ public class IntroActivity extends AppCompatActivity implements LogFileListFragm
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: called, closing bluetooth connection");
+        Log.d(TAG, "onDestroy: called, closing bluetooth connection, restoring switch state in prefs to false");
         //clean up: cancel bluetooth thread
         BluetoothConnectionService.getInstance().stop();
-
-        Log.d(TAG, "storing saved preference in: " + getPackageName());
+        SharedPreferences prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+        prefs.edit().putBoolean(SWITCH_STATE, false).apply(); //restore back to false
         super.onDestroy();
     }
 

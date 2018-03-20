@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:background="@drawable/gradient_darkgray_lightgray_center"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_darkgray_lightgray_center">
 
 
     <LinearLayout
@@ -11,9 +11,6 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:background="@drawable/gradient_darkgray_lightgray_center"
-
-
         android:orientation="horizontal">
 
         <LinearLayout
@@ -55,6 +52,8 @@
             android:id="@+id/buttonLayoutColumn2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:layout_marginRight="25dp"
             android:orientation="vertical">
 
             <android.support.v7.widget.AppCompatButton
@@ -83,6 +82,28 @@
 
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/buttonLayoutColumn3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/buttonSettings"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/blue_rounded_button"
+                android:drawableTop="@drawable/ic_action_settings"
+                android:paddingTop="10dp"
+                android:text="@string/action_settings"
+                android:textColor="@color/white"/>
+
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

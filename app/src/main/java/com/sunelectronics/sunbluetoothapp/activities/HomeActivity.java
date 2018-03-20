@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +55,7 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONNECTION_LOST;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.EXIT_APP;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SWITCH_STATE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_LOGGER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_MONITOR;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
@@ -346,8 +348,9 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: called CLOSING DB");
+        Log.d(TAG, "onDestroy: called CLOSING DB, restoring on/off switch state to false in prefs");
         mDataBaseHelper.close();
+
         super.onDestroy();
     }
 
