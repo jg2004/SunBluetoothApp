@@ -76,7 +76,6 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     private boolean mIsLoggingData;
     private boolean mResponseReceived = true;
     private View view;
-    private String mControllerType;
     private String mCommandSent = "NO COMMAND SENT";
     private TC01SerialSendAgent mSerialSendAgent;
     private int mMissedResponses;
@@ -91,14 +90,14 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         Log.d(TAG, "onCreate: CREATING A DISPLAYTEMPERATURE FRAGMENT!!!");
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mControllerType = PreferenceSetting.getControllerType(getContext());
+        String controllerType = PreferenceSetting.getControllerType(getContext());
 
         if (savedInstanceState != null) {
             Log.d(TAG, "savedInstanceState of TC01DispTempFrag not null, restoring chamberModel!");
             mIsLoggingData = savedInstanceState.getBoolean(LOGGING_STATE);
             mTemperatureController = (TemperatureController) savedInstanceState.getSerializable(TEMP_CONTROLLER);
-
             String fileName = savedInstanceState.getString(FILE_NAME);
+
             if (mIsLoggingData) {
                 mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
             }
@@ -107,7 +106,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
             if (mTemperatureController == null) {
                 Log.d(TAG, "CHAMBER MODEL WAS  NULL, CREATED NEW ONE");
-                mTemperatureController = TemperatureController.createController(mControllerType);
+                mTemperatureController = TemperatureController.createController(controllerType);
             }
 
             mIsLoggingData = prefs.getBoolean(LOGGING_STATE, false);
@@ -152,8 +151,6 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                     Log.d(TAG, "removing displayUpdate runnable from nHandler and stopping temperature LOGGER as well");
                     Toast.makeText(getContext(), "Connection Lost, turning off switch", Toast.LENGTH_LONG).show();
                     turnOffChamberSwitch();
-                    //mHandler.removeCallbacks(this);
-                    //stopLogger();
                     return;
                 }
                 mMissedResponses = !mResponseReceived ? mMissedResponses + 1 : 0;
@@ -191,7 +188,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         mTextViewSetTemp = (TextView) view.findViewById(R.id.textViewSet);
         mTextViewCycleNumber = (TextView) view.findViewById(R.id.textViewCycleNumber);
 
-        mButtonSingleSegment= (Button) view.findViewById(buttonSingleSegment);
+        mButtonSingleSegment = (Button) view.findViewById(buttonSingleSegment);
         mButtonSingleSegment.setEnabled(false);
         mButtonSingleSegment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,8 +261,8 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         });
 
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mSwitchOnOff.setChecked(prefs.getBoolean(SWITCH_STATE,false));
-        Log.d(TAG, "initializeViews: set switch state from prefs to: " + prefs.getBoolean(SWITCH_STATE,false));
+        mSwitchOnOff.setChecked(prefs.getBoolean(SWITCH_STATE, false));
+        Log.d(TAG, "initializeViews: set switch state from prefs to: " + prefs.getBoolean(SWITCH_STATE, false));
     }
 
     private void showAlertDialog(String alertType) {
@@ -344,7 +341,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     public void onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu: called");
         //menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
-        menu.setGroupEnabled(R.id.displayTempFragMenuGroup,true);
+        menu.setGroupEnabled(R.id.displayTempFragMenuGroup, true);
         MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
         startLoggingMenuItem.setEnabled(mSwitchOnOff.isChecked());
 
@@ -463,7 +460,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
             //re-sync by clearing out array of commands written list
             //BluetoothConnectionService.getInstance().clearCommandsWrittenList();
             // TODO: 1/2/2018 temporary code!!
-            Toast.makeText(mContext, "response was not numeric, clear command list to re-sync", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "response was not numeric, ignoring data", Toast.LENGTH_LONG).show();
             return;
         }
         switch (commandSent) {
