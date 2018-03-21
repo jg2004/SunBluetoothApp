@@ -470,6 +470,8 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 mTemperatureController.setTimeStampOfReading(System.currentTimeMillis());
                 mTemperatureController.setCh1Reading(responseToCommandSent);
                 mTextViewTemp.setText(String.format("%s C", mTemperatureController.getCh1Reading()));
+                Toast.makeText(mContext, "Live chart changes, ignoring data", Toast.LENGTH_LONG).show();
+
 
                 break;
 
