@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -29,7 +31,16 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.sunelectronics.sunbluetoothapp.R;
+import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
 import com.sunelectronics.sunbluetoothapp.interfaces.IChamberOffSwitch;
 import com.sunelectronics.sunbluetoothapp.interfaces.ILogger;
@@ -39,8 +50,13 @@ import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
 import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogWriter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import static android.content.Context.MODE_PRIVATE;
 import static com.sunelectronics.sunbluetoothapp.R.id.buttonSingleSegment;
+import static com.sunelectronics.sunbluetoothapp.R.id.lineChart;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
@@ -73,13 +89,18 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     private BroadcastReceiver mDispTempBroadcastReceiver;
     private TemperatureController mTemperatureController;
     private TemperatureLogWriter mTemperatureLogWriter;
-    private boolean mIsLoggingData;
+    private boolean mIsLoggingData, mIsLandscape;
     private boolean mResponseReceived = true;
     private View view;
     private String mCommandSent = "NO COMMAND SENT";
     private TC01SerialSendAgent mSerialSendAgent;
     private int mMissedResponses;
     private Button mButtonSingleSegment;
+    private LineChart mLineChart;
+    private LineDataSet mLineDataSetTemps, mLineDataSetSetPoints;
+    private LineData mLineData;
+    private long mStartTime;
+    private ActionBar mSupportActionBar;
 
 
     @Override
@@ -91,6 +112,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
         String controllerType = PreferenceSetting.getControllerType(getContext());
+        mIsLandscape = (getResources().getConfiguration().orientation) == Configuration.ORIENTATION_LANDSCAPE;
 
         if (savedInstanceState != null) {
             Log.d(TAG, "savedInstanceState of TC01DispTempFrag not null, restoring chamberModel!");
@@ -126,15 +148,76 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         Log.d(TAG, "onCreateView: called");
         view = inflater.inflate(mTemperatureController.getResourceLayout(), container, false);
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setTitle(String.format("%s MONITOR", mTemperatureController.getName()));
-            supportActionBar.show();
+        mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (mSupportActionBar != null) {
+            mSupportActionBar.setTitle(String.format("%s MONITOR", mTemperatureController.getName()));
+            mSupportActionBar.show();
         }
+
         initializeRunnables();
         initializeViews(view);
+        if (mIsLandscape) initializeChart(view);
         setHasOptionsMenu(true);
         return view;
+    }
+
+    private void initializeChart(View view) {
+        mStartTime = System.currentTimeMillis();
+        mLineChart = (LineChart) view.findViewById(lineChart);
+        mLineChart.setVisibility(View.VISIBLE);
+        makeViewsInvisible(view);
+        List<Entry> tempEntries = new ArrayList<>();
+        List<Entry> setPointEntries = new ArrayList<>();
+        mLineDataSetTemps = new LineDataSet(tempEntries, "TEMP");
+        mLineDataSetTemps.setDrawCircles(false);
+        mLineDataSetTemps.setDrawValues(false);
+        mLineDataSetTemps.setColor(Color.BLUE);
+        mLineDataSetSetPoints = new LineDataSet(setPointEntries, "SET");
+        mLineDataSetSetPoints.setDrawCircles(false);
+        mLineDataSetSetPoints.setDrawValues(false);
+        mLineDataSetSetPoints.setColor(Color.BLACK);
+        mLineData = new LineData(mLineDataSetTemps, mLineDataSetSetPoints);
+        mLineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        Description description = new Description();
+        description.setText(mTemperatureController.getName().toUpperCase() + " live chart");
+        description.setTextSize(12);
+        mLineChart.setDescription(description);
+
+        mLineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+
+                if (value < 1) {
+                    return String.format(Locale.ENGLISH, "%.2f min", value);
+
+                } else if (value >= 1 && value < 60) {
+                    return String.format(Locale.ENGLISH, "%.1f min", value);
+
+                } else {
+                    value /= 60;
+                    return String.format(Locale.ENGLISH, "%.1f hr", value);
+                }
+            }
+        });
+
+    }
+
+    private void makeViewsInvisible(View view) {
+        view.findViewById(R.id.textViewLabelCh1).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewCycleLabel).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewWaitLabel).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewSetLabel).setVisibility(View.INVISIBLE);
+        mTextViewCycleNumber.setVisibility(View.INVISIBLE);
+        mTextViewSetTemp.setVisibility(View.INVISIBLE);
+        mTextViewTemp.setVisibility(View.INVISIBLE);
+        mTextViewWaitTime.setVisibility(View.INVISIBLE);
+        mSwitchOnOff.setEnabled(false);
+        mSwitchOnOff.setVisibility(View.INVISIBLE);
+        mButtonSingleSegment.setEnabled(false);
+        mButtonSingleSegment.setVisibility(View.INVISIBLE);
+        mSupportActionBar.hide();
+        ((HomeActivity) getActivity()).hideBottomNavigationView();
+
     }
 
     private void initializeRunnables() {
@@ -456,9 +539,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         //verify that response is numeric
         if (!isNumeric(responseToCommandSent)) {
-            //if it's not, then display is out of sync with controller responses
-            //re-sync by clearing out array of commands written list
-            //BluetoothConnectionService.getInstance().clearCommandsWrittenList();
+
             // TODO: 1/2/2018 temporary code!!
             Toast.makeText(mContext, "response was not numeric, ignoring data", Toast.LENGTH_LONG).show();
             return;
@@ -470,13 +551,28 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 mTemperatureController.setTimeStampOfReading(System.currentTimeMillis());
                 mTemperatureController.setCh1Reading(responseToCommandSent);
                 mTextViewTemp.setText(String.format("%s C", mTemperatureController.getCh1Reading()));
+                if (mIsLandscape) {
 
+                    float xValue = (mTemperatureController.getTimeStampOfReading() - mStartTime) / 60000f;
+                    float yValue = Float.parseFloat(mTemperatureController.getCh1Reading());
+                    mLineDataSetTemps.addEntry(new Entry(xValue, yValue));
+                }
                 break;
 
             case TC01_SET_QUERY:
 
                 mTemperatureController.setCurrentSetPoint(responseToCommandSent);
                 mTextViewSetTemp.setText(String.format("%s C", mTemperatureController.getCurrentSetPoint()));
+                if (mIsLandscape && mLineDataSetTemps.getEntryCount() > 0) {
+                    //if no entries, then index out of bound exception occurs
+                    float xValue = (mTemperatureController.getTimeStampOfReading() - mStartTime) / 60000f;
+                    float yValue = Float.parseFloat(mTemperatureController.getCurrentSetPoint());
+                    mLineDataSetSetPoints.addEntry(new Entry(xValue, yValue));
+                    mLineChart.setData(mLineData);
+                    mLineData.notifyDataChanged();
+                    mLineChart.notifyDataSetChanged();
+                    mLineChart.invalidate();
+                }
                 break;
 
             case TC01_WAIT_QUERY:
