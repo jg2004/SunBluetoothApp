@@ -93,6 +93,7 @@
     <string name="none">NONE</string>
     <string name="input">RESULT:</string>
     <string name="profile">Profiles</string>
+    <string name="stop">STOP</string>
 
     <string-array name="controller_types">
         <item>EC1x</item>

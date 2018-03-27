@@ -18,6 +18,7 @@ import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.DIALOG_TITLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC10_STOP_COMMAND;
 
 
 public class SingleSegDialogFragment extends DialogFragment {
@@ -47,7 +48,7 @@ public class SingleSegDialogFragment extends DialogFragment {
         SingleSegDialogFragment fragment = new SingleSegDialogFragment();
         Bundle args = new Bundle();
         args.putString(DIALOG_TITLE, title);
-        args.putSerializable(CONTROLLER,controller);
+        args.putSerializable(CONTROLLER, controller);
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,6 +82,19 @@ public class SingleSegDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+            }
+        });
+        Button buttonStop = (Button) view.findViewById(R.id.buttonStop);
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "sending STOP command");
+                        BluetoothConnectionService.getInstance().write(TC10_STOP_COMMAND);
+                    }
+                }, DELAY);
             }
         });
         Button buttonOK = (Button) view.findViewById(R.id.buttonOk);
