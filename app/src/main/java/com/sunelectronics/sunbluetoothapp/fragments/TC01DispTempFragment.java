@@ -224,7 +224,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         mHandler = new Handler();
         mSerialSendAgent = TC01SerialSendAgent.getInstance(mHandler);
-        //runnable to send TC01 commands every half second
+        //runnable to send TC01 commands every  second
         mDisplayUpdateRunnable = new Runnable() {
             @Override
             public void run() {
