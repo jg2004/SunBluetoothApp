@@ -44,14 +44,13 @@
             android:text="@string/alert_dialog_ok"
             />
 
-        <android.support.v7.widget.AppCompatButton
+        <ImageButton
             android:id="@+id/buttonStop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            android:background="@drawable/white_rounded_button_accent"
-            android:text="@string/stop"
+            android:src="@drawable/ic_action_stop_logger_red"
             />
 
         <android.support.v7.widget.AppCompatButton
@@ -67,6 +66,5 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textColor="@android:color/holo_red_light"
-        android:text="Pressing Stop will clear set point and stop Local Program"/>
+        android:text="Pressing the red STOP icon will clear set point and stop Local Program"/>
 </LinearLayout>
-

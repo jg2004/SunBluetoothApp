@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
@@ -84,7 +85,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-        Button buttonStop = (Button) view.findViewById(R.id.buttonStop);
+        ImageButton buttonStop = (ImageButton) view.findViewById(R.id.buttonStop);
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +96,7 @@ public class SingleSegDialogFragment extends DialogFragment {
                         BluetoothConnectionService.getInstance().write(TC10_STOP_COMMAND);
                     }
                 }, DELAY);
+                dismiss();
             }
         });
         Button buttonOK = (Button) view.findViewById(R.id.buttonOk);

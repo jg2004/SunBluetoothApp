@@ -96,6 +96,7 @@
     <string name="monitor_view">Monitor View</string>
     <string name="live_chart_view">Live Chart View</string>
     <string name="save_live_chart">Save Live Chart</string>
+    <string name="stop">STOP</string>
 
     <string-array name="controller_types">
         <item>EC1x</item>
