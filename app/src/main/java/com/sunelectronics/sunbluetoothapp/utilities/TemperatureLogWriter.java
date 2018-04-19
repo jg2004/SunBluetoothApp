@@ -13,19 +13,18 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.FORMATTER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.NEW_LINE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SPACE;
 
 public class TemperatureLogWriter implements Serializable {
 
     private static final String TAG = "TemperatureLogWriter";
-    private static final String FORMATTER = "%02d";
-    private static final String NEW_LINE = "\r\n";
-    private static final String SPACE = " ";
+
     private BufferedWriter mBufferedWriter;
     private String mFileName;
     private Context mContext;
@@ -151,12 +150,13 @@ public class TemperatureLogWriter implements Serializable {
         return null;
     }
 
-    public void log() {
+    public void log(long loggerStartTime) {
 
         StringBuilder sb = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);//HH is military time (no AM/PM)
-
-        sb.append(sdf.format(new Date(mTemperatureController.getTimeStampOfReading()))).append(",").append(mTemperatureController.getCh1Reading())
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);//HH is military time (no AM/PM)
+        float timeElapsed = (mTemperatureController.getTimeStampOfReading() - loggerStartTime) / 60000f;
+        String timeElapsedInMinutes = String.format(Locale.ENGLISH, "%.1f", timeElapsed);
+        sb.append(timeElapsedInMinutes).append(",").append(mTemperatureController.getCh1Reading())
                 .append(",");
         if (mTemperatureController instanceof DualChannelTemperatureController) {
 

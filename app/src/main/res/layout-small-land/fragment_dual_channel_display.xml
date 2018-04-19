@@ -9,6 +9,31 @@
                                              android:layout_margin="10dp"
                                              android:background="@drawable/border_curved_padding">
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:saveEnabled="true"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        >
+    </com.github.mikephil.charting.charts.LineChart>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/textViewLabelCh1"
@@ -131,14 +156,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:layout_marginStart="8dp"
-        android:checked="false"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"
-        app:layout_constraintRight_toLeftOf="@+id/toggleButtonCoolEnable"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:checked="false"
         app:layout_constraintLeft_toRightOf="@+id/toggleButtonHeatEnable"
-        android:layout_marginLeft="8dp"/>
+        app:layout_constraintRight_toLeftOf="@+id/toggleButtonCoolEnable"
+        app:layout_constraintTop_toBottomOf="@+id/buttonStatus"/>
 
     <Button
         android:id="@+id/buttonSingleSegment"
@@ -158,32 +183,32 @@
         android:id="@+id/toggleButtonHeatEnable"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/button_on_off"
         android:checked="false"
         android:text="ToggleButton"
         android:textOff="Heat"
         android:textOn="Heat"
         android:textSize="12sp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
         app:layout_constraintLeft_toLeftOf="@+id/buttonStatus"
-        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/switchOnOff"/>
 
     <ToggleButton
         android:id="@+id/toggleButtonCoolEnable"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/button_on_off"
         android:checked="false"
         android:textOff="Cool"
         android:textOn="Cool"
         android:textSize="12sp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/switchOnOff"
-        android:layout_marginRight="0dp"
-        android:layout_marginEnd="0dp"
-        app:layout_constraintRight_toRightOf="@+id/buttonStatus"/>
+        app:layout_constraintRight_toRightOf="@+id/buttonStatus"
+        app:layout_constraintTop_toBottomOf="@+id/switchOnOff"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"

@@ -31,10 +31,19 @@ public class Constants {
     public static final String LOG_FILE_VIEWER_TITLE = "FILE VIEWER";
     public static final String SCAN_MODE_TITLE = "SCAN MODE";
     //constants used
+    public static final String NEW_LINE = "\r\n";
+    public static final String FORMATTER = "%02d";
+    public static final String SPACE = " ";
+    public static final String LOGGER_START_TIME = "logger_start_time";
+    public static final String CHART_VISIBLE = "chart_visible";
+    public static final String START_TIME = "start_time";
+    public static final String TEMP_FILE = "temp.txt";
+    public static final String LINE_CHART_VISIBILITY = "line_chart_visibility";
     public static final String TC01_NO_SET_POINT = "NONE";
     public static final String TC01_INFINITY_WAIT_TIME = "FOREV";
     public static final String TC01_INFINITY = "1999.9";
     public static final String CONTROLLER_TYPE = "controller_type";
+    public static final String CONTROLLER_ON = "controller_on";
     public static final String SWITCH_STATE = "switch_state";
     public static final String SEND_STOP = "SEND STOP COMMAND";
     public static final String CHART_TITLE = "TEMPERATURE CHART";

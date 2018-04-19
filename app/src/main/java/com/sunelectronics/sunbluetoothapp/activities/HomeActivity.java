@@ -45,6 +45,7 @@ import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.INVISIBLE;
 import static com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService.STATE_CONNECTED;
 import static com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService.STATE_CONNECTING;
 import static com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService.STATE_NONE;
@@ -85,21 +86,26 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         view = findViewById(R.id.activityLayout);
-        buildFragmentList(PreferenceSetting.getControllerType(getApplicationContext()));
         setUpViews();
         if (savedInstanceState == null) {
             Log.d(TAG, "onCreate: savedInstanceState was NULL");
+            buildFragmentList(PreferenceSetting.getControllerType(getApplicationContext()));
             switchFragment(0, TAG_FRAGMENT_MONITOR);
 
         } else {
+            //if not null, then don't recreate all fragments since they will be restored automatically
             Log.d(TAG, "onCreate: savedInstanceState was NOT NULL");
+            rebuildFragmentList(PreferenceSetting.getControllerType(getApplicationContext()));
         }
     }
 
+    public void hideBottomNavigationView() {
 
-    public void hideBottomNavigationView(){
+        mBottomNavigationView.setVisibility(INVISIBLE);
+    }
 
-        mBottomNavigationView.setVisibility(View.INVISIBLE);
+    public void showBottomNavigationView() {
+        mBottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     //-------------------------------private methods----------------------------------------------
@@ -181,6 +187,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
     private void buildFragmentList(String controllerType) {
 
         if (controllerType.equals(TC01)) {
+
             mFragmentList.add(new TC01DispTempFragment());
             mFragmentList.add(new TC01ProfileDetailFragment());
             mFragmentList.add(new LogFileListFragment());
@@ -191,6 +198,51 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
             mFragmentList.add(new LPDownloadFragment());
             mFragmentList.add(new LogFileListFragment());
         }
+
+        Log.d(TAG, "buildFragmentList: number of fragments in list: " + mFragmentList.size());
+    }
+
+    /**
+     * get fragments that have already been created and add to fragment list so that fragment state
+     * is restored (instead of recreating 3 new fragments
+     */
+    private void rebuildFragmentList(String controllerType) {
+
+        Fragment fragment1 = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_MONITOR);
+        if (fragment1 != null) {
+            mFragmentList.add(fragment1);
+            Log.d(TAG, "buildFragmentList: added fragment: " + fragment1.getTag());
+        } else {
+            if (controllerType.equals(TC01)) {
+                mFragmentList.add(new TC01DispTempFragment());
+
+            } else {
+                mFragmentList.add(new DisplayTemperatureFragment());
+            }
+        }
+
+        Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_TEMP_PROF);
+        if (fragment2 != null) {
+            mFragmentList.add(fragment2);
+            Log.d(TAG, "buildFragmentList: added fragment: " + fragment2.getTag());
+        } else {
+            if (controllerType.equals(TC01)) {
+                mFragmentList.add(new TC01ProfileDetailFragment());
+
+            } else {
+                mFragmentList.add(new LPDownloadFragment());
+            }
+        }
+
+        Fragment fragment3 = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_LOGGER);
+        if (fragment3 != null) {
+            mFragmentList.add(fragment3);
+            Log.d(TAG, "buildFragmentList: added fragment: " + fragment3.getTag());
+        } else {
+            mFragmentList.add(new LogFileListFragment());
+        }
+
+        Log.d(TAG, "buildFragmentList: mFragmentListSize: " + mFragmentList.size());
 
     }
 
@@ -205,9 +257,11 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
         Log.d(TAG, "switchFragment: called");
 
+
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);//this clears all fragments off backstack
         }
+
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.homeContainer, mFragmentList.get(position), tag).commit();
@@ -351,9 +405,8 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: called CLOSING DB, restoring on/off switch state to false in prefs");
+        Log.d(TAG, "onDestroy: called CLOSING DB");
         mDataBaseHelper.close();
-
         super.onDestroy();
     }
 
@@ -490,7 +543,7 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "onStop: called");
+        Log.d(TAG, "onStop: called, unregister reciever that listens for connection lost");
         LocalBroadcastManager.getInstance(HomeActivity.this).unregisterReceiver(mReceiver);
         super.onStop();
     }
@@ -507,4 +560,6 @@ public class HomeActivity extends AppCompatActivity implements LogFileListFragme
         }
 
     }
+
+
 }

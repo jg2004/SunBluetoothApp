@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,43 +26,51 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.interfaces.ChartDataCallback;
 import com.sunelectronics.sunbluetoothapp.interfaces.IChamberOffSwitch;
 import com.sunelectronics.sunbluetoothapp.interfaces.ILogger;
 import com.sunelectronics.sunbluetoothapp.models.TC01Controller;
 import com.sunelectronics.sunbluetoothapp.models.TC01SerialSendAgent;
 import com.sunelectronics.sunbluetoothapp.models.TemperatureController;
+import com.sunelectronics.sunbluetoothapp.utilities.ChartUtilityHelperClass;
+import com.sunelectronics.sunbluetoothapp.utilities.LoadChartTask;
 import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
+import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogReader;
 import com.sunelectronics.sunbluetoothapp.utilities.TemperatureLogWriter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static android.content.Context.MODE_PRIVATE;
+import static android.util.Log.d;
+import static android.view.View.VISIBLE;
 import static com.sunelectronics.sunbluetoothapp.R.id.buttonSingleSegment;
 import static com.sunelectronics.sunbluetoothapp.R.id.lineChart;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_ICON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_MESSAGE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TITLE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.ALERT_TYPE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_VISIBLE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CONTROLLER_ON;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.FILE_NAME;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGER_START_TIME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOGGING_STATE;
-import static com.sunelectronics.sunbluetoothapp.utilities.Constants.SWITCH_STATE;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_TIME;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_PARAMETER;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_CMD_ERROR;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_CYCLE_QUERY;
@@ -74,22 +81,25 @@ import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_TEMP_Q
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_UTL_INT;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TC01_WAIT_QUERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_CONTROLLER;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_FILE;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TERMINATE_LOGGING_SESSION;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TURN_OFF_CHAMBER;
 
-public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch, ILogger {
+public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch, ILogger, ChartDataCallback {
     private static final String TAG = "TC01DispTempFrag";
     private static final int COMMAND_SEND_DELAY_MS = 1000;
-    private static final int LOGGER_DELAY_MS = 15000;
+    private static final int LOGGER_DELAY_MS = 20000;
+    private static final int LIVE_CHART_DELAY_MS = 20000;
+    private static final int LIVE_CHART_INIT_DELAY_MS = 3000;
     private Handler mHandler;
-    private Runnable mDisplayUpdateRunnable, mLoggerRunnable;
+    private Runnable mDisplayUpdateRunnable, mLoggerRunnable, mLiveChartRunnable;
     private TextView mTextViewTemp, mTextViewWaitTime, mTextViewSetTemp, mTextViewCycleNumber;
     private Switch mSwitchOnOff;
     private Context mContext;
     private BroadcastReceiver mDispTempBroadcastReceiver;
     private TemperatureController mTemperatureController;
     private TemperatureLogWriter mTemperatureLogWriter;
-    private boolean mIsLoggingData, mIsLandscape;
+    private boolean mIsLoggingData, mIsLandscape, mControllerOn, mChartVisible;
     private boolean mResponseReceived = true;
     private View view;
     private String mCommandSent = "NO COMMAND SENT";
@@ -99,8 +109,11 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     private LineChart mLineChart;
     private LineDataSet mLineDataSetTemps, mLineDataSetSetPoints;
     private LineData mLineData;
-    private long mStartTime;
+    private long mLiveChartStartTime, mLoggerStartTime;
     private ActionBar mSupportActionBar;
+    private Description mChartDescription;
+    private ProgressBar progressBar;
+    private boolean taskBusy;
 
 
     @Override
@@ -108,38 +121,36 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         // onSavedInstanceSate is not called if frag put on backstack, all state is retained!
 
-        Log.d(TAG, "onCreate: CREATING A DISPLAYTEMPERATURE FRAGMENT!!!");
+        Log.d(TAG, "onCreate: called");
         super.onCreate(savedInstanceState);
-        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
         String controllerType = PreferenceSetting.getControllerType(getContext());
         mIsLandscape = (getResources().getConfiguration().orientation) == Configuration.ORIENTATION_LANDSCAPE;
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "savedInstanceState of TC01DispTempFrag not null, restoring chamberModel!");
-            mIsLoggingData = savedInstanceState.getBoolean(LOGGING_STATE);
-            mTemperatureController = (TemperatureController) savedInstanceState.getSerializable(TEMP_CONTROLLER);
-            String fileName = savedInstanceState.getString(FILE_NAME);
+            restoreStateFromSavedInstanceState(savedInstanceState);
 
-            if (mIsLoggingData) {
-                mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
-            }
         } else {
-            Log.d(TAG, "onCreate: savedInstanceState is NULL");
 
             if (mTemperatureController == null) {
-                Log.d(TAG, "CHAMBER MODEL WAS  NULL, CREATED NEW ONE");
                 mTemperatureController = TemperatureController.createController(controllerType);
-            }
-
-            mIsLoggingData = prefs.getBoolean(LOGGING_STATE, false);
-            if (mIsLoggingData) {
-                String fileName = prefs.getString(FILE_NAME, null);
-                if (fileName != null) {
-                    mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
-                }
+                restorStateFromPrefs();
             }
         }
-        Log.d(TAG, "onCreate called: mIsLoggingData is: " + mIsLoggingData);
+    }
+
+    private void restoreStateFromSavedInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "restoreStateFromSavedInstanceState called as savedInstanceState was not NULL");
+        mIsLoggingData = savedInstanceState.getBoolean(LOGGING_STATE);
+        mControllerOn = savedInstanceState.getBoolean(CONTROLLER_ON);
+        mLiveChartStartTime = savedInstanceState.getLong(START_TIME);
+        mLoggerStartTime = savedInstanceState.getLong(LOGGER_START_TIME);
+        mChartVisible = savedInstanceState.getBoolean(CHART_VISIBLE);
+        mTemperatureController = (TemperatureController) savedInstanceState.getSerializable(TEMP_CONTROLLER);
+        String fileName = savedInstanceState.getString(FILE_NAME);
+
+        if (mIsLoggingData) {
+            mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
+        }
     }
 
     @Nullable
@@ -156,16 +167,40 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         initializeRunnables();
         initializeViews(view);
-        if (mIsLandscape) initializeChart(view);
+        if (mIsLandscape) makeViewsInvisible(view);
+
+        TemperatureLogReader reader = new TemperatureLogReader(getContext());
+
+        if (reader.fileExists(TEMP_FILE)) {
+            d(TAG, "onCreateView: temp file exists, loading file from asyncTask");
+            LoadChartTask task = new LoadChartTask(this);
+            task.execute(reader.getFileContents(TEMP_FILE));
+
+        } else {
+            initializeChart();
+        }
+
         setHasOptionsMenu(true);
         return view;
     }
 
-    private void initializeChart(View view) {
-        mStartTime = System.currentTimeMillis();
-        mLineChart = (LineChart) view.findViewById(lineChart);
-        mLineChart.setVisibility(View.VISIBLE);
-        makeViewsInvisible(view);
+    private void initializeChart() {
+        initializeChartLabels();
+        if (mLineData == null) {
+            d(TAG, "Line data was NULL, initialize charts");
+            initializeChartData();
+        }
+    }
+
+    private void initializeChartLabels() {
+        Log.d(TAG, "initializeChartLabels: called");
+        ChartUtilityHelperClass.formatChart(mLineChart);
+        mChartDescription = ChartUtilityHelperClass.getFormattedDescription();
+        mLineChart.setDescription(mChartDescription);
+    }
+
+    private void initializeChartData() {
+        d(TAG, "initializeChartData: called");
         List<Entry> tempEntries = new ArrayList<>();
         List<Entry> setPointEntries = new ArrayList<>();
         mLineDataSetTemps = new LineDataSet(tempEntries, "TEMP");
@@ -177,95 +212,13 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         mLineDataSetSetPoints.setDrawValues(false);
         mLineDataSetSetPoints.setColor(Color.BLACK);
         mLineData = new LineData(mLineDataSetTemps, mLineDataSetSetPoints);
-        mLineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        Description description = new Description();
-        description.setText(mTemperatureController.getName().toUpperCase() + " live chart");
-        description.setTextSize(12);
-        mLineChart.setDescription(description);
-
-        mLineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-
-                if (value < 1) {
-                    return String.format(Locale.ENGLISH, "%.2f min", value);
-
-                } else if (value >= 1 && value < 60) {
-                    return String.format(Locale.ENGLISH, "%.1f min", value);
-
-                } else {
-                    value /= 60;
-                    return String.format(Locale.ENGLISH, "%.1f hr", value);
-                }
-            }
-        });
-
-    }
-
-    private void makeViewsInvisible(View view) {
-        view.findViewById(R.id.textViewLabelCh1).setVisibility(View.INVISIBLE);
-        view.findViewById(R.id.textViewCycleLabel).setVisibility(View.INVISIBLE);
-        view.findViewById(R.id.textViewWaitLabel).setVisibility(View.INVISIBLE);
-        view.findViewById(R.id.textViewSetLabel).setVisibility(View.INVISIBLE);
-        mTextViewCycleNumber.setVisibility(View.INVISIBLE);
-        mTextViewSetTemp.setVisibility(View.INVISIBLE);
-        mTextViewTemp.setVisibility(View.INVISIBLE);
-        mTextViewWaitTime.setVisibility(View.INVISIBLE);
-        mSwitchOnOff.setEnabled(false);
-        mSwitchOnOff.setVisibility(View.INVISIBLE);
-        mButtonSingleSegment.setEnabled(false);
-        mButtonSingleSegment.setVisibility(View.INVISIBLE);
-        mSupportActionBar.hide();
-        ((HomeActivity) getActivity()).hideBottomNavigationView();
-
-    }
-
-    private void initializeRunnables() {
-
-        mHandler = new Handler();
-        mSerialSendAgent = TC01SerialSendAgent.getInstance(mHandler);
-        //runnable to send TC01 commands every  second
-        mDisplayUpdateRunnable = new Runnable() {
-            @Override
-            public void run() {
-
-                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
-
-                    Log.d(TAG, "removing displayUpdate runnable from nHandler and stopping temperature LOGGER as well");
-                    Toast.makeText(getContext(), "Connection Lost, turning off switch", Toast.LENGTH_LONG).show();
-                    turnOffChamberSwitch();
-                    return;
-                }
-                mMissedResponses = !mResponseReceived ? mMissedResponses + 1 : 0;
-                Log.d(TAG, "run: mMissedResponses: " + mMissedResponses);
-
-                //if no response after 3 consecutive writes, turn off switch
-
-                if (mMissedResponses > 2) {
-                    Snackbar.make(view, "Controller Not Responding - check controller power", Snackbar.LENGTH_INDEFINITE).show();
-                    turnOffChamberSwitch();
-                    return;
-                }
-                Log.d(TAG, "run: inside display update runnable");
-                mCommandSent = mTemperatureController.getNextPollingCommand();
-                mSerialSendAgent.sendCommand(mCommandSent);
-                mResponseReceived = false;
-                mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
-            }
-        };
-        //runnable to write temperature data to a text file
-        mLoggerRunnable = new Runnable() {
-            @Override
-            public void run() {
-                mTemperatureLogWriter.log();
-                mHandler.postDelayed(this, LOGGER_DELAY_MS);
-            }
-        };
     }
 
     private void initializeViews(final View view) {
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         TextView textViewTempLabel = (TextView) view.findViewById(R.id.textViewLabelCh1);
         textViewTempLabel.setText(String.format("%s:", mTemperatureController.getCh1Label()));
+        mLineChart = (LineChart) view.findViewById(lineChart);
         mTextViewTemp = (TextView) view.findViewById(R.id.textViewCh1Temp);
         mTextViewWaitTime = (TextView) view.findViewById(R.id.textViewWait);
         mTextViewSetTemp = (TextView) view.findViewById(R.id.textViewSet);
@@ -292,7 +245,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         mSwitchOnOff.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "onTouch: event occured");
+                d(TAG, "onTouch: event occured");
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -316,25 +269,34 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         mSwitchOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG, "onCheckedChanged: switch was changed to: " + isChecked);
+                d(TAG, "onCheckedChanged: switch was changed to: " + isChecked);
                 if (isChecked) {
 
-                    BluetoothConnectionService.getInstance().clearCommandsWrittenList();
                     mMissedResponses = 0;
-                    Log.d(TAG, "onCheckedChanged: starting display update runnable");
+                    d(TAG, "onCheckedChanged: starting display update runnable");
                     mHandler.postDelayed(mDisplayUpdateRunnable, COMMAND_SEND_DELAY_MS);
+                    mHandler.postDelayed(mLiveChartRunnable, LIVE_CHART_INIT_DELAY_MS);
+                    if (!mControllerOn) {
+                        mControllerOn = true;
+                        mLiveChartStartTime = System.currentTimeMillis();
+                        d(TAG, "onCheckedChanged: controller was off, initializing start time");
+                    }
                     mButtonSingleSegment.setEnabled(true);
-                    Log.d(TAG, "onCheckedChanged: invalidating options menu");
+                    d(TAG, "onCheckedChanged: invalidating options menu");
                     getActivity().invalidateOptionsMenu();
                     if (mIsLoggingData) {
-                        Log.d(TAG, "onCheckedChanged: starting logger, mIsLoggingData was true");
+                        d(TAG, "onCheckedChanged: starting logger, mIsLoggingData was true");
                         startLogger();
                     }
 
                 } else {
-                    Log.d(TAG, "onCheckedChanged: REMOVING display runnable because switch is off");
+                    d(TAG, "onCheckedChanged: REMOVING display runnable because switch is off");
                     mHandler.removeCallbacks(mDisplayUpdateRunnable);
-                    Log.d(TAG, "onCheckedChanged: invalidating options menu");
+                    mHandler.removeCallbacks(mLiveChartRunnable);
+                    mButtonSingleSegment.setEnabled(false);
+                    mControllerOn = false;
+                    clearAllChartData();
+                    d(TAG, "onCheckedChanged: invalidating options menu");
                     getActivity().invalidateOptionsMenu();
                     if (mIsLoggingData) {
                         stopLogger();
@@ -342,10 +304,147 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 }
             }
         });
+        mSwitchOnOff.setChecked(PreferenceSetting.getSwitchState(getContext()));
+    }
 
-        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        mSwitchOnOff.setChecked(prefs.getBoolean(SWITCH_STATE, false));
-        Log.d(TAG, "initializeViews: set switch state from prefs to: " + prefs.getBoolean(SWITCH_STATE, false));
+    private void clearAllChartData() {
+
+        if (!mLineChart.isEmpty()) {
+
+            Log.d(TAG, "clearAllChartData: clearing all chart data");
+            mLineChart.clearValues();
+            initializeChartData();
+        }
+    }
+
+    /**
+     * sets all the views invisible other than the line chart sets linechart to visible
+     *
+     * @param view The view of the fragment creates
+     */
+
+    private void makeViewsInvisible(View view) {
+        d(TAG, "makeViewsInvisible: making chart visible");
+        view.findViewById(R.id.textViewLabelCh1).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewCycleLabel).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewWaitLabel).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.textViewSetLabel).setVisibility(View.INVISIBLE);
+        mTextViewCycleNumber.setVisibility(View.INVISIBLE);
+        mTextViewSetTemp.setVisibility(View.INVISIBLE);
+        mTextViewTemp.setVisibility(View.INVISIBLE);
+        mTextViewWaitTime.setVisibility(View.INVISIBLE);
+        mSwitchOnOff.setEnabled(false);
+        mSwitchOnOff.setVisibility(View.INVISIBLE);
+        mButtonSingleSegment.setVisibility(View.INVISIBLE);
+        if (mIsLandscape) mSupportActionBar.hide();
+        mLineChart.setVisibility(VISIBLE);
+        mChartVisible = mLineChart.getVisibility() == VISIBLE;
+        if (mIsLandscape) ((HomeActivity) getActivity()).hideBottomNavigationView();
+    }
+
+    /**
+     * sets all the view other than the line chart to visible and sets linechart to invisible
+     *
+     * @param view The view of the fragment creates
+     */
+    private void makeViewsVisible(View view) {
+        d(TAG, "makeViewsVisible: making chart invisible");
+        mLineChart.setVisibility(View.INVISIBLE);
+        mChartVisible = mLineChart.getVisibility() == VISIBLE;
+        view.findViewById(R.id.textViewLabelCh1).setVisibility(VISIBLE);
+        view.findViewById(R.id.textViewCycleLabel).setVisibility(VISIBLE);
+        view.findViewById(R.id.textViewWaitLabel).setVisibility(VISIBLE);
+        view.findViewById(R.id.textViewSetLabel).setVisibility(VISIBLE);
+        mTextViewCycleNumber.setVisibility(VISIBLE);
+        mTextViewSetTemp.setVisibility(VISIBLE);
+        mTextViewTemp.setVisibility(VISIBLE);
+        mTextViewWaitTime.setVisibility(VISIBLE);
+        mSwitchOnOff.setEnabled(true);
+        mSwitchOnOff.setVisibility(VISIBLE);
+        mButtonSingleSegment.setVisibility(VISIBLE);
+        mSupportActionBar.show();
+        ((HomeActivity) getActivity()).showBottomNavigationView();
+    }
+
+    private void initializeRunnables() {
+
+        mHandler = new Handler();
+        mSerialSendAgent = TC01SerialSendAgent.getInstance(mHandler);
+
+        mLiveChartRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if (mLineChart.getLineData() != null) {
+                    SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                    String date = df.format(new Date(mLiveChartStartTime));
+                    mChartDescription.setText(String.format(Locale.getDefault(), "%s Points: %d", date, mLineDataSetTemps.getEntryCount()));
+                }
+
+                if (mTemperatureController.hasNonNullCh1AndSet()) {
+                    if (!taskBusy){
+                        addDataToChart();
+                    }
+                }
+
+                mHandler.postDelayed(this, LIVE_CHART_DELAY_MS);
+            }
+        };
+
+        //runnable to send TC01 commands every  second
+        mDisplayUpdateRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
+
+                    d(TAG, "removing displayUpdate runnable from nHandler and stopping temperature LOGGER as well");
+                    Toast.makeText(getContext(), "Connection Lost, turning off switch", Toast.LENGTH_LONG).show();
+                    turnOffChamberSwitch();
+                    return;
+                }
+                mMissedResponses = !mResponseReceived ? mMissedResponses + 1 : 0;
+
+                //if no response after 3 consecutive writes, turn off switch
+
+                if (mMissedResponses > 2) {
+                    Snackbar.make(view, "Controller Not Responding", Snackbar.LENGTH_INDEFINITE).show();
+                    turnOffChamberSwitch();
+                    return;
+                }
+                mCommandSent = mTemperatureController.getNextPollingCommand();
+                mSerialSendAgent.sendCommand(mCommandSent);
+                mResponseReceived = false;
+                mHandler.postDelayed(this, COMMAND_SEND_DELAY_MS);
+            }
+        };
+        //runnable to write temperature data to a text file
+        mLoggerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mTemperatureLogWriter.log(mLoggerStartTime);
+                mHandler.postDelayed(this, LOGGER_DELAY_MS);
+            }
+        };
+    }
+
+    private void addDataToChart() {
+
+        float xValue = (mTemperatureController.getTimeStampOfReading() - mLiveChartStartTime) / 60000f;
+        float tempReading = Float.parseFloat(mTemperatureController.getCh1Reading());
+        mLineDataSetTemps.addEntry(new Entry(xValue, tempReading));
+        float setPoint = Float.parseFloat(mTemperatureController.getCurrentSetPoint());
+        mLineDataSetSetPoints.addEntry(new Entry(xValue, setPoint));
+        refreshChart();
+
+    }
+
+    private void refreshChart() {
+        //notify LineData and LineChart data has changed
+        mLineData.notifyDataChanged();
+        mLineChart.notifyDataSetChanged();
+        mLineChart.invalidate();
+        mLineChart.setData(mLineData);
     }
 
     private void showAlertDialog(String alertType) {
@@ -361,14 +460,14 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     public void turnOffChamberSwitch() {
         //used by HomeActivity to turn off chamber after user is shown alertDialog and presses Yes
         //to confirm shut off
-        Log.d(TAG, "turnOffChamberSwitch: called");
+        d(TAG, "turnOffChamberSwitch: called");
         mSwitchOnOff.setChecked(false);
     }
 
     private void showSingleSegmentDialog() {
 
         TC01SingleSegDialogFragment fragment = TC01SingleSegDialogFragment.newInstance(getString(R.string.enter_segment), (TC01Controller) mTemperatureController);
-        Log.d(TAG, "showSingleSegmentDialog: showing dialog");
+        d(TAG, "showSingleSegmentDialog: showing dialog");
         fragment.show(getFragmentManager(), "single_seg_frag");
     }
 
@@ -387,9 +486,9 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
      */
     public void stopLogger() {
 
-        Log.d(TAG, "stopLogger: called");
+        d(TAG, "stopLogger: called");
         mIsLoggingData = false;
-        Log.d(TAG, "stopLogger: invalidate options menu called");
+        d(TAG, "stopLogger: invalidate options menu called");
         getActivity().invalidateOptionsMenu();
         mHandler.removeCallbacks(mLoggerRunnable);
         closeLoggingFile();
@@ -398,14 +497,14 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     public void closeLoggingFile() {
 
         if (mTemperatureLogWriter != null) {
-            Log.d(TAG, "closeLoggingFile: closing OutputStreamWriter");
+            d(TAG, "closeLoggingFile: closing OutputStreamWriter");
             mTemperatureLogWriter.closeFile();
         }
     }
 
     private void startLogger() {
 
-        Log.d(TAG, "startLogger: called, logging temperature data");
+        d(TAG, "startLogger: called, logging temperature data");
         Toast.makeText(getContext(), "LOGGER STARTED", Toast.LENGTH_SHORT).show();
         mIsLoggingData = true;
         getActivity().invalidateOptionsMenu();
@@ -414,7 +513,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
     private void pauseLogger() {
 
-        Log.d(TAG, "pauseLogger: called, removing loggerRunnable callback");
+        d(TAG, "pauseLogger: called, removing loggerRunnable callback");
         Toast.makeText(mContext, "LOGGING PAUSED", Toast.LENGTH_SHORT).show();
         mHandler.removeCallbacks(mLoggerRunnable);
         mTemperatureLogWriter.flush();
@@ -422,11 +521,16 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        Log.d(TAG, "onPrepareOptionsMenu: called");
-        //menu.setGroupEnabled(R.id.displayTempFragMenuGroup, mSwitchOnOff.isChecked());
+        d(TAG, "onPrepareOptionsMenu: called");
         menu.setGroupEnabled(R.id.displayTempFragMenuGroup, true);
         MenuItem startLoggingMenuItem = menu.findItem(R.id.startLogging);
         startLoggingMenuItem.setEnabled(mSwitchOnOff.isChecked());
+        MenuItem liveChartmenuItem = menu.findItem(R.id.displayLiveChart);
+        MenuItem saveLiveChartMenuItem = menu.findItem(R.id.saveLiveChart);
+        if (!mSwitchOnOff.isChecked()) {
+            makeViewsVisible(view);
+            liveChartmenuItem.setEnabled(false);
+        }
 
         if (mIsLoggingData) {
             startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -437,6 +541,16 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
             //not logging
             startLoggingMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             startLoggingMenuItem.setIcon(null);
+        }
+
+        if (mLineChart.getVisibility() == VISIBLE) {
+
+            liveChartmenuItem.setTitle(R.string.monitor_view);
+            saveLiveChartMenuItem.setVisible(true);
+
+        } else {
+            liveChartmenuItem.setTitle(R.string.live_chart_view);
+            saveLiveChartMenuItem.setVisible(false);
         }
     }
 
@@ -451,6 +565,13 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         switch (item.getItemId()) {
 
+            case R.id.saveLiveChart:
+
+                if (mLineChart.getLineData() != null)
+                    ChartUtilityHelperClass.saveLiveChartToFile(mLineChart, mContext, mLiveChartStartTime, null, true);
+                else Toast.makeText(mContext, "No chart data to save!", Toast.LENGTH_SHORT).show();
+                break;
+
             case R.id.startLogging:
                 if (BluetoothConnectionService.getInstance().getCurrentState() != BluetoothConnectionService.STATE_CONNECTED) {
                     Snackbar.make(view, R.string.bluetooth_not_connected, Snackbar.LENGTH_SHORT).show();
@@ -459,6 +580,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
                 if (item.getIcon() == null) {
                     mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController);
+                    mLoggerStartTime = System.currentTimeMillis();
                     startLogger();
                 } else {
                     // stop recording icon is showing so show confirmation dialog. If user presses yes
@@ -466,6 +588,17 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                     showAlertDialog(TERMINATE_LOGGING_SESSION);
                 }
                 return true;
+
+            case R.id.displayLiveChart:
+
+                if (mLineChart.getVisibility() == VISIBLE) {
+                    makeViewsVisible(view);
+                } else {
+                    makeViewsInvisible(view);
+                }
+
+                getActivity().invalidateOptionsMenu();
+                break;
 
             case R.id.controllerReset:
                 mSerialSendAgent.sendCommand(TC01_RESET_COMMAND);
@@ -478,11 +611,13 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         return false;
     }
 
+
     @Override
     public void onDetach() {
 
-        Log.d(TAG, "onDetach: called, removing displayUpdate callback from mHandler");
+        d(TAG, "onDetach: called, removing displayUpdate callback from mHandler");
         mHandler.removeCallbacks(mDisplayUpdateRunnable);
+        mHandler.removeCallbacks(mLiveChartRunnable);
         if (mIsLoggingData) {
             pauseLogger();
         }
@@ -492,7 +627,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
     @Override
     public void onAttach(Context context) {
-        Log.d(TAG, "onAttach: called");
+        d(TAG, "onAttach: called");
         super.onAttach(context);
         mContext = context;
 
@@ -502,6 +637,11 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
                 String responseToCommandSent = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
                 mResponseReceived = true;
+                if ((mCommandSent.equals(TC01_TEMP_QUERY) || mCommandSent.equals(TC01_SET_QUERY)) && responseToCommandSent.equals(TC01_INFINITY)) {
+                    // invalid response from T or C
+                    Log.d(TAG, "onReceive: received 1999.9, command: " + mCommandSent);
+                    return;
+                }
                 if (String.valueOf(responseToCommandSent.charAt(0)).equals("I")) {
                     //timeout interrupt char received
                     showSnackBar();
@@ -513,20 +653,17 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 }
                 if (responseToCommandSent.contains(TC01_UTL_INT)) {
                     Snackbar.make(view, "UTL interrupt received. Controller temperature exceeded UTL", Snackbar.LENGTH_INDEFINITE).show();
-                    Log.d(TAG, "onReceive: UTL interrupt, turning off switch");
+                    d(TAG, "onReceive: UTL interrupt, turning off switch");
                     turnOffChamberSwitch();
                     return;
                 }
-                String action = intent.getAction();
-                Log.d(TAG, "Broadcast received: \n action: " + action + "\n" + "Command Sent: " +
-                        mCommandSent + "\n" + "Response: " + responseToCommandSent);
+
                 updateView(mCommandSent, responseToCommandSent);
             }
         };
 
         LocalBroadcastManager.getInstance(context).registerReceiver(mDispTempBroadcastReceiver, new IntentFilter(BluetoothConnectionService.MY_INTENT_FILTER));
     }
-
 
     /**
      * method used to update the ChamberModel object and textViews according to response from bluetooth
@@ -539,9 +676,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
 
         //verify that response is numeric
         if (!isNumeric(responseToCommandSent)) {
-
-            // TODO: 1/2/2018 temporary code!!
-            Toast.makeText(mContext, "response was not numeric, ignoring data", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "updateView: response was not numeric, ignoring data");
             return;
         }
         switch (commandSent) {
@@ -551,28 +686,12 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 mTemperatureController.setTimeStampOfReading(System.currentTimeMillis());
                 mTemperatureController.setCh1Reading(responseToCommandSent);
                 mTextViewTemp.setText(String.format("%s C", mTemperatureController.getCh1Reading()));
-                if (mIsLandscape) {
-
-                    float xValue = (mTemperatureController.getTimeStampOfReading() - mStartTime) / 60000f;
-                    float yValue = Float.parseFloat(mTemperatureController.getCh1Reading());
-                    mLineDataSetTemps.addEntry(new Entry(xValue, yValue));
-                }
                 break;
 
             case TC01_SET_QUERY:
 
                 mTemperatureController.setCurrentSetPoint(responseToCommandSent);
                 mTextViewSetTemp.setText(String.format("%s C", mTemperatureController.getCurrentSetPoint()));
-                if (mIsLandscape && mLineDataSetTemps.getEntryCount() > 0) {
-                    //if no entries, then index out of bound exception occurs
-                    float xValue = (mTemperatureController.getTimeStampOfReading() - mStartTime) / 60000f;
-                    float yValue = Float.parseFloat(mTemperatureController.getCurrentSetPoint());
-                    mLineDataSetSetPoints.addEntry(new Entry(xValue, yValue));
-                    mLineChart.setData(mLineData);
-                    mLineData.notifyDataChanged();
-                    mLineChart.notifyDataSetChanged();
-                    mLineChart.invalidate();
-                }
                 break;
 
             case TC01_WAIT_QUERY:
@@ -596,7 +715,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 break;
 
             default:
-                Log.d(TAG, "Unknown command sent: " + commandSent + " response: " + responseToCommandSent);
+                d(TAG, "Unknown command sent: " + commandSent + " response: " + responseToCommandSent);
                 break;
         }//end of switch statement
     }
@@ -620,7 +739,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
             return (test > 1800);
 
         } catch (NumberFormatException e) {
-            Log.d(TAG, "isWaitForever: numberformat exception");
+            d(TAG, "isWaitForever: numberformat exception");
             return false;
         }
 
@@ -647,50 +766,116 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop: called");
+        d(TAG, "onStop: called");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart: called");
+        Log.d(TAG, "onStart: called, deleting TEMP FILE and checking if chart is visible");
+        ChartUtilityHelperClass.deleteFile(getContext(), TEMP_FILE);
+        if (mChartVisible) makeViewsInvisible(view);
+        else makeViewsVisible(view);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause: called");
+        d(TAG, "onPause: called");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: called");
-
+        d(TAG, "onResume: called");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: called");
-        SharedPreferences prefs = getActivity().getSharedPreferences(getActivity().getPackageName(), MODE_PRIVATE);
-        prefs.edit().putBoolean(LOGGING_STATE, mIsLoggingData).apply();
-        Log.d(TAG, "storing saved preference in: " + getActivity().getPackageName());
-        Log.d(TAG, "mIsLogginData value is " + mIsLoggingData);
-        prefs.edit().putBoolean(SWITCH_STATE, mSwitchOnOff.isChecked()).apply();
+        d(TAG, "onDestroy: called, storing state to prefs, saving chart");
+        ChartUtilityHelperClass.saveLiveChartToFile(mLineChart, getContext(), mLiveChartStartTime, TEMP_FILE, false);
+        storeStateToPrefs();
+    }
+
+    private void storeStateToPrefs() {
+        //this is required when DispTempFrag is destroyed and new one created. This can happen when
+        //another fragment is visible when phone is rotated to landscape. Only visible fragment is retained
+        //The state is restored to false in IntroActivity's onDestroy. Don't put in HomeActivity as it's onDestroy
+        //is called when screen is rotate
+
+        Log.d(TAG, "storeStateToPrefs: called");
+        PreferenceSetting.storeLiveChartVisibility(getContext(), mChartVisible);
+        PreferenceSetting.storeLoggingState(getContext(), mIsLoggingData);
+        PreferenceSetting.storeSwitchState(getContext(), mSwitchOnOff.isChecked());
+        PreferenceSetting.storeStartTime(getContext(), mLiveChartStartTime);
+        PreferenceSetting.storeLoggerStartTime(getContext(), mLoggerStartTime);
         if (mIsLoggingData && mTemperatureLogWriter != null) {
-            prefs.edit().putString(FILE_NAME, mTemperatureLogWriter.getFileName()).apply();
+            PreferenceSetting.storeFileName(getContext(), mTemperatureLogWriter.getFileName());
+        }
+        PreferenceSetting.storeControllerOn(getContext(), mControllerOn);
+    }
+
+    private void restorStateFromPrefs() {
+        Log.d(TAG, "restorStateFromPrefs: called since controller was NULL and state not retained");
+        mChartVisible = PreferenceSetting.getLiveChartVisibility(getContext());
+        mControllerOn = PreferenceSetting.getControllerOn(getContext());
+        mLiveChartStartTime = PreferenceSetting.getStartTime(getContext());
+        mIsLoggingData = PreferenceSetting.getLoggingState(getContext());
+        mLoggerStartTime = PreferenceSetting.getLoggerStartTime(getContext());
+        if (mIsLoggingData) {
+            String fileName = PreferenceSetting.getFileName(getContext());
+            if (fileName != null) {
+                mTemperatureLogWriter = new TemperatureLogWriter(getContext(), mTemperatureController, fileName);
+            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState: called, storing boolean value mIsoggingData: " + mIsLoggingData);
+        d(TAG, "onSaveInstanceState: called, storing state variable to outState bundle");
         outState.putBoolean(LOGGING_STATE, mIsLoggingData);
         outState.putSerializable(TEMP_CONTROLLER, mTemperatureController);
+        outState.putBoolean(CONTROLLER_ON, mControllerOn);
+        outState.putLong(START_TIME, mLiveChartStartTime);
+        outState.putLong(LOGGER_START_TIME, mLoggerStartTime);
+        outState.putBoolean(CHART_VISIBLE, mChartVisible);
         if (mIsLoggingData) {
             outState.putString(FILE_NAME, mTemperatureLogWriter.getFileName());
         }
+
         super.onSaveInstanceState(outState);
     }
+
+    /*******************************called from AsynTask pre,post execute methods********************
+     /**
+     * called from Async task LoadChartTask in postexecute method
+     * @param lineData data from to populate chart
+     */
+    @Override
+    public void setLineData(LineData lineData) {
+
+        Log.d(TAG, "setLineData: called, populating chart data and restarting livechart runnable");
+        progressBar.setVisibility(View.INVISIBLE);
+        mLineData = lineData;
+        mLineDataSetTemps = (LineDataSet) mLineData.getDataSetByLabel("TEMP", true);
+        mLineDataSetSetPoints = (LineDataSet) mLineData.getDataSetByLabel("SET", true);
+        initializeChartLabels();
+        refreshChart();
+        taskBusy = false;
+        mHandler.postDelayed(mLiveChartRunnable, LIVE_CHART_INIT_DELAY_MS);
+    }
+
+    /**
+     * called from LoadChartTask's pre execute method
+     */
+    @Override
+    public void initialize() {
+
+        Log.d(TAG, "initialize: called, removing liveChart runnable");
+        mHandler.removeCallbacks(mLiveChartRunnable);
+        taskBusy = true;
+        progressBar.setVisibility(VISIBLE);
+    }
+    //*********************************************************************************************/
 }

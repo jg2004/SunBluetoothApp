@@ -20,7 +20,9 @@ import com.sunelectronics.sunbluetoothapp.R;
 import com.sunelectronics.sunbluetoothapp.activities.BluetoothStartUp;
 import com.sunelectronics.sunbluetoothapp.activities.HomeActivity;
 import com.sunelectronics.sunbluetoothapp.bluetooth.BluetoothConnectionService;
+import com.sunelectronics.sunbluetoothapp.utilities.ChartUtilityHelperClass;
 import com.sunelectronics.sunbluetoothapp.utilities.Constants;
+import com.sunelectronics.sunbluetoothapp.utilities.PreferenceSetting;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -30,6 +32,7 @@ import java.io.InputStreamReader;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.START_DISCOVERY;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TAG_FRAGMENT_HELP_DIALOG;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_FILE;
 
 
 public class IntroFragment extends Fragment implements View.OnClickListener {
@@ -73,6 +76,7 @@ public class IntroFragment extends Fragment implements View.OnClickListener {
 
             case R.id.buttonConnect:
 
+                restoreDefaults();
                 if (BluetoothConnectionService.getInstance().getCurrentState() == BluetoothConnectionService.STATE_NONE) {
                     Log.d(TAG, "onClick: not connected, starting BluetoothStartup class");
                     Intent intent = new Intent(getContext(), BluetoothStartUp.class);
@@ -151,4 +155,15 @@ public class IntroFragment extends Fragment implements View.OnClickListener {
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.homeContainer, fragment, tag).commit();
     }
+
+
+    private void restoreDefaults() {
+        Log.d(TAG, "restoreDefaults: called, deleting temp.txt chart file and restoring defaults in prefs");
+        PreferenceSetting.storeLiveChartVisibility(getContext(), false);
+        PreferenceSetting.storeLoggingState(getContext(), false);
+        PreferenceSetting.storeSwitchState(getContext(), false);
+        PreferenceSetting.storeControllerOn(getContext(), false);
+        ChartUtilityHelperClass.deleteFile(getContext(), TEMP_FILE);
+    }
+
 }
