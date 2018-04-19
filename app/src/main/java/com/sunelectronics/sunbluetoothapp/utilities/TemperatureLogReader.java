@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.LOG_FILES_DIRECTORY;
+import static com.sunelectronics.sunbluetoothapp.utilities.Constants.TEMP_FILE;
 
 public class TemperatureLogReader {
 
@@ -35,6 +36,12 @@ public class TemperatureLogReader {
             Toast.makeText(mContext, "File does not exist", Toast.LENGTH_LONG).show();
             return false;
         }
+    }
+
+    public boolean fileExists(String fileName) {
+
+        File file = new File(mContext.getFilesDir() + File.separator + LOG_FILES_DIRECTORY, fileName);
+        return file.exists();
     }
 
     public boolean deleteAllFilesInLogFilesDirectory() {
@@ -60,8 +67,10 @@ public class TemperatureLogReader {
         File[] files = logFilesDirectory.listFiles();
         if (files != null) {
             for (File f : files) {
-                fileObjectList.add(new LogFileObject(f.getName(), f.length()));
-                Log.d(TAG, "getLogFileObjects: added " + f.getName() + " to list");
+                if (!f.getName().equalsIgnoreCase(TEMP_FILE)) {
+                    fileObjectList.add(new LogFileObject(f.getName(), f.length()));
+                    Log.d(TAG, "getLogFileObjects: added " + f.getName() + " to list");
+                }
             }
         }
         return fileObjectList;

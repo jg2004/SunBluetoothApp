@@ -31,11 +31,15 @@ public abstract class TemperatureController implements Serializable {
     String name, utlQueryCommand, ltlqueryCommand;
     private String ch1Reading, currentSetPoint;
     ArrayList<String> pollingCommands;
-    ArrayList<String> chartCommands;
     private int mPollCommandIterator;
     int mResourceLayout;
     private long timeStampOfReading;
     private static final String TAG = "TemperatureController";
+
+    public boolean hasNonNullCh1AndSet() {
+
+        return ch1Reading != null && currentSetPoint != null;
+    }
 
     public String getUtlCommand() {
         return utlCommand;
@@ -173,7 +177,6 @@ public abstract class TemperatureController implements Serializable {
     public String getCoolDisableCommand() {
         return coolDisableCommand;
     }
-
 
 
     public static String getName(String controllerType) {

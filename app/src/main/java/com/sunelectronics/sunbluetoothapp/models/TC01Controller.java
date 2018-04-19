@@ -23,8 +23,8 @@ public class TC01Controller extends TemperatureController {
         setQueryCommand = TC01_SET_QUERY;
         cycleNumberQuery = TC01_CYCLE_QUERY;
         pollingCommands.add(ch1QueryCommand);
-        pollingCommands.add(waitQueryCommand);
         pollingCommands.add(setQueryCommand);
+        pollingCommands.add(waitQueryCommand);
         pollingCommands.add(cycleNumberQuery);
         mResourceLayout = R.layout.fragment_tc01_display;
         utlQueryCommand = TC01_UTL_QUERY;

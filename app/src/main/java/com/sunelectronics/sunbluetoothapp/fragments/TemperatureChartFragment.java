@@ -1,7 +1,6 @@
 package com.sunelectronics.sunbluetoothapp.fragments;
 
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,22 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.sunelectronics.sunbluetoothapp.R;
-
-import java.util.ArrayList;
+import com.sunelectronics.sunbluetoothapp.interfaces.ChartDataCallback;
+import com.sunelectronics.sunbluetoothapp.utilities.ChartUtilityHelperClass;
+import com.sunelectronics.sunbluetoothapp.utilities.LoadChartTask;
 
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_DATA;
 import static com.sunelectronics.sunbluetoothapp.utilities.Constants.CHART_TITLE;
 
-public class TemperatureChartFragment extends Fragment {
+public class TemperatureChartFragment extends Fragment implements ChartDataCallback {
     private static final String TAG = "TemperatureChartFragmen";
     private String mLogFileContents;
     private LineChart mLineChart;
@@ -46,8 +40,8 @@ public class TemperatureChartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: called");
         View view = inflater.inflate(R.layout.fragment_chart, container, false);
-         mLineChart = (LineChart) view.findViewById(R.id.lineChart);
-         mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        mLineChart = (LineChart) view.findViewById(R.id.lineChart);
+        mSupportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         Log.d(TAG, "onCreateView: orientation is: " + getActivity().getResources().getConfiguration().orientation);
 
         if (mSupportActionBar != null && getActivity().getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
@@ -57,75 +51,16 @@ public class TemperatureChartFragment extends Fragment {
         return view;
     }
 
-    private void populateChart(final LineChart lineChart) {
+    private void populateChart() {
 
-        String[] mLogFileContentsArray = mLogFileContents.split("\n");
-        Log.d(TAG, "onCreateView: mLogFileContents split into: " + mLogFileContentsArray.length + " lines");
-        String chartTitle = mLogFileContentsArray[0];
-        String[] headers = mLogFileContentsArray[1].split(",");
-        int yValuesToPlot = headers.length - 1;
-        yValuesToPlot = yValuesToPlot > 6 ? 6 : yValuesToPlot;//plot no more than 6 values since color array has only 6 values
-        final String[] xValues = new String[mLogFileContentsArray.length - 2];
-
-        // an arraylist of arraylist<Entry>
-        ArrayList<ArrayList<Entry>> yValuesArrayList = new ArrayList<>();
-
-        for (int i = 0; i < yValuesToPlot; i++) {
-            yValuesArrayList.add(new ArrayList<Entry>());
-        }
-
-        for (int i = 0; i < mLogFileContentsArray.length - 2; i++) {
-
-            String[] row = mLogFileContentsArray[i + 2].split(",");
-            xValues[i] = row[0];
-            for (int j = 0; j < yValuesToPlot; j++) {
-
-                float temp;
-                //try catch is used to catch non -numeric values such as SET=NONE
-                try {
-                    temp = Float.parseFloat(row[j + 1]);
-                } catch (NumberFormatException e) {
-                    temp = 0f;
-                }
-                yValuesArrayList.get(j).add(new Entry(i, temp));
-            }
-        }
-
-        int[] colorArray = {Color.BLUE, Color.GREEN, Color.BLACK, Color.CYAN, Color.DKGRAY, Color.MAGENTA};
-        Log.d(TAG, "onCreateView: size of xValues: " + xValues.length);
-        LineDataSet[] lineDataSetArray = new LineDataSet[yValuesToPlot];
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-
-        for (int i = 0; i < yValuesToPlot; i++) {
-            lineDataSetArray[i] = new LineDataSet(yValuesArrayList.get(i), headers[i + 1]);
-            lineDataSetArray[i].setDrawCircles(false);
-            lineDataSetArray[i].setDrawValues(false);
-            lineDataSetArray[i].setColor(colorArray[i]);
-            dataSets.add(lineDataSetArray[i]);
-        }
-
-        lineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return xValues[(int) value];
-            }
-        });
-
-        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        Description description = new Description();
-        description.setText(chartTitle + " Points: " + xValues.length);
-        description.setTextSize(12);
-
-        lineChart.setDescription(description);
-        lineChart.setData(new LineData(dataSets));
-
+        LoadChartTask task = new LoadChartTask(this);
+        task.execute(mLogFileContents);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        populateChart(mLineChart);
-
+        populateChart();
     }
 
     @Override
@@ -133,4 +68,35 @@ public class TemperatureChartFragment extends Fragment {
         mSupportActionBar.hide();
         super.onStop();
     }
+
+    /*******************************called from AsynTask pre,post execute methods**********************/
+
+    @Override
+    public void initialize() {
+        Log.d(TAG, "initialize: called");
+        //can put a progress bar in layout and set to visible here if desired
+    }
+
+    @Override
+    public void setLineData(LineData lineData) {
+
+        Log.d(TAG, "setLineData: called");
+        int entryCount = lineData.getDataSets().get(0).getEntryCount();
+        mLineChart.setData(lineData);
+        ChartUtilityHelperClass.formatChart(mLineChart);
+        Description description = ChartUtilityHelperClass.getFormattedDescription();
+        String chartTitle = ChartUtilityHelperClass.getChartTitleFromFileContents(mLogFileContents);
+        description.setText(chartTitle + " Points: " + entryCount);
+        mLineChart.setDescription(description);
+        refreshChart();
+    }
+
+    /**********************************************************************************************/
+
+    private void refreshChart() {
+        //notify  LineChart data has changed
+        mLineChart.notifyDataSetChanged();
+        mLineChart.invalidate();
+    }
+
 }
