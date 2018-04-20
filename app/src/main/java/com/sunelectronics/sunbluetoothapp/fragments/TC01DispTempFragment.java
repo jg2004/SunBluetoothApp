@@ -273,7 +273,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
                 if (isChecked) {
 
                     mMissedResponses = 0;
-                    d(TAG, "onCheckedChanged: starting display update runnable");
+                    d(TAG, "onCheckedChanged: starting display and livechart runnable");
                     mHandler.postDelayed(mDisplayUpdateRunnable, COMMAND_SEND_DELAY_MS);
                     mHandler.postDelayed(mLiveChartRunnable, LIVE_CHART_INIT_DELAY_MS);
                     if (!mControllerOn) {
@@ -436,7 +436,6 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         float setPoint = Float.parseFloat(mTemperatureController.getCurrentSetPoint());
         mLineDataSetSetPoints.addEntry(new Entry(xValue, setPoint));
         refreshChart();
-
     }
 
     private void refreshChart() {
@@ -855,7 +854,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
     @Override
     public void setLineData(LineData lineData) {
 
-        Log.d(TAG, "setLineData: called, populating chart data and restarting livechart runnable");
+        Log.d(TAG, "setLineData: called, populating chart data");
         progressBar.setVisibility(View.INVISIBLE);
         mLineData = lineData;
         mLineDataSetTemps = (LineDataSet) mLineData.getDataSetByLabel("TEMP", true);
@@ -863,7 +862,7 @@ public class TC01DispTempFragment extends Fragment implements IChamberOffSwitch,
         initializeChartLabels();
         refreshChart();
         taskBusy = false;
-        mHandler.postDelayed(mLiveChartRunnable, LIVE_CHART_INIT_DELAY_MS);
+        //No need to restart livechart runnable as it is started when switch is checked
     }
 
     /**

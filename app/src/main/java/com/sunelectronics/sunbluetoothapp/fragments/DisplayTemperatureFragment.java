@@ -368,7 +368,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
                     stopLogger();
                     return;
                 }
-                Log.d(TAG, "run: inside displayupdate runnable");
                 // this checks if no response to the initial STATUS? command is sent, as in the case where controller has no
                 // power or faulty RS232 setting such as baud rate not 9600 or Handshaking turne on.
                 // It then turns off switch off and displays message. It's initally false, then
@@ -822,9 +821,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
                 mControllerResponding = true;
                 String commandSent = intent.getStringExtra(BluetoothConnectionService.COMMAND_SENT);
                 String responseToCommandSent = intent.getStringExtra(BluetoothConnectionService.BLUETOOTH_RESPONSE);
-                String action = intent.getAction();
-                Log.d(TAG, "Broadcast received: \n action: " + action + "\n" + "Command Sent: " +
-                        commandSent + "\n" + "Response: " + responseToCommandSent);
                 updateView(commandSent, responseToCommandSent);
             }
         };
@@ -850,8 +846,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
                     //if it's not, then display is out of sync with controller responses
                     //re-sync by clearing out array of commands written list
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    // TODO: 1/2/2018 temporary code!!
-                    Toast.makeText(mContext, "chamber temp was not numeric, clear command list to re-sync", Toast.LENGTH_LONG).show();
                     break;
                 }
                 mTemperatureController.setTimeStampOfReading(System.currentTimeMillis());
@@ -879,8 +873,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
             case PC_SET_QUERY_COMMAND:
                 if (!isNumeric(responseToCommandSent) && !responseToCommandSent.contains("NONE")) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    // TODO: 1/2/2018 temporary code!!
-                    Toast.makeText(mContext, "set temp was not numeric and not NONE", Toast.LENGTH_LONG).show();
                     break;
                 }
                 if (responseToCommandSent.contains("NONE")) {
@@ -897,8 +889,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
 
                 if (!responseToCommandSent.contains(":") && !responseToCommandSent.contains("FOREVER")) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    // TODO: 1/2/2018 temporary code!!
-                    Toast.makeText(mContext, "Wait time did not contain colon symbol", Toast.LENGTH_LONG).show();
                     break;
                 }
                 if (responseToCommandSent.contains("FOREVER")) {
@@ -915,8 +905,6 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
                     //if it's not, then display is out of sync with controller responses
                     //re-sync by clearing out array of commands written list
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    // TODO: 1/2/2018 temporary code!!
-                    Toast.makeText(mContext, "rate was not numeric, clear command list to re-sync", Toast.LENGTH_LONG).show();
                     break;
                 }
                 mTextViewRate.setText(responseToCommandSent);
@@ -931,11 +919,9 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
                     mSwitchOnOff.setChecked(false);
                 }
 
-                // TODO: 1/2/2018 temporary code!!
 
                 if (responseToCommandSent.length() < 12) {
                     BluetoothConnectionService.getInstance().clearCommandsWrittenList();
-                    Toast.makeText(getContext(), "Status length less than 12, re-syncing", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mControllerStatus.setStatusMessages(responseToCommandSent);
@@ -1058,7 +1044,7 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
     @Override
     public void setLineData(LineData lineData) {
 
-        Log.d(TAG, "setLineData: called, populating chart data and restarting livechart runnable");
+        Log.d(TAG, "setLineData: called, populating chart data");
         progressBar.setVisibility(View.INVISIBLE);
         mLineData = lineData;
         mLineDataSetTemps = (LineDataSet) mLineData.getDataSetByLabel(mTemperatureController.getCh1Label(), true);
@@ -1069,7 +1055,7 @@ public class DisplayTemperatureFragment extends Fragment implements IChamberOffS
         initializeChartLabels();
         refreshChart();
         taskBusy = false;
-        mHandler.postDelayed(mLiveChartRunnable, LIVE_CHART_INIT_DELAY_MS);
+        //no need to restart livechart runnable as it is started when switch is checked
     }
 
     /**
